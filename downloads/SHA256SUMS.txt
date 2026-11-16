@@ -1,0 +1,2 @@
+8953e0e256118803bac38f852054f48a5bc6fb8f4efdde57305100d8521ceeec  OpenMap_SketchUp_0.1.0.rbz
+b3039c5fbfe8dec1c0c98cb17f5e0ce19cfa47f2eaffa46e2a2da3855859853b  OpenMap_SketchUp_Open_Source_0.1.0.zip

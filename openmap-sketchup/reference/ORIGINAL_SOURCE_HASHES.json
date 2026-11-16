@@ -1,0 +1,13 @@
+{
+  "mapskp.rb": "56e6ee7cb22520c972ec4ceaea0acdccc33f71b91228aedcd03c26b6d858e6d4",
+  "mapskp/runtime_bootstrap.rb": "8ecd6471df114c6f948033f0b79c2ad046347bc9b669bb08be09e1eff00f2e56",
+  "mapskp/distribution_profile.json": "1a3f03e21adf718f9dcf5682772fb913ecaececbcc8a545b30ae8f7ef29ccb5b",
+  "mapskp/map_importer.rb": "61cc1dc34a2bdd912a51a44de7e349c26714a31b38d3f5ba6a4ae32f2ed0600f",
+  "mapskp/main.rb": "732589e566adb2efdeb3cd9293c0251a26697fc867247aabab20b9c92086e458",
+  "mapskp/bridge/map_bridge_server.py": "2d6882007e338fea62ca9f6e23aeee6b0ad2b2555f8f86aa90904b3ea428b5fc",
+  "mapskp/ui/index.html": "92c8fd2dfab39f3cce927d6b53e3df7138c54d9a3a3392e082f5932ad1b47b5a",
+  "mapskp/ui/icons/mapskp_avatar_256.png": "ded5eda00543f2454476a7e9f8e870cef370b1b2433be77e299c7f284e4ec16f",
+  "mapskp/ui/icons/mapskp_avatar_64.png": "4917e49a59198a3b03fe84e7b6cf2deca216c0393c48c60b494dcb24e9f84382",
+  "mapskp/ui/icons/mapskp_avatar_24.png": "82d536b002ce4177284e6318f70849bdcb9d7bac056f352d0a5534539b61a39d",
+  "mapskp/ui/icons/mapskp_avatar_16.png": "ec5220c75823023ced0f1f892cdcb9820fa6cd5e77aae1083075624389fc56b1"
+}

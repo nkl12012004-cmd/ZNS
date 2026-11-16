@@ -1,0 +1,12 @@
+{
+  "version": "2.8.1",
+  "build_number": 20801,
+  "protocol_rev": 2,
+  "edition": "Commercial_SaaS_Armored",
+  "distribution_mode": "saas",
+  "auto_open_first_install": true,
+  "zero_scare_customer_ui": false,
+  "armored_native_cpp": true,
+  "requires_server_projection_grant": true,
+  "saas_backend_url": "https://api.hiepd5.com"
+}
