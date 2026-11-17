@@ -234,7 +234,7 @@ class OriginalApplicationTests(unittest.TestCase):
         for module in self.app.original_engine._load():
             self.assertEqual(Path(module.__file__).resolve().parent,self.app.original_engine.kernel_dir)
             self.assertEqual(Path(module.__file__).suffix,'.py')
-            source=Path(module.__file__).read_text()
+            source=Path(module.__file__).read_text(encoding='utf-8')
             self.assertNotIn('marshal.loads(',source)
             self.assertNotIn('exec(',source)
         self.network.assert_not_called();self.authentication.assert_not_called()
