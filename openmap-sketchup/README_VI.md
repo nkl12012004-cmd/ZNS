@@ -1,4 +1,4 @@
-# OpenMap SketchUp 0.1.0
+# OpenMap SketchUp 0.2.0 — Windows Full
 
 Bản viết lại nguồn mở độc lập theo yêu cầu: **đăng nhập Email/Google qua Supabase,
 không ví xu, không tín dụng, không mua gói, không tính lượt dựng/nạp/xuất.**
@@ -10,6 +10,20 @@ bản quyền ban đầu; giấy phép MIT của mã mới không áp dụng cho
 Các tệp lõi mã hóa, thư viện native và dịch vụ tài khoản thương mại của bản gốc
 không được dùng. Vì vậy, tài khoản Email/Google thuộc **dự án Supabase do bạn
 cấu hình**, không tự động dùng dữ liệu tài khoản/dịch vụ của nhà cung cấp cũ.
+
+## Cài bản Windows Full
+
+Tải **OpenMap_SketchUp_Full_0.2.0_Windows_x64.rbz** trong GitHub Release,
+cài qua Extension Manager rồi đóng/mở lại SketchUp. Python 3.14.10,
+Pillow 12.3.0 và OCR Tesseract 5.5.1/English đã được đóng kèm.
+
+Mở OpenMap, chờ runtime tự cài và khởi động, sau đó nhập Project URL và
+public key Supabase trong nút **Cấu hình**. Không cần cài Python/pip hoặc
+chạy server/terminal riêng trong chế độ Windows tự chứa.
+
+[Hướng dẫn Windows Full từng bước](docs/INSTALL_WINDOWS_FULL_VI.md).
+Các bước cấu hình file và chạy server bằng terminal ở phần dưới dành cho
+nhà phát triển hoặc chế độ máy chủ riêng.
 
 ## Tính năng đã triển khai
 
@@ -51,10 +65,10 @@ chọn vùng, không phải cam kết sai số hình học 0 mm ở mọi vĩ đ
 ## Yêu cầu
 
 - SketchUp Desktop có Ruby API/HtmlDialog, mục tiêu SketchUp 2021 trở lên.
-- Python 3.10+ và Pillow; có thể chạy máy chủ trên cùng máy hoặc máy chủ riêng.
+- Bản Windows Full đã kèm Python/Pillow/OCR. Cách chạy máy chủ riêng cần Python 3.10+ và Pillow.
 - Một dự án Supabase với URL và **public anon/publishable key**.
 - Internet để xác thực và tải dữ liệu bản đồ/DEM/OSM.
-- Tesseract OCR và dữ liệu ngôn ngữ `eng` nếu cần đọc tọa độ từ ảnh.
+- OCR Tesseract và `eng` đã có trong bản Full; chỉ cài riêng khi dùng server tùy chỉnh.
   Đặt đường dẫn chương trình vào `TESSERACT_BIN` trong `.env` nếu chưa có trong PATH.
 
 ## 1. Cấu hình Supabase
@@ -78,13 +92,14 @@ PUBLIC_BASE_URL=http://127.0.0.1:8877
 6. Google Authorized redirect URI là callback mà Supabase hiển thị, thường:
    `https://YOUR_PROJECT.supabase.co/auth/v1/callback`.
 7. Trong Supabase Authentication → URL Configuration → Redirect URLs, thêm:
-   `http://127.0.0.1:8877/auth/callback**`.
+   `http://127.0.0.1:*/auth/callback**` cho bản Full dùng cổng động;
+   server riêng có thể dùng URL/cổng cố định của bạn.
 
 Google đăng nhập trong trình duyệt mặc định. Khi báo hoàn tất, quay lại SketchUp;
 extension tự nhận phiên qua luồng PKCE. Authorization code chỉ dùng một lần;
 trình duyệt không nhận access token qua URL của OpenMap.
 
-## 2. Chạy máy chủ
+## 2. Chạy máy chủ riêng — chỉ dành cho chế độ nâng cao
 
 Windows PowerShell, mở từ thư mục dự án:
 
@@ -117,11 +132,11 @@ HTTP server để phục vụ trực tiếp mật khẩu/token qua HTTP trên m�
 
 ## 3. Cài extension
 
-Trong gói nguồn ZIP có `install/OpenMap_SketchUp_0.1.0.rbz`.
+Trong gói nguồn ZIP có `install/OpenMap_SketchUp_Full_0.2.0_Windows_x64.rbz`.
 
 1. SketchUp → Extension Manager → Install Extension… → chọn file RBZ.
 2. Mở Extensions → OpenMap SketchUp → Mở OpenMap hoặc bấm icon toolbar.
-3. Bấm Cấu hình nếu máy chủ không ở địa chỉ mặc định.
+3. Đóng/mở lại SketchUp. Trong Cấu hình chọn tự chạy cục bộ và điền Supabase; hoặc chọn máy chủ riêng nếu cần.
 4. Đăng nhập Email hoặc Google, chọn vùng và bấm Dựng bản đồ.
 5. Khi xong, bấm Nạp vào SketchUp hoặc Xuất OBJ + ảnh.
 6. Để lưu SKP, chọn Group OpenMap trong mô hình rồi bấm Lưu SKP đã chọn.
@@ -179,6 +194,8 @@ npm run test:ui
 npm run test:ruby
 ```
 
-Đóng gói từ thư mục dự án: `python tools/build.py`.
+Tạo runtime: `python tools/prepare_runtime.py`. Đóng gói: `python tools/build.py`.
+Runtime dùng các bản phát hành và SHA-256 trong `tools/runtime.lock.json`;
+không cần tự cài pip vào runtime. GitHub Windows workflow kiểm tra gói trước khi tạo Release.
 Xem `docs/VALIDATION.md` để biết kết quả và giới hạn kiểm tra của bản bàn giao.
 Xem `docs/FEATURE_PORT.md` để đối chiếu tính năng cũ và phần đã chuyển sang.

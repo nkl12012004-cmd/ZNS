@@ -688,3 +688,6 @@ font-size:18px;
 line-height:1;
 min-width:28px}
 
+.setup-overlay{position:fixed;inset:0;z-index:500;background:#122b3270;backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:18px}
+.setup-card{width:510px;max-width:100%;max-height:92vh;overflow:auto;padding:25px}
+.setup-card h3{font-size:15px;margin:22px 0 7px}.setup-card p{font-size:12px}.setup-card label{font-size:12px}#setup-form{border-top:1px solid #cbd8cf;margin-top:18px}#setup-runtime{margin:15px 0}.setup-card #setup-message{white-space:pre-wrap;font-size:12px}.dark .setup-card{background:#182331!important}#runtime-progress{margin-top:12px}#runtime-retry{font-size:11px;margin-top:8px}

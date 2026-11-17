@@ -1,0 +1,51 @@
+{
+  "schema": "openmap.runtime.lock.v1",
+  "python_version": "3.14.10",
+  "pillow_version": "12.3.0",
+  "tesseract_version": "5.5.1",
+  "tesseract_package_version": "5.5.2",
+  "leptonica_version": "1.85.0",
+  "platform": "windows-x64",
+  "downloads": {
+    "python.zip": {
+      "url": "https://www.python.org/ftp/python/3.14.10/python-3.14.10-embed-amd64.zip",
+      "sha256": "90905e64a840557d8c1bc4f5b74db3d7ee85e3ffb217611cac1c7813acea4159",
+      "size": 12619664
+    },
+    "pillow.whl": {
+      "url": "https://files.pythonhosted.org/packages/f1/e0/492879f69d94f91f60fc8cd05ba03650e9520afebb2fb7aa12777d7c7f38/pillow-12.3.0-cp314-cp314-win_amd64.whl",
+      "sha256": "fdafc9cce40277e0f7a0feabce0ee50dd2fa1800f3b38015e51296b5e814048d",
+      "size": 7237707
+    },
+    "tesseract-modern.nupkg": {
+      "url": "https://api.nuget.org/v3-flatcontainer/tesseractocr/5.5.2/tesseractocr.5.5.2.nupkg",
+      "sha256": "2d11e0a45f8f5887d91277dd61e4b2b57423be0e06aefba432484ebc33a8a794",
+      "size": 9319776
+    },
+    "eng.traineddata": {
+      "url": "https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/4.1.0/eng.traineddata",
+      "sha256": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2",
+      "size": 4113088
+    },
+    "TESSERACT_LICENSE.txt": {
+      "url": "https://raw.githubusercontent.com/tesseract-ocr/tesseract/5.5.1/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "size": 11358
+    },
+    "LEPTONICA_LICENSE.txt": {
+      "url": "https://raw.githubusercontent.com/DanBloomberg/leptonica/1.85.0/leptonica-license.txt",
+      "sha256": "87829abb5bbb00b55a107365da89e9a33f86c4250169e5a1e5588505be7d5806",
+      "size": 1521
+    },
+    "TESSDATA_LICENSE.txt": {
+      "url": "https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/4.1.0/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "size": 11358
+    },
+    "vclibs.appx": {
+      "url": "https://download.microsoft.com/download/4/7/c/47c6134b-d61f-4024-83bd-b9c9ea951c25/Microsoft.VCLibs.x64.14.00.Desktop.appx",
+      "sha256": "b56a9101f706f9d95f815f5b7fa6efbac972e86573d378b96a07cff5540c5961",
+      "size": 6764349
+    }
+  }
+}

@@ -8,15 +8,22 @@ import subprocess
 from PIL import Image
 
 from .net import PublicError
+from . import native_ocr
 
 
 def binary(configured=None):
     return configured or os.environ.get("TESSERACT_BIN") or shutil.which("tesseract")
 
 
+def available(configured=None):
+    return bool(binary(configured) or native_ocr.available())
+
+
 def recognize(body, configured=None):
     program = binary(configured)
-    if not program:
+    if native_ocr.available() and not configured and not os.environ.get("TESSERACT_BIN"):
+        program = None
+    if not program and not native_ocr.available():
         raise PublicError("OCR cần Tesseract trên máy chủ. Bạn vẫn có thể dán tọa độ hoặc link Google Maps.", 503)
     encoded = body.get("image")
     if not isinstance(encoded, str) or len(encoded) > 8_000_000:
@@ -27,6 +34,8 @@ def recognize(body, configured=None):
             if max(image.size) > 8192:
                 raise PublicError("Ảnh OCR quá lớn; cắt vùng chứa tọa độ trước.")
             image.thumbnail((3000, 3000))
+            if not program:
+                return {"text": native_ocr.recognize(image)}
             stream = BytesIO(); image.convert("RGB").save(stream, "PNG")
         result = subprocess.run([program, "stdin", "stdout", "-l", "eng", "--psm", "6"], input=stream.getvalue(), stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=40, check=False)
         if result.returncode:

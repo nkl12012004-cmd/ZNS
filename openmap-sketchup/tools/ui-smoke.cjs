@@ -14,16 +14,19 @@ const { pathToFileURL } = require('node:url');
   const png = fs.readFileSync(path.join(root, 'extension/openmap_sketchup/ui/icon.png'));
   await page.route('https://tile.openstreetmap.org/**', route => route.fulfill({ contentType: 'image/png', body: png }));
   await page.addInitScript(() => {
-    window.testState = { token: null, apiCalls: [], imported: 0 };
+    window.testState = { token: null, apiCalls: [], imported: 0, configured: false, runtimePolls: 0, restarts: 0 };
     window.sketchup = { openmap(raw) {
       const message = JSON.parse(raw), a = message.args, s = window.testState;
       let result = { ok: true, data: {} };
       const session = { access_token: 'ui-valid-token', refresh_token: 'ui-refresh', user: { email: 'test@example.org' } };
-      if (message.action === 'config') result.data = { server: 'http://127.0.0.1:8877', anchor: null };
+      if (message.action === 'config') result.data = { server: 'http://127.0.0.1:50001', mode: 'bundled', version: '0.2.0', anchor: null };
+      if (message.action === 'runtime_status') { s.runtimePolls++; result.data = s.runtimePolls < 2 ? { state: 'preparing', progress: 40, mode: 'bundled', message: 'Đang cài bộ xử lý' } : { state: 'ready', progress: 100, mode: 'bundled', message: 'Bộ xử lý sẵn sàng' }; }
+      if (message.action === 'runtime_restart') { s.restarts++; s.runtimePolls = 0; s.token = null; }
       if (message.action === 'session') s.token = a.access_token;
       if (message.action === 'api') {
         s.apiCalls.push({ method: a.method, path: a.path, body: a.body });
-        if (a.path === '/health') result.data = { auth_configured: true, version: 'test' };
+        if (a.path === '/health') result.data = { auth_configured: s.configured, ocr_available: true, version: 'test' };
+        else if (a.path === '/api/runtime/config') { if (a.method === 'POST') s.configured = true; result.data = { supabase_url: '', public_key: '', auth_configured: s.configured, redirect_url: 'http://127.0.0.1:*/auth/callback**' }; }
         else if (a.path === '/api/auth/login') result = a.body.password === 'correct-test-password' ? { ok: true, data: session } : { ok: false, status: 401, error: 'Email hoặc mật khẩu không đúng.' };
         else if (a.path === '/api/auth/google/start') result.data = { flow_id: 'test-flow', poll_secret: 'test-secret', authorize_url: 'https://test.supabase.co/auth/v1/authorize?provider=google' };
         else if (a.path.indexOf('/api/auth/google/status?') === 0) result.data = { state: 'ready', session };
@@ -41,7 +44,13 @@ const { pathToFileURL } = require('node:url');
     } };
   });
   await page.goto(pathToFileURL(path.join(root, 'extension/openmap_sketchup/ui/index.html')).href);
-  await page.locator('#connection').filter({ hasText: 'sẵn sàng' }).waitFor();
+  await page.locator('#setup-overlay').waitFor();
+  assert(await page.locator('#login-button').isDisabled());
+  await page.locator('#setup-url').fill('https://test.supabase.co');
+  await page.locator('#setup-key').fill('test-public-key');
+  await page.locator('#setup-save').click();
+  await page.locator('#setup-overlay').waitFor({ state: 'hidden' });
+  await page.waitForFunction(() => !document.getElementById('login-button').disabled);
   assert(await page.locator('#workspace').isHidden());
   await page.locator('#email').fill('test@example.org');
   await page.locator('#password').fill('wrong-password');
@@ -90,7 +99,13 @@ const { pathToFileURL } = require('node:url');
   await page.locator('#google').click();
   await page.locator('#workspace').waitFor();
   assert.equal(await page.locator('#account-email').textContent(), 'test@example.org');
+  await page.locator('#settings').click();
+  await page.locator('#setup-overlay').waitFor();
+  await page.locator('#setup-restart').click();
+  await page.locator('#login').waitFor();
+  await page.waitForFunction(() => !document.getElementById('login-button').disabled);
+  assert.equal(await page.evaluate(() => window.testState.restarts), 1);
   assert.deepEqual(errors, []);
   await browser.close();
-  console.log('UI PASS: login/Google, decimal/DMS coordinates, manual/automatic import, OBJ/GLB, theme, WebGL 3D/wireframe, responsive layout and logout. SketchUp bridge and auth responses are fixtures.');
+  console.log('UI PASS: first-run runtime progress, Supabase setup, login/Google, decimal/DMS coordinates, manual/automatic import, OBJ/GLB, theme, WebGL 3D/wireframe, responsive layout, logout and worker restart. Native bridge/auth responses are fixtures.');
 })().catch(error => { console.error(error); process.exit(1); });

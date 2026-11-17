@@ -13,7 +13,7 @@
     <section class="intro"><span class="eyebrow">SKETCHUP · MAPS · TERRAIN</span><h1>Bắt đầu từ<br>một địa điểm.</h1><p>Ảnh vệ tinh, địa hình và dữ liệu đường, nhà — trong cùng một mô hình SketchUp.</p><div class="tags"><span>Nền phẳng</span><span>Địa hình DEM</span><span>OpenStreetMap</span></div><p class="fine">OpenMap là bản viết lại độc lập, mã nguồn MIT.</p></section>
     <section class="card signin"><h2>Đăng nhập</h2><p class="muted">Tiếp tục bằng Email hoặc Google để mở không gian bản đồ.</p>
       <form id="login-form"><label>Email<input id="email" type="email" autocomplete="username" required maxlength="320"></label><label>Mật khẩu<input id="password" type="password" autocomplete="current-password" required maxlength="4096"></label><button id="login-button" class="primary" type="submit">Đăng nhập bằng Email</button></form>
-      <button id="google" class="google">Tiếp tục với Google</button><button id="signup" class="quiet full">Tạo tài khoản bằng Email</button><small id="connection" class="muted">Đang kết nối máy chủ…</small>
+      <button id="google" class="google">Tiếp tục với Google</button><button id="signup" class="quiet full">Tạo tài khoản bằng Email</button><small id="connection" class="muted">Đang khởi động bộ xử lý…</small><progress id="runtime-progress" value="0" max="100"></progress><button id="runtime-retry" class="quiet full" hidden>Thử khởi động lại bộ xử lý</button>
     </section>
   </main>
   <main id="workspace" hidden>
@@ -49,6 +49,21 @@
     </section></div>
     <footer>Ảnh: Esri và các nhà cung cấp dữ liệu · Đường/nhà: © OpenStreetMap contributors · Cao độ: Mapzen Terrain Tiles. Thông tin nguồn được lưu trong từng mảnh và tệp xuất.</footer>
   </main>
+  <div id="setup-overlay" class="setup-overlay" hidden><section class="card setup-card" role="dialog" aria-modal="true" aria-labelledby="setup-title">
+    <div class="heading"><h2 id="setup-title">Cấu hình OpenMap</h2><button id="setup-close" type="button" class="quiet">Đóng</button></div>
+    <p id="setup-runtime" class="muted">Đang kiểm tra bộ xử lý…</p>
+    <label>Bộ xử lý<select id="setup-mode"><option value="bundled">Tự chạy trên máy Windows này</option><option value="remote">Máy chủ riêng — nâng cao</option></select></label>
+    <div id="setup-remote" hidden><label>Địa chỉ máy chủ<input id="setup-server" placeholder="https://maps.example.com"></label><p class="fine">Supabase được cấu hình trên máy chủ riêng. Dùng HTTPS khi kết nối qua mạng.</p></div>
+    <button id="setup-apply-mode" type="button">Áp dụng chế độ</button>
+    <form id="setup-form"><h3>Đăng nhập Supabase</h3><p class="muted">Lấy hai giá trị public trong phần API của dự án Supabase của bạn.</p>
+      <label>Project URL<input id="setup-url" type="url" placeholder="https://your-project.supabase.co" required></label>
+      <label>Public anon / publishable key<input id="setup-key" type="password" autocomplete="off" placeholder="sb_publishable_… hoặc anon JWT" required></label>
+      <p class="fine">Chỉ dùng public key; không dùng service_role, secret key hoặc mật khẩu. Cấu hình được lưu trên máy này.</p>
+      <label>Redirect URL cho Google<input id="setup-redirect" readonly value="http://127.0.0.1:*/auth/callback**"></label>
+      <p class="fine">Thêm URL này trong Supabase → Authentication → URL Configuration → Redirect URLs; bật Google provider nếu dùng đăng nhập Google.</p>
+      <button id="setup-save" type="submit" class="primary full">Lưu cấu hình Supabase</button>
+    </form><p id="setup-message" class="muted" role="status"></p><div class="utility-row"><button id="setup-restart" type="button">Khởi động lại bộ xử lý</button><button id="setup-logs" type="button">Mở thư mục cấu hình / log</button></div>
+  </section></div>
   <script src="viewer.js"></script><script src="app.js"></script>
 </body>
 </html>

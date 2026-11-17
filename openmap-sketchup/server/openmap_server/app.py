@@ -13,6 +13,7 @@ from .builder import build, export_obj, parameters
 from .formats import export_glb, preview_mesh
 from . import ocr
 from .net import PublicError, fetch_json
+from .local_runtime import save_config, validate_public_config
 
 
 class Application:
@@ -24,6 +25,15 @@ class Application:
         self.pool = ThreadPoolExecutor(max_workers=2, thread_name_prefix="openmap")
         self.search_lock = threading.Lock()
         self.last_search = 0
+
+    def require_local(self, headers):
+        token = self.config.get("OPENMAP_LOCAL_TOKEN", "")
+        if not token or not secrets.compare_digest(token, headers.get("X-OpenMap-Local", "")):
+            raise PublicError("Yêu cầu cấu hình cục bộ không hợp lệ.", 403)
+
+    def check_transport(self, headers):
+        if self.config.get("OPENMAP_LOCAL_TOKEN"):
+            self.require_local(headers)
 
     def close(self):
         with self.lock:
@@ -67,8 +77,30 @@ class Application:
             return job
 
     def route(self, method, path, query, headers, body):
+        self.check_transport(headers)
         if method == "GET" and path == "/health":
-            return {"name": "OpenMap SketchUp", "version": VERSION, "auth_configured": self.auth.configured, "ocr_available": bool(ocr.binary(self.config.get("TESSERACT_BIN")))}
+            import platform
+            import PIL
+            return {"name": "OpenMap SketchUp", "version": VERSION, "auth_configured": self.auth.configured, "ocr_available": ocr.available(self.config.get("TESSERACT_BIN")),
+                    "instance": self.config.get("OPENMAP_INSTANCE_ID", ""), "python": platform.python_version(), "pillow": PIL.__version__}
+        if path == "/api/runtime/config" and method in ("GET", "POST"):
+            self.require_local(headers)
+            if method == "POST":
+                url, key = validate_public_config(body)
+                replacement = {**self.config, "SUPABASE_URL": url, "SUPABASE_ANON_KEY": key}
+                auth = SupabaseAuth(url, key, self.config["PUBLIC_BASE_URL"])
+                path_config = self.config.get("OPENMAP_CONFIG_FILE")
+                if not path_config:
+                    raise PublicError("Chưa đặt đường dẫn cấu hình cục bộ.", 500)
+                save_config(path_config, replacement)
+                with self.lock:
+                    for job in self.jobs.values():
+                        job['cancel'].set()
+                    self.jobs.clear()
+                    self.config.update(SUPABASE_URL=url, SUPABASE_ANON_KEY=key)
+                    self.auth = auth
+            return {"supabase_url": self.config.get("SUPABASE_URL", ""), "public_key": self.config.get("SUPABASE_ANON_KEY", ""), "auth_configured": self.auth.configured,
+                    "redirect_url": "http://127.0.0.1:*/auth/callback**"}
         if method == "POST" and path.startswith("/api/auth/"):
             action = path.removeprefix("/api/auth/")
             if action in ("login", "signup", "refresh"):
@@ -168,6 +200,11 @@ def handler_for(application):
                     return self.send(200, "<!doctype html><meta charset=utf-8><title>OpenMap</title><h1>Đã đăng nhập</h1><p>Quay lại SketchUp để tiếp tục. Bạn có thể đóng trang này.</p>".encode(), "text/html; charset=utf-8")
                 if self.headers.get("Origin"):
                     raise PublicError("API này dành cho ứng dụng SketchUp.", 403)
+                application.check_transport(self.headers)
+                if self.command == "POST" and target.path == "/api/runtime/shutdown":
+                    application.require_local(self.headers)
+                    threading.Thread(target=self.server.shutdown, daemon=True).start()
+                    return self.send(200, {"ok": True})
                 length = self.headers.get("Content-Length", "0")
                 maximum = 12_000_000 if target.path == "/api/ocr" else 65_536
                 if not length.isdigit() or int(length) > maximum:

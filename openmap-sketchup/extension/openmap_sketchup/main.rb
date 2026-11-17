@@ -5,6 +5,7 @@ require 'json'
 require 'uri'
 require_relative 'importer'
 require_relative 'linking'
+require_relative 'runtime'
 
 module OpenMapSketchUp
   module Core
@@ -12,8 +13,25 @@ module OpenMapSketchUp
     @contexts = {}
     @token = nil
 
+    def self.mode
+      value = Sketchup.read_default('OpenMapSketchUp', 'mode', '').to_s
+      return value if %w[bundled remote].include?(value)
+      old = Sketchup.read_default('OpenMapSketchUp', 'server', 'http://127.0.0.1:8877')
+      old == 'http://127.0.0.1:8877' ? 'bundled' : 'remote'
+    end
+
+    def self.managed?
+      mode == 'bundled'
+    end
+
     def self.base_url
-      Sketchup.read_default('OpenMapSketchUp', 'server', 'http://127.0.0.1:8877')
+      managed? ? Runtime.base_url : Sketchup.read_default('OpenMapSketchUp', 'server', 'http://127.0.0.1:8877')
+    end
+
+    def self.start_runtime
+      return unless managed?
+      executable = Sketchup.find_support_file('SketchUp.exe').to_s
+      Runtime.start(File.join(__dir__, 'server'), executable.empty? ? nil : File.dirname(executable))
     end
 
     def self.valid_base!(raw)
@@ -28,12 +46,12 @@ module OpenMapSketchUp
     end
 
     def self.settings
-      result = UI.inputbox(['URL máy chủ OpenMap'], [base_url], 'Cấu hình OpenMap')
-      return unless result
-      Sketchup.write_default('OpenMapSketchUp', 'server', valid_base!(result[0].strip))
-      @token = nil
-      @auth_session = nil
-      @dialog.execute_script('window.location.reload()') if @dialog && @dialog.visible?
+      @open_settings = true
+      if @dialog && @dialog.visible?
+        @dialog.execute_script('if(window.OpenMap && window.OpenMap.openSettings){window.OpenMap.openSettings();}')
+      else
+        show
+      end
     rescue StandardError => error
       UI.messagebox(error.message)
     end
@@ -52,11 +70,13 @@ module OpenMapSketchUp
     end
 
     def self.http(method, path, body, extra_headers = {}, &callback)
+      raise 'Bộ xử lý đang khởi động. Đợi thông báo sẵn sàng hoặc mở Cấu hình để thử lại.' if managed? && Runtime.status['state'] != 'ready'
       raise 'Đường dẫn API không hợp lệ.' unless path.is_a?(String) && path.bytesize <= 2048 && path =~ %r{\A/(?:api/[A-Za-z0-9_/?=&%.+\-]+|health)\z}
       methods = { 'GET' => Sketchup::Http::GET, 'POST' => Sketchup::Http::POST, 'DELETE' => Sketchup::Http::DELETE }
       raise 'Phương thức HTTP không hợp lệ.' unless methods.key?(method)
       request = Sketchup::Http::Request.new(valid_base!(base_url) + path, methods[method])
       headers = { 'Content-Type' => 'application/json' }
+      headers['X-OpenMap-Local'] = Runtime.transport_token if managed?
       headers['Authorization'] = 'Bearer ' + @token if @token
       if extra_headers['X-Flow-Secret'].is_a?(String) && extra_headers['X-Flow-Secret'].length <= 256
         headers['X-Flow-Secret'] = extra_headers['X-Flow-Secret']
@@ -68,7 +88,7 @@ module OpenMapSketchUp
       request.start do |_req, response|
         @requests.delete(key)
         if response.nil?
-          callback.call(nil, 'Không kết nối được máy chủ. Kiểm tra server/run.py và URL cấu hình.')
+          callback.call(nil, managed? ? 'Bộ xử lý cục bộ chưa phản hồi. Mở Cấu hình và bấm Khởi động lại.' : 'Không kết nối được máy chủ riêng. Kiểm tra URL trong Cấu hình.')
         elsif response.body && response.body.bytesize > 140_000_000
           callback.call(nil, 'Phản hồi quá lớn. Chia vùng thành mảnh nhỏ hơn.')
         else
@@ -87,7 +107,37 @@ module OpenMapSketchUp
     def self.invoke(id, action, args)
       case action
       when 'config'
-        reply(id, { 'ok' => true, 'data' => { 'server' => base_url, 'anchor' => Importer.anchor(Sketchup.active_model), 'session' => @auth_session } })
+        reply(id, { 'ok' => true, 'data' => { 'server' => base_url, 'mode' => mode, 'version' => OpenMapSketchUp::VERSION, 'anchor' => Importer.anchor(Sketchup.active_model), 'session' => @auth_session, 'open_settings' => @open_settings } })
+      when 'runtime_status'
+        start_runtime if managed? && Runtime.status['state'] == 'idle'
+        state = managed? ? Runtime.status : { 'state' => 'ready', 'progress' => 100, 'message' => 'Đang dùng máy chủ riêng' }
+        reply(id, { 'ok' => true, 'data' => state.merge('mode' => mode) })
+      when 'runtime_restart'
+        raise 'Chỉ dùng khởi động lại cho bộ xử lý cục bộ.' unless managed?
+        Runtime.stop
+        @token = @auth_session = nil
+        start_runtime
+        reply(id, { 'ok' => true, 'data' => {} })
+      when 'ack_settings'
+        @open_settings = false
+        reply(id, { 'ok' => true, 'data' => {} })
+      when 'set_mode'
+        target = args['mode']
+        raise 'Chế độ bộ xử lý không hợp lệ.' unless %w[bundled remote].include?(target)
+        if target == 'remote'
+          url = valid_base!(args['server'].to_s.strip)
+          Sketchup.write_default('OpenMapSketchUp', 'server', url)
+        end
+        Runtime.stop
+        Sketchup.write_default('OpenMapSketchUp', 'mode', target)
+        @token = @auth_session = nil
+        reply(id, { 'ok' => true, 'data' => {} })
+      when 'open_runtime_folder'
+        path = Runtime.state_root.tr('\\', '/')
+        FileUtils.mkdir_p(path)
+        encoded = path.split('/').map { |part| URI::DEFAULT_PARSER.escape(part, /[^A-Za-z0-9\-._~:]/) }.join('/')
+        UI.openURL('file:///' + encoded.sub(%r{\A/+}, ''))
+        reply(id, { 'ok' => true, 'data' => {} })
       when 'settings'
         settings
         reply(id, { 'ok' => true, 'data' => {} })
@@ -210,6 +260,7 @@ module OpenMapSketchUp
     end
 
     def self.show
+      start_runtime
       if @dialog && @dialog.visible?
         @dialog.bring_to_front
         return
@@ -242,6 +293,7 @@ module OpenMapSketchUp
       toolbar.restore
       @toolbar = toolbar
       Linking.install
+      Runtime.observe
       file_loaded(__FILE__)
     end
   end

@@ -1,3 +1,24 @@
+# Validation — Windows Full 0.2.0
+
+- 25 server tests pass locally, including local transport, Supabase config,
+  persistence, token separation and rejection of secret/service_role keys.
+- First-run progress, Supabase setup and restart are checked in Playwright
+  in addition to the existing map/auth/3D/import/export flows with fixtures.
+- All Ruby files are syntax checked. The runtime archive is independently
+  unpacked and checked entry-by-entry against its SHA-256 catalog.
+- Native Windows release is gated by tools/windows-smoke.py in GitHub Actions:
+  packaged CPython/Pillow, full server tests, OCR recognition, HTTPS/OpenSSL,
+  Ruby first-start/restart, Unicode paths and parent-exit shutdown.
+- GitHub Release is published only after that native Windows job succeeds.
+
+SketchUp Desktop is not installed here or on the runner. Actual model import,
+textures, Undo and SKP placement still need a SketchUp smoke test. Real Supabase
+credentials are intentionally not provided; the user chose to enter them later.
+The implementation retains the feature limits in FEATURE_PORT.md; the encrypted
+MapSKP proprietary core was not recovered.
+
+Previous live-data / geometry validation:
+
 # Validation — 2026-11-16
 
 Passed checks:

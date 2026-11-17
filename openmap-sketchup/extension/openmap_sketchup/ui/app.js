@@ -4,6 +4,7 @@
   var pending = {}, sequence = 0, session = null, refreshPromise = null, job = null;
   var jobTimer = null, googleTimer = null, active = false, noticeTimer = null;
   var modelAnchor = null, viewMode = '2d', previewJob = null;
+  var runtimeMode = 'bundled', runtimeReady = false;
   var $ = function (id) { return document.getElementById(id); };
   $('workspace').appendChild($('search-form'));
   $('workspace').appendChild($('search-results'));
@@ -72,7 +73,57 @@
     switchView('2d');
     return native('session', { access_token: null });
   }
-  $('settings').onclick = guard(function () { return native('settings'); });
+  function loginEnabled(value) { ['login-button','google','signup'].forEach(function (id) { $(id).disabled = !value; }); }
+  function openSettings() {
+    $('setup-overlay').hidden = false;
+    $('setup-message').textContent = '';
+    $('setup-save').disabled = true;
+    native('ack_settings').catch(function () {});
+    return native('config').then(function (config) {
+      runtimeMode = config.mode || 'remote'; $('setup-mode').value = runtimeMode;
+      $('setup-server').value = config.server || 'http://127.0.0.1:8877';
+      updateSetupMode();
+      return native('runtime_status');
+    }).then(function (state) {
+      $('setup-runtime').textContent = state.message || 'Bộ xử lý đã sẵn sàng';
+      if (runtimeMode === 'bundled' && state.state === 'ready') {
+        return api('GET', '/api/runtime/config').then(function (config) {
+          $('setup-url').value = config.supabase_url || ''; $('setup-key').value = config.public_key || '';
+          $('setup-redirect').value = config.redirect_url || 'http://127.0.0.1:*/auth/callback**';
+          $('setup-save').disabled = false;
+        });
+      }
+    }).catch(function (error) { $('setup-message').textContent = error.message; });
+  }
+  window.OpenMap.openSettings = openSettings;
+  function updateSetupMode() {
+    var local = $('setup-mode').value === 'bundled';
+    $('setup-remote').hidden = local; $('setup-form').hidden = !local;
+    $('setup-restart').hidden = !local;
+  }
+  $('setup-mode').onchange = updateSetupMode;
+  $('setup-close').onclick = function () { $('setup-overlay').hidden = true; };
+  $('settings').onclick = guard(openSettings);
+  $('setup-apply-mode').onclick = guard(function () {
+    return native('set_mode', { mode: $('setup-mode').value, server: $('setup-server').value }).then(function () { window.location.reload(); });
+  });
+  $('setup-form').onsubmit = guard(function () {
+    $('setup-save').disabled = true; $('setup-message').textContent = 'Đang lưu cấu hình…';
+    return api('POST', '/api/runtime/config', { supabase_url: $('setup-url').value, public_key: $('setup-key').value }).then(function () {
+      return clearLogin();
+    }).then(function () {
+      loginEnabled(true); $('setup-overlay').hidden = true; $('connection').textContent = 'Đã cấu hình Supabase · Sẵn sàng đăng nhập';
+      tell('Đã lưu cấu hình trên máy này. Bạn có thể đăng nhập.', true);
+    }).catch(function (error) { $('setup-message').textContent = error.message; }).finally(function () { $('setup-save').disabled = false; });
+  });
+  function restartRuntime() {
+    if (active && !window.confirm('Khởi động lại sẽ dừng tác vụ đang dựng. Tiếp tục?')) return;
+    $('setup-overlay').hidden = true;
+    loginEnabled(false);
+    return clearLogin().then(function () { return native('runtime_restart'); }).then(bootRuntime);
+  }
+  $('runtime-retry').onclick = guard(restartRuntime); $('setup-restart').onclick = guard(restartRuntime);
+  $('setup-logs').onclick = guard(function () { return native('open_runtime_folder'); });
   $('login-form').onsubmit = guard(function () {
     $('login-button').disabled = true;
     return api('POST', '/api/auth/login', { email: $('email').value, password: $('password').value }).then(loggedIn).finally(function () { $('login-button').disabled = false; });
@@ -299,11 +350,33 @@
   });
   $('wireframe').onclick = function () { window.OpenMapViewer.wireframe = !window.OpenMapViewer.wireframe; window.OpenMapViewer.render(); };
   $('reset-camera').onclick = function () { window.OpenMapViewer.reset(); };
-  native('config').then(function (config) {
-    return api('GET', '/health').then(function (info) {
-      $('connection').textContent = info.auth_configured ? 'Máy chủ sẵn sàng · OpenMap ' + info.version : 'Điền cấu hình Supabase trong server/.env trước khi đăng nhập.';
-      $('ocr').title = info.ocr_available ? 'Đọc tọa độ bằng Tesseract trên máy chủ' : 'Tính năng OCR cần cài Tesseract trên máy chủ';
+  function bootRuntime() {
+    loginEnabled(false); runtimeReady = false; $('runtime-retry').hidden = true; $('runtime-progress').hidden = false;
+    var started = Date.now(), config;
+    function poll() {
+      return native('runtime_status').then(function (state) {
+        runtimeMode = state.mode || config.mode || 'remote';
+        $('runtime-progress').value = state.progress || 0; $('connection').textContent = state.message || 'Đang khởi động…';
+        if (state.state === 'error') throw new Error(state.message);
+        if (state.state === 'ready') return;
+        if (Date.now() - started > 180000) throw new Error('Bộ xử lý chưa khởi động xong. Bấm Thử lại hoặc mở Cấu hình để xem log.');
+        return new Promise(function (resolve) { setTimeout(resolve, 500); }).then(poll);
+      });
+    }
+    return native('config').then(function (value) { config = value; return poll(); }).then(function () {
+      runtimeReady = true; $('runtime-progress').hidden = true;
+      return api('GET', '/health');
+    }).then(function (info) {
+      loginEnabled(info.auth_configured);
+      $('connection').textContent = info.auth_configured ? 'Bộ xử lý sẵn sàng · OpenMap ' + info.version : 'Mở Cấu hình để nhập Project URL và public key Supabase.';
+      $('ocr').title = info.ocr_available ? 'OCR đã có sẵn trong bộ xử lý' : 'Máy chủ chưa có bộ OCR';
+      if ((runtimeMode === 'bundled' && !info.auth_configured) || config.open_settings) return openSettings();
       if (info.auth_configured && config.session) return loggedIn(config.session);
+    }).catch(function (error) {
+      $('connection').textContent = error.message; $('runtime-progress').hidden = true;
+      $('runtime-retry').hidden = runtimeMode !== 'bundled';
+      if (config && config.open_settings) return openSettings();
     });
-  }).catch(function (error) { $('connection').textContent = error.message; });
+  }
+  bootRuntime();
 }());

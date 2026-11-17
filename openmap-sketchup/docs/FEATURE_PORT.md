@@ -14,7 +14,7 @@ Gói ZIP cũ được dùng làm tài liệu và nguồn tham chiếu. Mã runti
 | Kéo góc khung vùng chọn | Có |
 | Tìm địa chỉ, tọa độ thập phân/DMS, link có tọa độ | Có |
 | Gợi ý tìm kiếm trực tiếp | Chọn địa điểm mẫu và kết quả tìm; không gửi autocomplete liên tục đến Nominatim |
-| OCR ảnh chụp/Ctrl+V ảnh | Có, cần Tesseract/eng trên máy chủ |
+| OCR ảnh chụp/Ctrl+V ảnh | Có, Tesseract/eng đóng kèm trong Windows Full |
 | Vệ tinh Esri, Google vệ tinh/hybrid/đường phố | Có; phụ thuộc khả dụng nguồn tile |
 | OSM lớp xem 2D | Có; không dùng tile OSM để tải ảnh xuất hàng loạt |
 | Ảnh 2K/4K/8K | Có, thêm 1K; 8K JPEG, tối đa 8192 |
@@ -33,6 +33,8 @@ Gói ZIP cũ được dùng làm tài liệu và nguồn tham chiếu. Mã runti
 | Không di chuyển đối tượng cũ đã có khi bật plugin | Có; observer ghi nhận các đối tượng hiện có và chỉ xét mảnh mới thêm |
 | Lõi Google Photorealistic 3D độc quyền | Không có nguồn gốc; không khôi phục |
 | Auto-update dùng chữ ký nhà phát hành cũ | Không dùng; có script đóng gói mã mới |
+| Runtime Windows tự chứa | Có, Python/Pillow/OCR; tự khởi động và dừng theo SketchUp |
+| Cấu hình Supabase trong giao diện | Có, lưu public config ở LocalAppData |
 | Đăng nhập | Supabase Email/Google của dự án người dùng |
 | Xu/tín dụng/gói trả phí/referral/đếm lượt | Không có trong runtime mới |
 
