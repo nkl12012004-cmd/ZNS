@@ -1,4 +1,4 @@
-# Validation — Windows Full 0.2.1
+# Validation — Windows Full 0.2.2
 
 - 28 server tests passed locally. New cases build and retrieve geometry in local
   mode without a Supabase project, verify the private IPC token is still required,
@@ -16,7 +16,7 @@
   the fix on the user's machine or actual geometry API import/Undo/placement.
 
 Historical checks below refer to versions 0.2.0 and 0.1.0. Their mandatory
-Supabase/login instructions do not apply to Windows Full 0.2.1.
+Supabase/login instructions do not apply to Windows Full 0.2.2.
 
 # Validation — Windows Full 0.2.0
 

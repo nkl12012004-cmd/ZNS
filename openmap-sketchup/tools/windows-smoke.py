@@ -25,7 +25,7 @@ def main():
     if os.name != 'nt': raise SystemExit('This test must run on native Windows x64.')
     with tempfile.TemporaryDirectory(prefix='OpenMap bản đầy đủ ') as folder:
         path = Path(folder)
-        rbz = next((ROOT/'dist').glob('OpenMap_SketchUp_Full_0.2.1_Windows_x64.rbz'))
+        rbz = next((ROOT/'dist').glob('OpenMap_SketchUp_Full_0.2.2_Windows_x64.rbz'))
         installed = path/'SketchUp Plugins thử nghiệm'
         with zipfile.ZipFile(rbz) as archive: archive.extractall(installed)
         plugin = installed/'openmap_sketchup'

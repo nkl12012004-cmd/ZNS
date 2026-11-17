@@ -1,9 +1,9 @@
-# OpenMap SketchUp 0.2.1 — Windows Full, mở thẳng bản đồ
+# OpenMap SketchUp 0.2.2 — Windows Full, mở thẳng bản đồ
 
 **Không cần đăng nhập, tài khoản hoặc Supabase khi dùng bản Windows Full.**
 Không có xu, tín dụng, gói trả phí hoặc tính lượt xuất.
 
-[Tải bộ cài Full 0.2.1](https://github.com/nkl12012004-cmd/ZNS/releases/download/openmap-v0.2.1/OpenMap_SketchUp_Full_0.2.1_Windows_x64.rbz).
+[Tải bộ cài Full 0.2.2](https://github.com/nkl12012004-cmd/ZNS/releases/download/openmap-v0.2.2/OpenMap_SketchUp_Full_0.2.2_Windows_x64.rbz).
 Cài qua Extension Manager, thoát hoàn toàn mọi cửa sổ SketchUp rồi mở lại.
 Vào Extensions → OpenMap SketchUp → Mở OpenMap; chờ bộ xử lý khởi động,
 plugin tự vào bản đồ. Không cần điền cấu hình xác thực.
@@ -12,7 +12,7 @@ plugin tự vào bản đồ. Không cần điền cấu hình xác thực.
 Bản đồ/DEM/OSM cần Internet để tải dữ liệu. Bộ xử lý cục bộ chỉ nhận lệnh
 có mã kết nối riêng của phiên SketchUp, không phải máy chủ truy cập công khai.
 
-Bản 0.2.1 thay đường gọi API cục bộ gây lỗi HTTP 0 bằng kết nối loopback
+Bản 0.2.2 thay đường gọi API cục bộ gây lỗi HTTP 0 bằng kết nối loopback
 trực tiếp, bỏ proxy cho kết nối này và trả kết quả về luồng UI của SketchUp.
 Nếu khởi động lỗi, Cấu hình cho phép khởi động lại và mở log.
 
@@ -134,7 +134,7 @@ HTTP server để phục vụ trực tiếp mật khẩu/token qua HTTP trên m�
 
 ## 3. Cài extension
 
-Trong gói nguồn ZIP có `install/OpenMap_SketchUp_Full_0.2.1_Windows_x64.rbz`.
+Trong gói nguồn ZIP có `install/OpenMap_SketchUp_Full_0.2.2_Windows_x64.rbz`.
 
 1. SketchUp → Extension Manager → Install Extension… → chọn file RBZ.
 2. Mở Extensions → OpenMap SketchUp → Mở OpenMap hoặc bấm icon toolbar.

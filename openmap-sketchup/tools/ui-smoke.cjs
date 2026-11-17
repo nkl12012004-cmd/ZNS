@@ -20,7 +20,7 @@ const { pathToFileURL } = require('node:url');
       const message = JSON.parse(raw), a = message.args, s = window.testState;
       let result = { ok: true, data: {} };
       const session = { access_token: 'ui-valid-token', refresh_token: 'ui-refresh', user: { email: 'test@example.org' } };
-      if (message.action === 'config') result.data = { server: 'http://127.0.0.1:50001', mode: s.mode, version: '0.2.1', anchor: null };
+      if (message.action === 'config') result.data = { server: 'http://127.0.0.1:50001', mode: s.mode, version: '0.2.2', anchor: null };
       if (message.action === 'runtime_status') { s.runtimePolls++; result.data = s.runtimePolls < 2 ? { state: 'preparing', progress: 40, mode: s.mode, message: 'Đang cài bộ xử lý' } : { state: 'ready', progress: 100, mode: s.mode, message: 'Bộ xử lý sẵn sàng' }; }
       if (message.action === 'runtime_restart') { s.restarts++; s.runtimePolls = 0; s.token = null; s.failHealth = false; }
       if (message.action === 'session') s.token = a.access_token;
