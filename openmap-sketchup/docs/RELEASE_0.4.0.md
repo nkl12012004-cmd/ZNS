@@ -10,9 +10,9 @@ hình tham chiếu người dùng.
 Người dùng đã xác nhận công bố bản này cùng năm mô-đun nguồn khôi phục trong
 `nkl12012004-cmd/ZNS` ngày 17/11/2026, theo giờ Việt Nam.
 Release `sitecraft-v0.4.0` được công bố sau khi kiểm tra Windows của đúng gói đạt.
-Kết quả kiểm tra Windows đầy đủ chưa được ghi nhận tại thời điểm cập nhật này.
+Kiểm tra Windows đầy đủ đã đạt: [run 44022035961](https://github.com/nkl12012004-cmd/ZNS/actions/runs/44022035961), 86 bài đạt và hai bỏ qua đúng điều kiện; OCR, HTTPS và vòng đời Ruby/worker đạt.
 
-Liên kết tải có hiệu lực khi Release được công bố:
+Tệp phát hành:
 
 - [Bộ cài Windows Full](https://github.com/nkl12012004-cmd/ZNS/releases/download/sitecraft-v0.4.0/SiteCraft_Full_0.4.0_Windows_x64.rbz).
 - [Gói mã nguồn](https://github.com/nkl12012004-cmd/ZNS/releases/download/sitecraft-v0.4.0/SiteCraft_Source_0.4.0.zip).

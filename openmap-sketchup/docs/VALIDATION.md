@@ -104,21 +104,23 @@ sau khi chốt nguồn/manifest/runtime. Build ghi tệp và checksum; Release
 
 ## Trạng thái kiểm tra Windows của gói đầy đủ
 
-Lượt CI cho đúng gói SiteCraft 0.4.0, bao gồm năm mô-đun nguồn khôi phục, đang
-được chuẩn bị/chạy; chưa có kết quả cuối trong tài liệu này. Không dùng run
-dependency công khai 44017165169 để thay thế lượt kiểm tra đầy đủ này. Khi CI
-đạt, gói được phát hành tại [sitecraft-v0.4.0](https://github.com/nkl12012004-cmd/ZNS/releases/tag/sitecraft-v0.4.0).
+[Windows Full run 44022035961](https://github.com/nkl12012004-cmd/ZNS/actions/runs/44022035961) đã đạt trên gói tạo từ commit `81dd65637f765f58365a54eb3375eab0cffd3feb`.
+
+- 88 bài máy chủ: 86 đạt, hai bỏ qua đúng điều kiện (interpreter không hỗ trợ và fixture cục bộ không nằm trên runner).
+- Bộ dựng phục hồi chạy qua API HTTP, giữ mảng/UV/texture, bộ ghi và mốc/hệ số cao độ.
+- CPython 3.14.10/Pillow 12.2.0; Tesseract 5.5.0 đọc đúng ảnh tọa độ mẫu; HTTPS/OpenSSL đạt.
+- Ruby Core HTTP, nonce, đường dẫn Unicode, khởi động lại và dừng worker theo tiến trình cha đạt. Ca transport dùng engine độc lập offline; ca HTTP phục hồi chạy riêng bằng nguồn gốc.
+- Gói phát hành được tải lại: SHA-256 và CRC đạt; RBZ trong ZIP nguồn trùng RBZ phát hành.
+
+Đây vẫn không phải kiểm tra nạp/lưu SKP trong SketchUp Desktop thật. Không có SketchUpAPI.dll trên runner.
 
 ## Các kiểm tra còn cần trên môi trường đích
 
-- Chạy bộ runtime Windows cho đúng RBZ SiteCraft 0.4.0; mã phục hồi hiện mới
-  chạy tích hợp trên Linux. Kết quả dependency Windows không thay thế kiểm tra đó.
 - Dùng Windows thật với `SketchUpAPI.dll` tương thích để ghi SKP, rồi mở tệp bằng
   SketchUp Desktop. Chưa tạo hoặc xác minh SKP native thật trong các ca trên.
 - Nạp mesh/texture trong SketchUp, kiểm tra Undo, Group/Tag, bóng nắng, vị trí mảnh,
   lưu SKP và nâng cấp từ cài đặt cũ. Ruby fixture không mô phỏng geometry API.
-- Chạy Windows OCR với ảnh thật, ngôn ngữ OCR đã cài và fallback Tesseract của
-  runtime. Fixture subprocess không chứng minh Windows OCR có sẵn trên máy.
+- Thử OCR trên ảnh địa điểm của người dùng; PowerShell/Windows.Media.Ocr trong nguồn OCR gốc chưa được chạy thực. Tesseract đang dùng đã đọc ảnh mẫu thật trong lượt Windows ở trên.
 - Kiểm tra trực tiếp các nhà cung cấp ảnh/tìm kiếm/OSM/DEM. Fixture và cache không
   bảo đảm dịch vụ đang truy cập được, dữ liệu đủ hoặc hình mới nhất.
 - Kiểm tra ca 8K/vùng lớn và thời gian/RAM thực trên máy đích.

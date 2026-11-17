@@ -19,9 +19,8 @@ Các gói của Release `sitecraft-v0.4.0`:
 - [SiteCraft_Source_0.4.0.zip](https://github.com/nkl12012004-cmd/ZNS/releases/download/sitecraft-v0.4.0/SiteCraft_Source_0.4.0.zip): mã nguồn, tài liệu và bộ cài trong `install/`.
 - [SHA256SUMS.txt](https://github.com/nkl12012004-cmd/ZNS/releases/download/sitecraft-v0.4.0/SHA256SUMS.txt): checksum của hai gói.
 
-Release được công bố sau khi kiểm tra Windows của đúng gói đạt. Các liên kết
-tải có hiệu lực khi Release được công bố; kết quả Windows đầy đủ chưa được
-ghi nhận tại thời điểm cập nhật tài liệu này.
+Release đã công bố sau [kiểm tra Windows đầy đủ](https://github.com/nkl12012004-cmd/ZNS/actions/runs/44022035961): 86 bài đạt, hai bài bỏ qua đúng điều kiện; OCR Tesseract, HTTPS, kết nối Ruby, khởi động lại và dừng worker theo tiến trình cha đều đạt.
+Tệp phát hành đã tải lại và kiểm tra SHA-256/CRC; bộ cài nằm trong ZIP nguồn trùng từng byte với RBZ phát hành.
 
 Mã tích hợp mới giữ giấy phép MIT; mã MapSKP khôi phục và font giữ quyền gốc.
 Chưa tìm thấy giấy phép nguồn mở cho mã gốc trong ZIP được cung cấp. Vì vậy,

@@ -24,8 +24,7 @@ thiếu UV, giữ nguyên geometry/BIN và ảnh. Giữ riêng tệp GLB gốc k
 
 Bộ dựng đầy đủ khớp 61 ca với thực thi gốc; cảnh Quỳnh Lưu dùng cache khớp
 lưới/UV/texture/metadata. Linux: 87 bài máy chủ đạt, 1 bỏ qua đúng điều kiện;
-kiểm tra UI, font, Ruby và glTF Validator đạt. Quy trình Windows Full chạy trước
-khi phát hành. SketchUp Desktop/SDK save-load thật vẫn cần xác nhận trên máy đích;
+kiểm tra UI, font, Ruby và glTF Validator đạt. [Kiểm tra Windows Full](https://github.com/nkl12012004-cmd/ZNS/actions/runs/44022035961) đã đạt: 86 bài máy chủ, OCR Tesseract, HTTPS, Ruby HTTP, restart và parent-exit cleanup; hai bài bỏ qua đúng điều kiện. SketchUp Desktop/SDK save-load thật vẫn cần xác nhận trên máy đích;
 runner không thay thế kiểm tra import, Undo và hình thức hiển thị trong SketchUp.
 Google Photorealistic 3D và backend thương mại cũ không thuộc phần đã phục hồi.
 
