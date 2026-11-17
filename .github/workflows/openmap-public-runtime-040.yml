@@ -1,0 +1,33 @@
+name: OpenMap public runtime dependencies 0.4.0
+
+on:
+  push:
+    branches: [openmap-public-runtime-040]
+    paths:
+      - 'openmap-sketchup/tools/runtime.lock.json'
+      - 'openmap-sketchup/tools/prepare_runtime.py'
+      - 'openmap-sketchup/tools/public-runtime-smoke-040.py'
+      - '.github/workflows/openmap-public-runtime-040.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-dependencies-only:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: openmap-sketchup
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build public upstream dependency runtime only
+        run: python tools/prepare_runtime.py --output .cache/public-runtime-040
+      - name: Verify native Windows imports, BLAS, JPEG and public HTTPS
+        run: python tools/public-runtime-smoke-040.py --package-root .cache/public-runtime-040
