@@ -44,10 +44,10 @@ jobs:
         run: python tools/windows-smoke.py
       - uses: actions/upload-artifact@v4
         with:
-          name: OpenMap-Windows-Full-0.2.2
+          name: OpenMap-Windows-Full-0.2.3
           path: |
-            openmap-sketchup/dist/*0.2.2*.rbz
-            openmap-sketchup/dist/*0.2.2*.zip
+            openmap-sketchup/dist/*0.2.3*.rbz
+            openmap-sketchup/dist/*0.2.3*.zip
             openmap-sketchup/dist/SHA256SUMS.txt
           if-no-files-found: error
       - name: Publish verified installer and source

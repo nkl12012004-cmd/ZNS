@@ -99,6 +99,9 @@
   $('setup-mode').onchange = updateSetupMode;
   $('setup-close').onclick = function () { $('setup-overlay').hidden = true; };
   $('settings').onclick = guard(openSettings);
+  $('setup-use-local').onclick = guard(function () {
+    return native('set_mode', { mode: 'bundled' }).then(function () { window.location.reload(); });
+  });
   $('setup-apply-mode').onclick = guard(function () {
     return native('set_mode', { mode: $('setup-mode').value, server: $('setup-server').value }).then(function () { window.location.reload(); });
   });
@@ -373,7 +376,7 @@
       runtimeReady = false; loginEnabled(false);
       $('connection').textContent = error.message; $('runtime-progress').hidden = true;
       $('runtime-retry').hidden = runtimeMode !== 'bundled';
-      if (runtimeMode === 'bundled' || (config && config.open_settings)) return openSettings();
+      return openSettings();
     });
   }
   bootRuntime();

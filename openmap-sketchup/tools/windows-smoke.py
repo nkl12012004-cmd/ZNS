@@ -25,7 +25,7 @@ def main():
     if os.name != 'nt': raise SystemExit('This test must run on native Windows x64.')
     with tempfile.TemporaryDirectory(prefix='OpenMap bản đầy đủ ') as folder:
         path = Path(folder)
-        rbz = next((ROOT/'dist').glob('OpenMap_SketchUp_Full_0.2.2_Windows_x64.rbz'))
+        rbz = next((ROOT/'dist').glob('OpenMap_SketchUp_Full_0.2.3_Windows_x64.rbz'))
         installed = path/'SketchUp Plugins thử nghiệm'
         with zipfile.ZipFile(rbz) as archive: archive.extractall(installed)
         plugin = installed/'openmap_sketchup'
@@ -52,6 +52,7 @@ with urllib.request.urlopen('https://www.python.org/robots.txt',timeout=30) as r
 print('Bundled HTTPS/OpenSSL: PASS')
 '''
         run([python,'-c',native_code,str(plugin/'server')],env={**env,'OPENMAP_OCR_DIR':str(engine/'ocr')})
+        run(['ruby',str(ROOT/'tools/mode-preferences-smoke.rb'),str(plugin)],env=env)
         run(['ruby',str(ROOT/'tools/runtime-smoke.rb'),str(plugin)],env=env)
         probe = path/'parent-probe.json'
         run(['ruby',str(ROOT/'tools/runtime-smoke.rb'),str(plugin),'--parent-exit'],env={**env,'OPENMAP_PARENT_PROBE':str(probe)})

@@ -15,10 +15,10 @@ module OpenMapSketchUp
     @token = nil
 
     def self.mode
-      value = Sketchup.read_default('OpenMapSketchUp', 'mode', '').to_s
-      return value if %w[bundled remote].include?(value)
-      old = Sketchup.read_default('OpenMapSketchUp', 'server', 'http://127.0.0.1:8877')
-      old == 'http://127.0.0.1:8877' ? 'bundled' : 'remote'
+      # The old mode/server preferences could silently select an obsolete server
+      # after installing Full. Only a choice made in the new UI enables remote.
+      value = Sketchup.read_default('OpenMapSketchUp', 'runtime_mode', 'bundled').to_s
+      %w[bundled remote].include?(value) ? value : 'bundled'
     end
 
     def self.managed?
@@ -136,7 +136,7 @@ module OpenMapSketchUp
           Sketchup.write_default('OpenMapSketchUp', 'server', url)
         end
         Runtime.stop
-        Sketchup.write_default('OpenMapSketchUp', 'mode', target)
+        Sketchup.write_default('OpenMapSketchUp', 'runtime_mode', target)
         @token = @auth_session = nil
         reply(id, { 'ok' => true, 'data' => {} })
       when 'open_runtime_folder'

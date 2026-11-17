@@ -15,15 +15,17 @@ const { pathToFileURL } = require('node:url');
   await page.route('https://tile.openstreetmap.org/**', route => route.fulfill({ contentType: 'image/png', body: png }));
   await page.addInitScript(() => {
     const remote = window.location.search.includes('remote');
-    window.testState = { token: null, apiCalls: [], imported: 0, mode: remote ? 'remote' : 'bundled', configured: remote, failHealth: window.location.search.includes('failed'), runtimePolls: 0, restarts: 0 };
+    const override = sessionStorage.getItem('test-runtime-mode');
+    window.testState = { token: null, apiCalls: [], imported: 0, mode: override || (remote ? 'remote' : 'bundled'), configured: remote, failHealth: window.location.search.includes('failed') && !override, runtimePolls: 0, restarts: 0 };
     window.sketchup = { openmap(raw) {
       const message = JSON.parse(raw), a = message.args, s = window.testState;
       let result = { ok: true, data: {} };
       const session = { access_token: 'ui-valid-token', refresh_token: 'ui-refresh', user: { email: 'test@example.org' } };
-      if (message.action === 'config') result.data = { server: 'http://127.0.0.1:50001', mode: s.mode, version: '0.2.2', anchor: null };
+      if (message.action === 'config') result.data = { server: 'http://127.0.0.1:50001', mode: s.mode, version: '0.2.3', anchor: null };
       if (message.action === 'runtime_status') { s.runtimePolls++; result.data = s.runtimePolls < 2 ? { state: 'preparing', progress: 40, mode: s.mode, message: 'Đang cài bộ xử lý' } : { state: 'ready', progress: 100, mode: s.mode, message: 'Bộ xử lý sẵn sàng' }; }
       if (message.action === 'runtime_restart') { s.restarts++; s.runtimePolls = 0; s.token = null; s.failHealth = false; }
       if (message.action === 'session') s.token = a.access_token;
+      if (message.action === 'set_mode') sessionStorage.setItem('test-runtime-mode', a.mode);
       if (message.action === 'api') {
         s.apiCalls.push({ method: a.method, path: a.path, body: a.body });
         if (a.path === '/health') result = s.failHealth ? { ok: false, status: 0, error: 'Không nhận được phản hồi hợp lệ từ bộ xử lý cục bộ.' } : { ok: true, data: { auth_mode: s.mode === 'bundled' ? 'local' : 'supabase', auth_configured: s.configured, ocr_available: true, version: 'test' } };
@@ -117,7 +119,15 @@ const { pathToFileURL } = require('node:url');
   await page.locator('#setup-restart').click();
   await page.locator('#workspace').waitFor();
   assert.equal(await page.evaluate(() => window.testState.restarts), 1);
+  // Remote failure from a retained setting exposes one-click local recovery.
+  await page.goto(pathToFileURL(path.join(root, 'extension/openmap_sketchup/ui/index.html')).href + '?remote=1&failed=1');
+  await page.locator('#setup-overlay').waitFor();
+  assert.equal(await page.locator('#setup-mode').inputValue(), 'remote');
+  await page.locator('#setup-use-local').click();
+  await page.locator('#workspace').waitFor();
+  assert.equal(await page.evaluate(() => window.testState.mode), 'bundled');
+  assert(!(await page.evaluate(() => window.testState.apiCalls)).some(c => c.path.startsWith('/api/auth/')));
   assert.deepEqual(errors, []);
   await browser.close();
-  console.log('UI PASS: direct local workspace without Supabase/login, worker failure/retry, optional remote login/Google, decimal/DMS coordinates, manual/automatic import, OBJ/GLB, theme, WebGL 3D/wireframe, responsive layout, logout and worker restart. Native bridge/auth responses are fixtures.');
+  console.log('UI PASS: direct local workspace without Supabase/login, worker failure/retry, remote failure to local recovery, optional remote login/Google, decimal/DMS coordinates, manual/automatic import, OBJ/GLB, theme, WebGL 3D/wireframe, responsive layout, logout and worker restart. Native bridge/auth responses are fixtures.');
 })().catch(error => { console.error(error); process.exit(1); });

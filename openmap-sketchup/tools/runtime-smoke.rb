@@ -10,6 +10,9 @@ require_relative 'bridge-host'
 plugin_dir = File.expand_path(ARGV.fetch(0))
 leave_running = ARGV[1] == '--parent-exit'
 require File.join(plugin_dir, 'main.rb')
+Sketchup.write_default('OpenMapSketchUp', 'mode', 'remote')
+Sketchup.write_default('OpenMapSketchUp', 'server', 'https://old-server.invalid')
+raise 'Legacy remote preferences disabled bundled startup' unless OpenMapSketchUp::Core.managed?
 runtime = OpenMapSketchUp::Runtime
 raise 'Windows x64 runner required' unless runtime.supported?
 
@@ -32,7 +35,7 @@ def rpc(runtime, path, body = nil, token = nil)
 end
 
 begin
-  runtime.start(File.join(plugin_dir, 'server'))
+  OpenMapSketchUp::Core.start_runtime
   wait_ready(runtime)
   if leave_running
     File.write(ENV.fetch('OPENMAP_PARENT_PROBE'), JSON.generate({ 'url' => runtime.base_url, 'token' => runtime.transport_token, 'state_root' => runtime.state_root }))
@@ -68,7 +71,7 @@ begin
   first_url = runtime.base_url
   runtime.stop
   sleep 1.0
-  runtime.start(File.join(plugin_dir, 'server'))
+  OpenMapSketchUp::Core.start_runtime
   wait_ready(runtime)
   status, health = rpc(runtime, '/health')
   raise 'Restart requires Supabase' unless status == 200 && health['auth_mode'] == 'local' && !health['auth_configured']

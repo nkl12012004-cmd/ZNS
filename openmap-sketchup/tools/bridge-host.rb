@@ -4,8 +4,18 @@
 module Sketchup
   class AppObserver; end
   class ModelObserver; end
-  def self.read_default(_section, _key, default)
-    default
+  @test_preferences = {}
+  def self.read_default(section, key, default)
+    @test_preferences.fetch([section, key], default)
+  end
+  def self.write_default(section, key, value)
+    @test_preferences[[section, key]] = value
+  end
+  def self.clear_test_preferences
+    @test_preferences.clear
+  end
+  def self.find_support_file(_name)
+    nil
   end
   module Http
     GET, POST, DELETE = 0, 1, 2

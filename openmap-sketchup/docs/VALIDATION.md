@@ -1,3 +1,19 @@
+# Validation — Windows Full 0.2.3
+
+- Regression host now retains preferences instead of always returning defaults.
+- Native Windows gate includes old `server` URL / `mode=remote` preferences,
+  explicit new remote selection persistence, invalid URL rejection and switching
+  back to local. The lifecycle test seeds an unreachable old server, then calls
+  actual Core.start_runtime and Core.http for local health, build and mesh/GLB.
+- Playwright checks automatic Settings after remote connection failure and
+  one-click recovery into the local workspace after reload, with no auth calls.
+- Existing packaged Python/OCR, 28 server tests, restart, Unicode paths and
+  parent-exit checks remain release gates.
+- Native SketchUp Desktop APIs are unavailable in CI. Actual user-machine
+  startup and model import/Undo/placement still require confirmation in SketchUp.
+
+Historical validation:
+
 # Validation — Windows Full 0.2.2
 
 - 28 server tests passed locally. New cases build and retrieve geometry in local
