@@ -1,5 +1,12 @@
 # Validation — Windows Full 0.2.0
 
+[Native Windows run 43996909891 passed](https://github.com/nkl12012004-cmd/ZNS/actions/runs/43996909891).
+Packaged CPython 3.14.10 and Pillow 12.3.0 passed all 25 server tests.
+The native OCR engine reports 5.5.0 (NuGet package TesseractOCR 5.5.2) and
+recognized `10.776889, 106.700806` from a generated image. HTTPS/OpenSSL,
+Ruby start/restart, Unicode install/cache paths and parent-exit cleanup passed.
+The release assets were downloaded again and matched SHA-256 and ZIP CRC.
+
 - 25 server tests pass locally, including local transport, Supabase config,
   persistence, token separation and rejection of secret/service_role keys.
 - First-run progress, Supabase setup and restart are checked in Playwright

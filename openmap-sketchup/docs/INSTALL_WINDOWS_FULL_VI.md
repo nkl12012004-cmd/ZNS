@@ -15,7 +15,7 @@ Configuration → Redirect URLs thêm `http://127.0.0.1:*/auth/callback**` vì m
 phiên SketchUp chọn cổng loopback riêng. Google Cloud redirect vẫn là callback
 của Supabase, thường `https://YOUR_PROJECT.supabase.co/auth/v1/callback`.
 
-Gói Full gồm CPython 3.14.10, Pillow 12.3.0, OCR Tesseract 5.5.1, Leptonica 1.85.0
+Gói Full gồm CPython 3.14.10, Pillow 12.3.0, OCR Tesseract 5.5.0, Leptonica 1.85.0
 và mô hình OCR tiếng Anh. OCR nhận tọa độ qua nút chọn ảnh hoặc Ctrl+V ảnh.
 Bộ xử lý tự dừng khi đóng SketchUp, kể cả khi tiến trình cha kết thúc bất thường.
 

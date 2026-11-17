@@ -13,9 +13,9 @@ cấu hình**, không tự động dùng dữ liệu tài khoản/dịch vụ c�
 
 ## Cài bản Windows Full
 
-Tải **OpenMap_SketchUp_Full_0.2.0_Windows_x64.rbz** trong GitHub Release,
+Tải [bộ cài Full 0.2.0](https://github.com/nkl12012004-cmd/ZNS/releases/download/openmap-v0.2.0/OpenMap_SketchUp_Full_0.2.0_Windows_x64.rbz),
 cài qua Extension Manager rồi đóng/mở lại SketchUp. Python 3.14.10,
-Pillow 12.3.0 và OCR Tesseract 5.5.1/English đã được đóng kèm.
+Pillow 12.3.0 và OCR Tesseract 5.5.0/English đã được đóng kèm.
 
 Mở OpenMap, chờ runtime tự cài và khởi động, sau đó nhập Project URL và
 public key Supabase trong nút **Cấu hình**. Không cần cài Python/pip hoặc
@@ -48,7 +48,7 @@ nhà phát triển hoặc chế độ máy chủ riêng.
 - Xem trước WebGL 3D: xoay, pan, zoom, căn giữa và khung dây.
 - Metadata trong SKP xuất mới, tự ghép các mảnh kéo-thả mới thêm vào mô hình;
   đọc metadata công khai `MapSKP_Meta` / `__MAPSKP_META__` của SKP cũ khi có.
-- OCR ảnh tọa độ và Ctrl+V ảnh, nếu máy chủ đã cài Tesseract.
+- OCR ảnh tọa độ và Ctrl+V ảnh; Tesseract đã được đóng kèm trong bản Windows Full.
 - Tác vụ nền, tiến độ, hủy tác vụ; mỗi tài khoản chỉ lấy được tác vụ của mình.
 
 Khối nhà là mô hình khối xấp xỉ từ OSM; map mặt đứng là ảnh tạo thủ tục,
