@@ -38,11 +38,43 @@ const { DefaultRubyVM } = require('@ruby/wasm-wasi/dist/node');
     rejected { OpenMapSketchUp::Importer.validate!(copy) }
     jpeg = ['ffd8ffc00011080020004003011100021100031100ffd9'].pack('H*')
     raise 'JPEG size parser failed' unless OpenMapSketchUp::Importer.jpeg_size(jpeg) == [64,32]
+    tile_data = {
+      'center'=>{'lat'=>0,'lon'=>0},
+      'bbox'=>{'south'=>-0.001,'north'=>0.001,'west'=>-0.001,'east'=>0.001},
+      'parameters'=>{'width'=>222.63898158654715,'height'=>221.1485516431887},
+      'hill_patch'=>false
+    }
+    reference = OpenMapSketchUp::Importer.tile_reference(tile_data)
+    raise 'Imported tile reference was rejected' unless reference && reference['center']['lat'] == 0 && reference['width'] > 222
+    tile_model = Struct.new(:stored) do
+      def get_attribute(_dictionary, _key)
+        stored
+      end
+    end.new(nil)
+    raise 'Old model without reference was not accepted' unless OpenMapSketchUp::Importer.last_tile(tile_model).nil?
+    tile_model.stored = JSON.generate(reference)
+    raise 'Saved neighbor reference was lost' unless OpenMapSketchUp::Importer.last_tile(tile_model) == reference
+    tile_data['hill_patch'] = true
+    raise 'Hill patch replaced the full tile reference' unless OpenMapSketchUp::Importer.tile_reference(tile_data).nil?
+    invalid = Marshal.load(Marshal.dump(reference))
+    invalid['center']['lat'] = Float::NAN
+    raise 'NaN tile reference was accepted' unless OpenMapSketchUp::Importer.valid_tile_reference(invalid).nil?
+    invalid = Marshal.load(Marshal.dump(reference))
+    invalid['bbox']['east'] = 179
+    raise 'Unbounded tile reference was accepted' unless OpenMapSketchUp::Importer.valid_tile_reference(invalid).nil?
+    invalid = Marshal.load(Marshal.dump(reference))
+    invalid['width'] = 100_001
+    tile_model.stored = JSON.generate(invalid)
+    raise 'Oversized tile reference was accepted' unless OpenMapSketchUp::Importer.last_tile(tile_model).nil?
+    tile_model.stored = '{broken json'
+    raise 'Corrupt old tile metadata was accepted' unless OpenMapSketchUp::Importer.last_tile(tile_model).nil?
+    tile_model.stored = 'x' * 4097
+    raise 'Oversized old tile metadata was accepted' unless OpenMapSketchUp::Importer.last_tile(tile_model).nil?
     delta = OpenMapSketchUp::Linking.offset({'lat'=>0,'lon'=>0,'elevation'=>0,'terrain_mode'=>'flat'}, {'lat'=>0,'lon'=>0.001,'elevation'=>100,'terrain_mode'=>'terrain_3d'})
     raise 'SKP georeference projection failed' unless (delta[0]-111.31949).abs < 0.001 && delta[2] == 0
     origin = OpenMapSketchUp::Linking.read_json('{"lat":10,"lon":106,"elevation_m":15,"terrain_mode":"flat"}', true)
     raise 'Legacy SKP metadata conversion failed' unless origin['elevation'] == 15 && origin['terrain_mode'] == 'flat'
-    puts 'Ruby preflight PASS: valid mesh, rejected indices/NaN/material, JPEG dimensions.'
+    puts 'Ruby preflight PASS: mesh validation, JPEG dimensions, last imported tile reference and corrupt/NaN/bounded metadata checks.'
   `);
   console.log('Ruby VM preflight assertions passed.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

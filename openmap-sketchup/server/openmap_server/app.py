@@ -14,6 +14,7 @@ from .formats import export_glb, preview_mesh
 from . import ocr
 from .net import PublicError, fetch_json
 from .local_runtime import save_config, validate_public_config
+from .geocode import Geocoder
 
 
 class Application:
@@ -25,6 +26,7 @@ class Application:
         self.pool = ThreadPoolExecutor(max_workers=2, thread_name_prefix="openmap")
         self.search_lock = threading.Lock()
         self.last_search = 0
+        self.geocoder = Geocoder()
 
     @property
     def local_access(self):
@@ -64,7 +66,10 @@ class Application:
                 raise PublicError("Mô hình quá lớn. Chia thành các mảnh nhỏ hơn.")
             with self.lock:
                 if not job["cancel"].is_set():
-                    job.update(state="complete", result=result, mesh=payload, export=exported, glb=glb, progress=100, message="Sẵn sàng nạp vào SketchUp")
+                    partial = bool(result.get("partial"))
+                    job.update(state="complete", result=result, mesh=payload, export=exported, glb=glb, progress=100,
+                               partial=partial, missing_layers=result.get("missing_layers", []), warnings=result.get("warnings", []),
+                               message="Đã dựng nền/địa hình; còn thiếu các lớp OSM được cảnh báo." if partial else "Sẵn sàng nạp vào SketchUp")
                     completed = sorted((value for value in self.jobs.values() if value["state"] == "complete" and value is not job), key=lambda value: value["created"])
                     def memory():
                         return sum(len(value.get("mesh", b"")) * 3 + len(value.get("export", b"")) + len(value.get("glb", b"")) for value in self.jobs.values())
@@ -124,19 +129,11 @@ class Application:
             return {"id": user["id"], "email": user.get("email", "")}
         if method == "POST" and path == "/api/ocr":
             return ocr.recognize(body, self.config.get("TESSERACT_BIN"))
-        if method == "GET" and path == "/api/search":
-            text = query.get("q", [""])[0].strip()
-            if not 2 <= len(text) <= 200:
-                raise PublicError("Nhập địa chỉ từ 2 đến 200 ký tự.")
-            with self.search_lock:
-                pause = 1.1 - (time.monotonic() - self.last_search)
-                if pause > 0:
-                    time.sleep(pause)
-                self.last_search = time.monotonic()
-                data = fetch_json("https://nominatim.openstreetmap.org/search?" + urllib.parse.urlencode({"q": text, "format": "jsonv2", "limit": 5}), limit=1_000_000, timeout=20)
-            if not isinstance(data, list):
-                raise PublicError("Không đọc được kết quả tìm địa chỉ.", 502)
-            return {"results": [{"label": value["display_name"], "lat": float(value["lat"]), "lon": float(value["lon"])} for value in data], "attribution": "© OpenStreetMap contributors"}
+        if ((method == "GET" and path in ("/api/search", "/api/search_suggest"))
+                or (method == "POST" and path in ("/api/geocode", "/api/search_suggest"))):
+            params = {key: values[0] for key, values in query.items() if values} if method == "GET" else body
+            return self.geocoder.search(params.get("q", params.get("query", "")), lat=params.get("lat"), lon=params.get("lon"),
+                                        limit=params.get("limit", 6), suggest=path == "/api/search_suggest")
         if method == "POST" and path == "/api/jobs":
             params = parameters(body)
             with self.lock:
@@ -163,7 +160,7 @@ class Application:
                     job.update(state="cancelled", message="Đã hủy")
                     return {"ok": True}
                 if method == "GET" and not match[2]:
-                    return {key: job[key] for key in ("id", "state", "progress", "message")}
+                    return {key: job[key] for key in ("id", "state", "progress", "message", "partial", "missing_layers", "warnings") if key in job}
                 if method == "GET" and match[2]:
                     if job["state"] != "complete":
                         raise PublicError("Tác vụ chưa hoàn tất.", 409)

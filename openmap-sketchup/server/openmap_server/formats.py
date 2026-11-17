@@ -12,7 +12,9 @@ def export_glb(model):
     binary = bytearray()
     document = {"asset": {"version": "2.0", "generator": "OpenMap SketchUp"}, "scene": 0, "scenes": [{"nodes": []}],
                 "nodes": [], "meshes": [], "materials": [], "accessors": [], "bufferViews": [], "buffers": [],
-                "extras": {"anchor": model["anchor"], "attribution": model["attribution"]}}
+                "extras": {"anchor": model["anchor"], "attribution": model["attribution"], "partial": bool(model.get("partial")),
+                           "missing_layers": model.get("missing_layers", []), "warnings": model.get("warnings", []),
+                           "imagery_requested_zoom": model.get("imagery_requested_zoom"), "imagery_source_zoom": model.get("imagery_source_zoom")}}
 
     def view(data, target=None):
         while len(binary) % 4: binary.append(0)

@@ -1,9 +1,9 @@
-# OpenMap SketchUp 0.2.3 — Windows Full, mở thẳng bản đồ
+# OpenMap SketchUp 0.3.0 — Windows Full, mở thẳng bản đồ
 
 **Không cần đăng nhập, tài khoản hoặc Supabase khi dùng bản Windows Full.**
 Không có xu, tín dụng, gói trả phí hoặc tính lượt xuất.
 
-[Tải bộ cài Full 0.2.3](https://github.com/nkl12012004-cmd/ZNS/releases/download/openmap-v0.2.3/OpenMap_SketchUp_Full_0.2.3_Windows_x64.rbz).
+[Tải bộ cài Full 0.3.0](https://github.com/nkl12012004-cmd/ZNS/releases/download/openmap-v0.3.0/OpenMap_SketchUp_Full_0.3.0_Windows_x64.rbz).
 Cài qua Extension Manager, thoát hoàn toàn mọi cửa sổ SketchUp rồi mở lại.
 Vào Extensions → OpenMap SketchUp → Mở OpenMap; chờ bộ xử lý khởi động,
 plugin tự vào bản đồ. Không cần điền cấu hình xác thực.
@@ -12,7 +12,7 @@ plugin tự vào bản đồ. Không cần điền cấu hình xác thực.
 Bản đồ/DEM/OSM cần Internet để tải dữ liệu. Bộ xử lý cục bộ chỉ nhận lệnh
 có mã kết nối riêng của phiên SketchUp, không phải máy chủ truy cập công khai.
 
-Bản 0.2.3 mặc định chạy cục bộ, không kế thừa chế độ máy chủ riêng/URL
+Bản 0.3.0 mặc định chạy cục bộ, không kế thừa chế độ máy chủ riêng/URL
 của các bản trước. Nếu muốn dùng máy chủ riêng, cần chọn lại rõ ràng trong
 Cấu hình; lựa chọn mới được lưu cho các lần mở sau. Khi máy chủ riêng lỗi,
 Cấu hình có nút chuyển về chạy trên máy này.
@@ -25,6 +25,21 @@ Nếu khởi động lỗi, Cấu hình cho phép khởi động lại và mở 
 Mã mới trong `extension/` và `server/` phát hành MIT. Tệp gốc đọc được trong
 `reference/` giữ quyền riêng. Đây là bản viết lại độc lập; lõi MapSKP mã hóa
 và Google Photorealistic 3D của bản gốc chưa khôi phục.
+
+## Thay đổi bản đồ/tìm kiếm 0.3.0
+
+- Một thanh bên chứa điều khiển, tiến trình, xuất tệp và ghép mảnh; không còn
+  ba bảng nổi chiếm vùng bản đồ. Thanh tìm kiếm có địa điểm mẫu, OCR và xóa nhanh.
+- Mặc định Hà Nội, khung 380m, Vệ tinh sạch Esri, ảnh 4K và lưới 64 như bản cũ.
+- Gợi ý địa điểm khi gõ, chọn bằng phím mũi tên/Enter; gửi tìm sẽ tới ngay kết quả
+  đầu. Có dự phòng ArcGIS/Photon/Nominatim; không dùng Nominatim cho autocomplete.
+- Link Google Maps đầy đủ đọc tọa độ ngay; link chia sẻ rút gọn chỉ theo redirect
+  HTTPS trên miền Maps được phép. Link không trả tọa độ được báo rõ để dán tọa độ.
+- Lớp bản đồ vệ tinh chọn để xem cũng là nguồn ảnh xuất. OSM chỉ dùng xem 2D;
+  nguồn ảnh xuất riêng được ghi rõ khi đang xem OSM.
+- OSM dùng XML trước cho vùng nhỏ, có hostname/Overpass dự phòng với thời gian
+  chờ hữu hạn. Khi mọi nguồn OSM đều lỗi, vẫn giữ ảnh/DEM nhưng báo lớp bị thiếu,
+  không tự nạp phần thiếu; người dùng chủ động nạp nền/địa hình hoặc dựng lại.
 
 ## Tính năng đã triển khai
 
@@ -139,7 +154,7 @@ HTTP server để phục vụ trực tiếp mật khẩu/token qua HTTP trên m�
 
 ## 3. Cài extension
 
-Trong gói nguồn ZIP có `install/OpenMap_SketchUp_Full_0.2.3_Windows_x64.rbz`.
+Trong gói nguồn ZIP có `install/OpenMap_SketchUp_Full_0.3.0_Windows_x64.rbz`.
 
 1. SketchUp → Extension Manager → Install Extension… → chọn file RBZ.
 2. Mở Extensions → OpenMap SketchUp → Mở OpenMap hoặc bấm icon toolbar.

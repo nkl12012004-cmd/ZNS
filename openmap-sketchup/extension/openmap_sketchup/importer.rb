@@ -49,6 +49,43 @@ module OpenMapSketchUp
       nil
     end
 
+    def self.valid_tile_reference(value)
+      return nil unless value.is_a?(Hash)
+      center, bbox = value['center'], value['bbox']
+      width, height = value['width'], value['height']
+      return nil unless center.is_a?(Hash) && bbox.is_a?(Hash)
+      return nil unless finite_number?(center['lat'], 80) && finite_number?(center['lon'], 180)
+      return nil unless [width, height].all? { |number| finite_number?(number, 10_000) && number >= 10 }
+      return nil unless %w[south north].all? { |key| finite_number?(bbox[key], 80) }
+      return nil unless %w[west east].all? { |key| finite_number?(bbox[key], 180) }
+      return nil unless bbox['south'] < bbox['north'] && bbox['west'] < bbox['east']
+      return nil unless (center['lat'] - (bbox['north'] + bbox['south']) / 2.0).abs < 1e-7
+      return nil unless (center['lon'] - (bbox['east'] + bbox['west']) / 2.0).abs < 1e-7
+      latitude = center['lat'] * Math::PI / 180.0
+      ellipsoid = 1 - 0.0066943799901413165 * Math.sin(latitude)**2
+      lat_scale = Math::PI / 180.0 * 6_378_137 * (1 - 0.0066943799901413165) / ellipsoid**1.5
+      lon_scale = Math::PI / 180.0 * 6_378_137 * Math.cos(latitude) / Math.sqrt(ellipsoid)
+      return nil unless ((bbox['east'] - bbox['west']) * lon_scale - width).abs <= [1.0, width * 0.01].max
+      return nil unless ((bbox['north'] - bbox['south']) * lat_scale - height).abs <= [1.0, height * 0.01].max
+      { 'center' => center.select { |key, _| %w[lat lon].include?(key) },
+        'bbox' => bbox.select { |key, _| %w[south north west east].include?(key) },
+        'width' => width, 'height' => height }
+    end
+
+    def self.tile_reference(data)
+      return nil unless data.is_a?(Hash) && !data['hill_patch'] && data['parameters'].is_a?(Hash)
+      valid_tile_reference({ 'center' => data['center'], 'bbox' => data['bbox'],
+                             'width' => data['parameters']['width'], 'height' => data['parameters']['height'] })
+    end
+
+    def self.last_tile(model)
+      raw = model.get_attribute(DICTIONARY, 'last_tile')
+      return nil unless raw.is_a?(String) && raw.bytesize <= 4096 && raw.valid_encoding?
+      valid_tile_reference(JSON.parse(raw, max_nesting: 8))
+    rescue JSON::ParserError, EncodingError, TypeError
+      nil
+    end
+
     def self.validate!(data)
       raise 'Định dạng mô hình không hợp lệ.' unless data.is_a?(Hash) && data['schema'] == 'openmap.mesh.v1' && valid_anchor?(data['anchor'])
       center = data['center']
@@ -149,7 +186,15 @@ module OpenMapSketchUp
         root.set_attribute(DICTIONARY, 'anchor', JSON.generate(data['anchor']))
         root.set_attribute(DICTIONARY, 'attribution', JSON.generate(data['attribution']))
         root.set_attribute(DICTIONARY, 'bbox', JSON.generate(data['bbox']))
+        root.set_attribute(DICTIONARY, 'partial', !!data['partial'])
+        root.set_attribute(DICTIONARY, 'missing_layers', JSON.generate(data['missing_layers'] || []))
+        root.set_attribute(DICTIONARY, 'warnings', JSON.generate(data['warnings'] || []))
+        %w[imagery_requested_zoom imagery_source_zoom].each do |key|
+          root.set_attribute(DICTIONARY, key, data[key]) if data[key].is_a?(Integer) && data[key].between?(0, 24)
+        end
         model.set_attribute(DICTIONARY, 'anchor', JSON.generate(data['anchor']))
+        reference = tile_reference(data)
+        model.set_attribute(DICTIONARY, 'last_tile', JSON.generate(reference)) if reference
         model.shadow_info['Latitude'] = data['center']['lat']
         model.shadow_info['Longitude'] = data['center']['lon']
         model.shadow_info['NorthAngle'] = 0

@@ -114,7 +114,7 @@ module OpenMapSketchUp
     def self.invoke(id, action, args)
       case action
       when 'config'
-        reply(id, { 'ok' => true, 'data' => { 'server' => base_url, 'mode' => mode, 'version' => OpenMapSketchUp::VERSION, 'anchor' => Importer.anchor(Sketchup.active_model), 'session' => @auth_session, 'open_settings' => @open_settings } })
+        reply(id, { 'ok' => true, 'data' => { 'server' => base_url, 'mode' => mode, 'version' => OpenMapSketchUp::VERSION, 'anchor' => Importer.anchor(Sketchup.active_model), 'last_tile' => Importer.last_tile(Sketchup.active_model), 'session' => @auth_session, 'open_settings' => @open_settings } })
       when 'runtime_status'
         start_runtime if managed? && Runtime.status['state'] == 'idle'
         state = managed? ? Runtime.status : { 'state' => 'ready', 'progress' => 100, 'message' => 'Đang dùng máy chủ riêng' }
@@ -239,6 +239,7 @@ module OpenMapSketchUp
         model.start_operation('OpenMap — Đặt lại mốc', true)
         model.delete_attribute(Importer::DICTIONARY, 'anchor')
         model.delete_attribute(Importer::DICTIONARY, 'frame')
+        model.delete_attribute(Importer::DICTIONARY, 'last_tile')
         model.commit_operation
         reply(id, { 'ok' => true, 'data' => {} })
       when 'undo'

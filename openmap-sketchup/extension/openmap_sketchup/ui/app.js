@@ -2,9 +2,11 @@
 (function () {
   'use strict';
   var pending = {}, sequence = 0, session = null, refreshPromise = null, job = null;
+  var bridgePage = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
   var jobTimer = null, googleTimer = null, active = false, noticeTimer = null;
-  var modelAnchor = null, viewMode = '2d', previewJob = null;
+  var modelAnchor = null, lastTile = null, viewMode = '2d', previewJob = null;
   var runtimeMode = 'bundled', runtimeReady = false;
+  var suggestTimer = null, suggestSequence = 0, suggestItems = [], suggestIndex = -1;
   var $ = function (id) { return document.getElementById(id); };
   $('workspace').appendChild($('search-form'));
   $('workspace').appendChild($('search-results'));
@@ -16,7 +18,7 @@
   function native(action, args) {
     return new Promise(function (resolve, reject) {
       if (!window.sketchup || !window.sketchup.openmap) { reject(new Error('Mở extension trong SketchUp để sử dụng.')); return; }
-      var id = 'r' + (++sequence), timeout = setTimeout(function () {
+      var id = bridgePage + '-r' + (++sequence), timeout = setTimeout(function () {
         if (pending[id]) { delete pending[id]; reject(new Error('Yêu cầu mất quá nhiều thời gian.')); }
       }, 180000);
       pending[id] = { resolve: resolve, reject: reject, timer: timeout };
@@ -47,6 +49,9 @@
     return native('config').then(function (config) {
       var a = config.anchor;
       modelAnchor = a;
+      lastTile = config.last_tile || null;
+      $('anchor-panel').hidden = !a;
+      document.querySelectorAll('[data-direction]').forEach(function (button) { button.disabled = !lastTile; });
       $('anchor').textContent = a ? a.lat.toFixed(6) + ', ' + a.lon.toFixed(6) + ' · Cao độ mốc ' + a.elevation.toFixed(2) + ' m' : 'Mốc sẽ được đặt khi nạp mảnh đầu tiên.';
       terrainModeUI();
     });
@@ -58,19 +63,23 @@
     }).then(enterWorkspace).catch(function (error) { session = null; native('session', { access_token: null }); throw error; });
   }
   function enterWorkspace(me) {
+    $('control-panel').insertBefore($('app-header'), $('control-panel').firstChild);
     $('password').value = ''; $('login').hidden = true; $('workspace').hidden = false;
     document.body.classList.add('workspace-open');
+    document.body.classList.toggle('has-account', runtimeMode === 'remote');
     $('account-email').textContent = me.email || me.id;
     $('logout').hidden = runtimeMode === 'bundled';
     renderMap(); return updateAnchor();
   }
   function clearLogin() {
+    document.body.insertBefore($('app-header'), document.body.firstChild);
     session = null; clearTimeout(googleTimer); clearTimeout(jobTimer); active = false;
     job = null; $('build').disabled = false; $('import').disabled = $('export').disabled = $('export-glb').disabled = $('cancel').disabled = true;
     $('job-message').textContent = 'Chọn một vùng, rồi bấm Dựng bản đồ.';
     $('progress').value = 0; $('job-detail').textContent = '';
     $('login').hidden = false; $('workspace').hidden = true;
     document.body.classList.remove('workspace-open');
+    document.body.classList.remove('has-account');
     previewJob = null;
     if (window.OpenMapViewer) window.OpenMapViewer.clear();
     switchView('2d');
@@ -140,7 +149,7 @@
   $('logout').onclick = guard(function () { return api('POST', '/api/auth/logout', {}).catch(function () {}).then(clearLogin); });
   function numeric(id) { var input = $(id); if (!input.checkValidity() || !input.value.trim()) throw new Error('Kiểm tra giá trị ' + id + '.'); return Number(input.value); }
   function buildParams() {
-    return { lat: numeric('lat'), lon: numeric('lon'), width: numeric('width'), height: numeric('height'), grid: numeric('grid'), image_size: numeric('image_size'), imagery: $('imagery').value, terrain: $('terrain').checked, exaggeration: numeric('exaggeration'), roads: $('roads').checked, buildings: $('buildings').checked,
+    return { lat: numeric('lat'), lon: numeric('lon'), width: numeric('width'), height: numeric('height'), grid: numeric('grid'), image_size: numeric('image_size'), imagery: $('imagery').value, terrain: $('terrain').checked, exaggeration: numeric('exaggeration'), roads: $('roads-main').checked || $('roads-local').checked, buildings: $('buildings').checked,
       roads_main: $('roads-main').checked, roads_local: $('roads-local').checked, water: $('water').checked, trees: $('trees').checked, project_name: $('project-name').value,
       default_floors: numeric('default-floors'), building_style: $('building-style').value, roof_style: $('roof-style').value };
   }
@@ -154,17 +163,23 @@
       if (!job || job.id !== id || !active) return;
       $('progress').value = status.progress; $('job-message').textContent = status.message;
       if (status.state === 'complete') {
+        job.partial = !!status.partial; job.warnings = status.warnings || []; job.missing_layers = status.missing_layers || [];
+        $('job-warning').hidden = !job.partial && !job.warnings.length;
+        $('job-warning').textContent = job.warnings.join(' ') + (job.partial ? ' Chưa tự nạp. Bạn có thể bấm Nạp nền/địa hình hoặc dựng lại vùng này để thử tải lớp OSM.' : '');
+        $('import').textContent = job.partial ? 'Nạp nền/địa hình' : 'Nạp SU';
         job.state = 'complete'; finishJob(status.message); $('import').disabled = $('export').disabled = $('export-glb').disabled = false;
-        if ($('auto-import').checked) return jobAction('import')();
+        if ($('auto-import').checked && !job.partial) return jobAction('import')();
       }
-      else if (status.state === 'error' || status.state === 'cancelled') { finishJob(status.message); }
+      else if (status.state === 'error' || status.state === 'cancelled') { $('progress').value = 0; finishJob(status.message); }
       else jobTimer = setTimeout(pollJob, 1700);
     }).catch(function (error) { finishJob(error.message); tell(error.message); });
   }
   $('build').onclick = guard(function () {
     var params = buildParams(); $('build').disabled = true; $('import').disabled = $('export').disabled = $('export-glb').disabled = true;
     previewJob = null;
+    $('job-warning').hidden = true; $('import').textContent = 'Nạp SU';
     $('progress').value = 0; $('job-detail').textContent = ''; $('job-message').textContent = 'Đang gửi vùng chọn…';
+    $('job-panel').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     return api('POST', '/api/jobs', params).then(function (value) {
       job = value; active = true; $('cancel').disabled = false; pollJob();
     }).catch(function (error) { finishJob(error.message); throw error; });
@@ -181,7 +196,7 @@
       return api('GET', '/api/me').then(function () { return native(action, { job_id: job.id }); }).then(function (result) {
         if (action === 'import') {
           $('job-detail').textContent = 'Đã nạp ' + result.name + ' · ' + result.triangles.toLocaleString() + ' tam giác. ' + (result.warnings || []).join(' ');
-          tell('Đã nạp bản đồ vào SketchUp.', true); return updateAnchor();
+          tell(job.partial ? 'Đã nạp nền/địa hình. Các lớp OSM được cảnh báo vẫn còn thiếu.' : 'Đã nạp bản đồ vào SketchUp.', !job.partial); return updateAnchor();
         }
         if (result.saved) tell(action === 'export_glb' ? 'Đã lưu mô hình GLB.' : 'Đã lưu gói OBJ, vật liệu, ảnh và metadata.', true);
       }).finally(function () { button.disabled = !job || job.state !== 'complete'; $('build').disabled = active; });
@@ -203,23 +218,79 @@
     if (isFinite(values.lat) && isFinite(values.lon) && Math.abs(values.lat) <= 80 && Math.abs(values.lon) <= 180) return [values.lat, values.lon];
     return null;
   }
+  function closeSuggestions() {
+    suggestItems = []; suggestIndex = -1; $('search-results').textContent = ''; $('search-results').hidden = true;
+    $('address').setAttribute('aria-expanded', 'false'); $('address').removeAttribute('aria-activedescendant');
+  }
+  function choosePlace(entry) {
+    clearTimeout(suggestTimer); suggestSequence++; closeSuggestions(); $('preset-list').hidden = true;
+    zoom = entry.kind === 'coords' || entry.source === 'coordinates' ? 17 : 16;
+    setCenter(Number(entry.lat), Number(entry.lon)); switchView('2d');
+    if (entry.kind !== 'coords' && entry.source !== 'coordinates') $('address').value = entry.title || entry.label || entry.display_name || $('address').value;
+    $('clear-search').hidden = !$('address').value;
+    $('search-submit').disabled = false; $('search-submit').textContent = 'Tìm';
+    tell(entry.label || entry.display_name || 'Đã chuyển tới địa điểm.', true);
+  }
+  function showSuggestions(items, selected) {
+    closeSuggestions(); suggestItems = items || []; suggestIndex = selected == null ? -1 : selected;
+    if (!suggestItems.length) return;
+    $('preset-list').hidden = true; $('search-results').hidden = false; $('address').setAttribute('aria-expanded', 'true');
+    suggestItems.forEach(function (entry, index) {
+      var button = document.createElement('button'); button.type = 'button'; button.id = 'suggest-' + index; button.setAttribute('role', 'option');
+      button.classList.toggle('active', index === suggestIndex); button.setAttribute('aria-selected', index === suggestIndex ? 'true' : 'false');
+      var title = document.createElement('span'), detail = document.createElement('span');
+      title.className = 'suggest-title'; title.textContent = entry.title || entry.label || entry.display_name;
+      detail.className = 'suggest-sub'; detail.textContent = entry.subtitle || Number(entry.lat).toFixed(5) + ', ' + Number(entry.lon).toFixed(5);
+      button.appendChild(title); button.appendChild(detail); button.onclick = function () { choosePlace(entry); };
+      $('search-results').appendChild(button);
+    });
+    if (suggestIndex >= 0) $('address').setAttribute('aria-activedescendant', 'suggest-' + suggestIndex);
+  }
+  function scheduleSuggestions() {
+    var text = $('address').value.trim(), generation = ++suggestSequence;
+    $('search-submit').textContent = 'Tìm';
+    clearTimeout(suggestTimer); closeSuggestions(); $('clear-search').hidden = !text;
+    var pair = coordinatesFromText(text);
+    if (pair) { showSuggestions([{ title: 'Tới tọa độ ' + pair[0].toFixed(6) + ', ' + pair[1].toFixed(6), subtitle: 'Bấm Enter để chuyển ngay', kind: 'coords', lat: pair[0], lon: pair[1] }], 0); return; }
+    if (text.length < 2 || !runtimeReady) return;
+    suggestTimer = setTimeout(function () {
+      api('POST', '/api/search_suggest', { query: text, lat: Number($('lat').value), lon: Number($('lon').value), limit: 6 }).then(function (value) {
+        if (generation === suggestSequence && $('address').value.trim() === text) showSuggestions(value.results || []);
+      }).catch(function () { if (generation === suggestSequence) closeSuggestions(); });
+    }, 180);
+  }
+  $('address').oninput = scheduleSuggestions;
+  $('address').onkeydown = function (event) {
+    if (event.key === 'Escape') { suggestSequence++; clearTimeout(suggestTimer); closeSuggestions(); return; }
+    if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && suggestItems.length) {
+      event.preventDefault(); var items = suggestItems.slice();
+      var next = event.key === 'ArrowDown' ? (suggestIndex + 1) % items.length : (suggestIndex <= 0 ? items.length - 1 : suggestIndex - 1);
+      showSuggestions(items, next);
+    }
+  };
+  $('clear-search').onclick = function () { $('address').value = ''; suggestSequence++; clearTimeout(suggestTimer); closeSuggestions(); $('clear-search').hidden = true; $('address').focus(); };
+  document.addEventListener('pointerdown', function (event) {
+    if (!$('search-form').contains(event.target) && !$('search-results').contains(event.target)) { suggestSequence++; clearTimeout(suggestTimer); closeSuggestions(); }
+  });
   $('search-form').onsubmit = guard(function () {
     var text = $('address').value.trim(), coordinates = coordinatesFromText(text);
-    if (coordinates) { setCenter(coordinates[0], coordinates[1]); return; }
-    return api('GET', '/api/search?q=' + encodeURIComponent(text)).then(function (value) {
-      $('search-results').textContent = '';
-      if (!value.results.length) { tell('Không tìm thấy địa chỉ. Thử nhập tọa độ.'); return; }
-      value.results.forEach(function (entry) {
-        var button = document.createElement('button'); button.textContent = entry.label;
-        button.onclick = function () { setCenter(entry.lat, entry.lon); $('search-results').textContent = ''; };
-        $('search-results').appendChild(button);
-      });
-    });
+    clearTimeout(suggestTimer);
+    if (suggestItems.length) { choosePlace(suggestItems[suggestIndex >= 0 ? suggestIndex : 0]); return; }
+    if (coordinates) { choosePlace({ kind: 'coords', lat: coordinates[0], lon: coordinates[1] }); return; }
+    if (text.length < 2) { tell('Nhập địa điểm hoặc dán tọa độ / link Google Maps.'); return; }
+    var generation = ++suggestSequence; closeSuggestions(); $('search-submit').textContent = '…';
+    return api('POST', '/api/geocode', { query: text, lat: Number($('lat').value), lon: Number($('lon').value), limit: 6 }).then(function (value) {
+      if (generation !== suggestSequence || $('address').value.trim() !== text) return;
+      if (!value.results || !value.results.length) throw new Error('Không tìm thấy địa điểm. Thử ghi thêm quận/tỉnh hoặc dán tọa độ.');
+      choosePlace(value.results[0]);
+    }).catch(function (error) {
+      if (generation === suggestSequence) throw error;
+    }).finally(function () { if (generation === suggestSequence) $('search-submit').textContent = 'Tìm'; });
   });
   var zoom = 16, drag = null, loadedTiles = {};
   function mapTile(style, z, x, y) {
     if (style === 'esri_sat') return 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/' + z + '/' + y + '/' + x;
-    if (style.indexOf('google_') === 0) return 'https://mt0.google.com/vt/lyrs=' + ({ google_sat: 's', google_hybrid: 'y', google_street: 'm' })[style] + '&hl=vi&x=' + x + '&y=' + y + '&z=' + z;
+    if (style.indexOf('google_') === 0) return 'https://mt' + ((x + y) % 4) + '.google.com/vt/lyrs=' + ({ google_sat: 's', google_hybrid: 'y', google_street: 'm' })[style] + '&hl=vi&x=' + x + '&y=' + y + '&z=' + z;
     return 'https://tile.openstreetmap.org/' + z + '/' + x + '/' + y + '.png';
   }
   function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
@@ -256,7 +327,18 @@
     $('map-credit').textContent = $('map-style').value === 'osm_clean' ? '© OpenStreetMap contributors' : ($('map-style').value === 'esri_sat' ? 'Tiles © Esri and providers' : '© Google and data providers');
   }
   ['lat', 'lon', 'width', 'height'].forEach(function (id) { $(id).onchange = renderMap; });
-  $('map-style').onchange = renderMap;
+  function updateImageryNote() {
+    $('imagery-note').textContent = $('map-style').value === 'osm_clean' ? 'OSM dùng để xem 2D. Ảnh xuất đang dùng: ' + $('imagery').selectedOptions[0].textContent + '.' : 'Ảnh xuất dùng cùng nguồn với bản đồ đang xem.';
+  }
+  $('map-style').onchange = function () {
+    var style = $('map-style').value;
+    if (style !== 'osm_clean') $('imagery').value = style === 'esri_sat' ? 'satellite' : style;
+    updateImageryNote(); renderMap();
+  };
+  $('imagery').onchange = function () {
+    if ($('imagery').value !== 'none') $('map-style').value = $('imagery').value === 'satellite' ? 'esri_sat' : $('imagery').value;
+    updateImageryNote(); renderMap();
+  };
   $('zoom-in').onclick = function () { zoom = Math.min(19, zoom + 1); renderMap(); };
   $('zoom-out').onclick = function () { zoom = Math.max(3, zoom - 1); renderMap(); };
   $('map').addEventListener('wheel', function (event) { event.preventDefault(); zoom = clamp(zoom + (event.deltaY < 0 ? 1 : -1), 3, 19); renderMap(); }, { passive: false });
@@ -276,12 +358,12 @@
   $('map').onpointerup = $('map').onpointercancel = function () { drag = null; $('map').classList.remove('dragging'); };
   document.querySelectorAll('[data-direction]').forEach(function (button) {
     button.onclick = function () {
-      var lat = Number($('lat').value), lon = Number($('lon').value), r = lat * Math.PI / 180, e2 = .0066943799901413165;
-      var latScale = Math.PI / 180 * 6378137 * (1 - e2) / Math.pow(1 - e2 * Math.sin(r) * Math.sin(r), 1.5);
-      var lonScale = Math.PI / 180 * 6378137 * Math.cos(r) / Math.sqrt(1 - e2 * Math.sin(r) * Math.sin(r));
+      if (!lastTile) return;
+      var lat = lastTile.center.lat, lon = lastTile.center.lon;
+      $('width').value = lastTile.width; $('height').value = lastTile.height;
       var direction = button.getAttribute('data-direction');
-      if (direction === 'north' || direction === 'south') lat += Number($('height').value) / latScale * (direction === 'north' ? 1 : -1);
-      else lon += Number($('width').value) / lonScale * (direction === 'east' ? 1 : -1);
+      if (direction === 'north' || direction === 'south') lat += (lastTile.bbox.north - lastTile.bbox.south) * (direction === 'north' ? 1 : -1);
+      else lon += (lastTile.bbox.east - lastTile.bbox.west) * (direction === 'east' ? 1 : -1);
       setCenter(lat, lon);
     };
   });
@@ -291,6 +373,8 @@
     $('mode-flat').classList.toggle('selected', !enabled); $('mode-terrain').classList.toggle('selected', enabled);
     $('mode-terrain').textContent = modelAnchor && modelAnchor.terrain_mode === 'flat' ? '⛰ Trám đồi 3D' : '⛰ Địa hình 3D';
     $('hill-hint').hidden = !patch;
+    $('grid').disabled = $('exaggeration').disabled = !enabled;
+    $('build').textContent = patch ? 'Trám đồi 3D vào map phẳng' : 'Đưa vào SketchUp';
   }
   $('mode-flat').onclick = function () { $('terrain').checked = false; terrainModeUI(); };
   $('mode-terrain').onclick = function () { $('terrain').checked = true; terrainModeUI(); };
@@ -301,8 +385,8 @@
   $('building-style').onchange = function () { document.querySelectorAll('[data-building]').forEach(function (b) { b.classList.toggle('selected', b.getAttribute('data-building') === $('building-style').value); }); };
   $('theme').onclick = function () { document.body.classList.toggle('dark'); try { localStorage.setItem('openmap-theme', document.body.classList.contains('dark') ? 'dark' : 'light'); } catch (_e) {} };
   try { document.body.classList.toggle('dark', localStorage.getItem('openmap-theme') === 'dark'); } catch (_e) {}
-  [['Hà Nội',21.028511,105.854444],['TP. Hồ Chí Minh',10.776889,106.700806],['Đà Nẵng',16.0544,108.2022],['Đà Lạt',11.9404,108.4583],['Hải Phòng',20.8449,106.6881],['Cần Thơ',10.0452,105.7469]].forEach(function (place) { var button = document.createElement('button'); button.textContent = place[0]; button.onclick = function () { setCenter(place[1], place[2]); $('preset-list').hidden = true; }; $('preset-list').appendChild(button); });
-  $('presets').onclick = function () { $('preset-list').hidden = !$('preset-list').hidden; };
+  [['Hà Nội',21.028511,105.854444],['TP. Hồ Chí Minh',10.776889,106.700806],['Đà Nẵng',16.0544,108.2022],['Đà Lạt',11.9404,108.4583],['Hải Phòng',20.8449,106.6881],['Cần Thơ',10.0452,105.7469]].forEach(function (place) { var button = document.createElement('button'); button.type = 'button'; button.textContent = place[0]; button.onclick = function () { choosePlace({ title: place[0], label: place[0], lat: place[1], lon: place[2] }); }; $('preset-list').appendChild(button); });
+  $('presets').onclick = function () { suggestSequence++; clearTimeout(suggestTimer); closeSuggestions(); $('preset-list').hidden = !$('preset-list').hidden; };
   function ocrFile(file) {
     if (!file || file.size > 6000000) { tell('Chọn ảnh tọa độ nhỏ hơn 6 MB.'); return; }
     tell('Đang đọc tọa độ trong ảnh…', true);
@@ -310,7 +394,7 @@
       api('POST', '/api/ocr', { image: reader.result.split(',')[1] }).then(function (result) {
         var pair = coordinatesFromText(result.text);
         if (!pair) throw new Error('Chưa nhận ra cặp tọa độ. Hãy cắt riêng vùng chữ hoặc dán tọa độ dạng văn bản.');
-        setCenter(pair[0], pair[1]); tell('Đã lấy tọa độ từ ảnh.', true);
+        choosePlace({ kind: 'coords', lat: pair[0], lon: pair[1] }); tell('Đã lấy tọa độ từ ảnh.', true);
       }).catch(function (error) { tell(error.message); });
     }; reader.readAsDataURL(file);
   }

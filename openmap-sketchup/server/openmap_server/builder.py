@@ -1,11 +1,13 @@
 import base64
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from hashlib import sha256
 from io import BytesIO
 import json
 import math
 import re
 import struct
 import threading
+import time
 import urllib.parse
 import xml.etree.ElementTree as ET
 import zipfile
@@ -15,8 +17,14 @@ from PIL import Image, ImageDraw
 from . import geo
 from .net import PublicError, fetch, fetch_json
 
-SATELLITE = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+SATELLITE = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}?blankTile=false"
+ESRI_NATIVE_ZOOM = 19
+# Esri can return a valid HTTP-200 JPEG that only says 'Map data not yet
+# available'. Do not export that image as if it were real satellite coverage.
+NO_DATA_TILES = {"9eafd300d61393184a4abc1d458564cfd1cd9b6f9c4e9c74687045c0a0e5b858"}
 ELEVATION = "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"
+DEFAULT_OVERPASS = "https://overpass-api.de/api/interpreter"
+OVERPASS_FALLBACKS = ("https://overpass.private.coffee/api/interpreter", "https://overpass.kumi.systems/api/interpreter")
 IMAGERY = {
     "satellite": (SATELLITE, "satellite"), "esri_sat": (SATELLITE, "satellite"),
     "google_sat": ("https://mt0.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", "google"),
@@ -87,6 +95,8 @@ class Raster:
             if cancel and cancel.is_set():
                 raise PublicError("Đã hủy tác vụ.")
             data = getter(template.format(z=zoom, x=x % (2 ** zoom), y=y), limit=3_000_000, timeout=25)
+            if sha256(data).hexdigest() in NO_DATA_TILES:
+                raise PublicError("Nguồn ảnh chưa có dữ liệu tại mức phóng đại này.", 502)
             try:
                 with Image.open(BytesIO(data)) as image:
                     if image.size != (256, 256) or image.format not in ("PNG", "JPEG"):
@@ -97,9 +107,16 @@ class Raster:
                 raise PublicError("Ảnh tile không hợp lệ hoặc dữ liệu địa hình bị thiếu.", 502) from None
 
         pairs = [(x, y) for y in range(ymin, ymax + 1) for x in range(xmin, xmax + 1)]
-        with ThreadPoolExecutor(max_workers=4) as pool:
-            for x, y, image in pool.map(download, pairs):
+        pool = ThreadPoolExecutor(max_workers=4)
+        futures = [pool.submit(download, pair) for pair in pairs]
+        try:
+            for future in as_completed(futures):
+                x, y, image = future.result()
                 self.image.paste(image, ((x - xmin) * 256, (y - ymin) * 256))
+        finally:
+            # A failed tile must not leave hundreds of queued requests running
+            # before reporting failure or trying a lower native zoom.
+            pool.shutdown(wait=True, cancel_futures=True)
 
     def sample(self, lat, lon):
         x, y = geo.tile_xy(lat, lon, self.zoom)
@@ -125,7 +142,7 @@ class Raster:
         return result.getvalue()
 
 
-def osm_data(bbox, roads, buildings, endpoint, water=False, trees=False):
+def osm_data(bbox, roads, buildings, endpoint, water=False, trees=False, *, cancel=None, progress=None):
     filters = []
     box = "{south},{west},{north},{east}".format(**bbox)
     if roads:
@@ -138,22 +155,53 @@ def osm_data(bbox, roads, buildings, endpoint, water=False, trees=False):
         filters.append('node["natural"="tree"](%s);' % box)
     if not filters:
         return []
-    query = '[out:json][timeout:20];(%s);out geom;' % "".join(filters)
-    try:
-        result = fetch_json(endpoint, method="POST", data=urllib.parse.urlencode({"data": query}).encode(), headers={"Content-Type": "application/x-www-form-urlencoded"}, timeout=25, limit=20_000_000)
-        if not isinstance(result, dict) or result.get("remark"):
-            raise PublicError("Overpass chưa trả đủ dữ liệu.", 502)
-        elements = result.get("elements", [])
-    except PublicError:
-        # A bounded, user-selected map request; no background bulk downloads.
+    query = '[out:json][timeout:8];(%s);out geom;' % "".join(filters)
+    encoded = urllib.parse.urlencode({"data": query})
+    endpoint = endpoint or DEFAULT_OVERPASS
+    providers = list(dict.fromkeys([endpoint, *OVERPASS_FALLBACKS]))
+    xml_query = urllib.parse.urlencode({"bbox": "{west},{south},{east},{north}".format(**bbox)})
+    xml = [("xml", host + "?" + xml_query, "GET") for host in
+           ("https://api.openstreetmap.org/api/0.6/map", "https://www.openstreetmap.org/api/0.6/map")]
+    overpass = [("overpass", url, "GET" if url == OVERPASS_FALLBACKS[0] else "POST") for url in providers]
+    # Small, interactive map requests are quick on the public map API and need
+    # not wait for a busy Overpass interpreter first. Keep an explicitly changed
+    # operator endpoint first; the shipped default is not a custom endpoint.
+    small = (bbox["east"] - bbox["west"]) * (bbox["north"] - bbox["south"]) <= .0025
+    custom = endpoint.rstrip("/") != DEFAULT_OVERPASS
+    if custom:
+        attempts = overpass[:1] + xml + overpass[1:]
+    else:
+        attempts = xml + overpass if small else overpass + xml
+    deadline = time.monotonic() + 38
+    for index, (kind, url, method) in enumerate(attempts):
+        if cancel and cancel.is_set():
+            raise PublicError("Đã hủy tác vụ.")
+        remaining = deadline - time.monotonic()
+        if remaining < 1:
+            break
+        if progress:
+            progress("Đọc đường/nhà OSM — nguồn %d/%d (%s)" % (index + 1, len(attempts), "OpenStreetMap" if kind == "xml" else "Overpass"))
         try:
-            url = "https://api.openstreetmap.org/api/0.6/map?" + urllib.parse.urlencode({"bbox": "{west},{south},{east},{north}".format(**bbox)})
-            elements = parse_osm_xml(fetch(url, timeout=25, limit=20_000_000), roads, buildings, water, trees)
-        except PublicError:
-            raise PublicError("Chưa tải được đường/nhà OSM. Thử lại, chọn vùng nhỏ hơn, hoặc bỏ chọn hai lớp OSM để dựng nền và địa hình.", 502) from None
-    if not isinstance(elements, list) or len(elements) > 25_000:
-        raise PublicError("Vùng có quá nhiều đối tượng OSM. Chia thành các mảnh nhỏ hơn.")
-    return elements
+            if kind == "xml":
+                elements = parse_osm_xml(fetch(url, timeout=min(9, remaining), limit=20_000_000), roads, buildings, water, trees)
+            else:
+                result = fetch_json(url + ("?" + encoded if method == "GET" else ""), method=method,
+                                    data=encoded.encode() if method == "POST" else None,
+                                    headers={"Content-Type": "application/x-www-form-urlencoded"}, timeout=min(9, remaining), limit=20_000_000)
+                if not isinstance(result, dict) or result.get("remark") or "elements" not in result:
+                    raise PublicError("Overpass chưa trả đủ dữ liệu.", 502)
+                elements = result["elements"]
+            if not isinstance(elements, list) or any(not isinstance(item, dict) for item in elements):
+                raise PublicError("Nguồn OSM trả dữ liệu không hợp lệ.", 502)
+            if len(elements) > 25_000:
+                raise PublicError("Vùng có quá nhiều đối tượng OSM. Chia thành các mảnh nhỏ hơn.")
+            if cancel and cancel.is_set():
+                raise PublicError("Đã hủy tác vụ.")
+            return elements
+        except PublicError as error:
+            if error.status != 502:
+                raise
+    raise PublicError("Các nguồn dữ liệu OpenStreetMap hiện không phản hồi. Chưa tải được các lớp OSM đã chọn.", 502)
 
 
 def parse_osm_xml(raw, roads, buildings, water=False, trees=False):
@@ -246,6 +294,8 @@ def add_roof(roof_mesh, trim, feet, roof_tris, top, style):
 def build(params, *, progress=lambda *_: None, cancel=None, getter=fetch, osm_getter=None, overpass="https://overpass-api.de/api/interpreter"):
     p, b = params, params["bbox"]
     cancel = cancel or threading.Event()
+    warnings = []
+    imagery_requested_zoom = imagery_source_zoom = None
     def update(percent, label):
         if cancel.is_set():
             raise PublicError("Đã hủy tác vụ.")
@@ -291,7 +341,22 @@ def build(params, *, progress=lambda *_: None, cancel=None, getter=fetch, osm_ge
                 break
             zoom -= 1
         template, credit = IMAGERY[p["imagery"]]
-        raster = Raster(b, zoom, template, getter, cancel, tile_budget)
+        imagery_requested_zoom = zoom
+        if credit == "satellite":
+            zoom = min(zoom, ESRI_NATIVE_ZOOM)
+        minimum_zoom = max(0, zoom - 2)
+        while True:
+            update(25, "Ghép ảnh vệ tinh — mức phóng đại %d" % zoom)
+            try:
+                raster = Raster(b, zoom, template, getter, cancel, tile_budget)
+                break
+            except PublicError as error:
+                if credit != "satellite" or error.status != 502 or zoom <= minimum_zoom:
+                    raise
+                zoom -= 1
+        imagery_source_zoom = zoom
+        if imagery_source_zoom < imagery_requested_zoom:
+            warnings.append("Ảnh xuất dùng mức phóng đại nguồn %d (mức tính theo kích thước ảnh là %d). Tệp xuất giữ cạnh dài %d px; phóng ảnh không tăng chi tiết nguồn." % (imagery_source_zoom, imagery_requested_zoom, p["image_size"]))
         jpeg = p["image_size"] == 8192
         material["texture_jpeg" if jpeg else "texture_png"] = base64.b64encode(raster.crop_png(p["image_size"], jpeg)).decode()
         material["color"] = [255, 255, 255]
@@ -318,7 +383,17 @@ def build(params, *, progress=lambda *_: None, cancel=None, getter=fetch, osm_ge
     water, trunks, crowns = mesh("Water", 7), mesh("Tree_trunks", 8), mesh("Tree_crowns", 9)
     update(65, "Đọc đường và khối nhà OpenStreetMap")
     include_osm = p["roads"] or p["buildings"] or p["water"] or p["trees"]
-    elements = (osm_getter(b, p["roads"], p["buildings"]) if osm_getter else osm_data(b, p["roads"], p["buildings"], overpass, p["water"], p["trees"])) if include_osm else []
+    missing_layers = []
+    try:
+        elements = (osm_getter(b, p["roads"], p["buildings"]) if osm_getter else osm_data(b, p["roads"], p["buildings"], overpass, p["water"], p["trees"], cancel=cancel, progress=lambda label: update(65, label))) if include_osm else []
+    except PublicError as error:
+        if error.status != 502:
+            raise
+        elements = []
+        missing_layers = [key for key in ("roads", "buildings", "water", "trees") if p[key]]
+        names = {"roads": "đường", "buildings": "nhà", "water": "mặt nước", "trees": "cây"}
+        warnings.append("Chưa tải được lớp OSM: %s. Chỉ dựng nền/ảnh và địa hình đã tải; các lớp này còn thiếu. Thử dựng lại khi nguồn OSM hoạt động." % ", ".join(names[key] for key in missing_layers))
+        update(70, "Nguồn OSM chưa phản hồi — giữ nền/địa hình, báo rõ các lớp còn thiếu")
     skipped = 0
     for index, element in enumerate(elements):
         if index % 100 == 0:
@@ -384,7 +459,7 @@ def build(params, *, progress=lambda *_: None, cancel=None, getter=fetch, osm_ge
                 append_quad(target, [[p1[0] - dx, p1[1] - dy, p1[2]], [p2[0] - dx, p2[1] - dy, p2[2]], [p2[0] + dx, p2[1] + dy, p2[2]], [p1[0] + dx, p1[1] + dy, p1[2]]])
         if sum(len(value["vertices"]) for value in (low, high, major, minor, water, trunks, crowns, roofs, trim)) > 300_000:
             raise PublicError("Mô hình quá dày để nạp ổn định. Chia vùng thành các mảnh nhỏ hơn.")
-    if include_osm:
+    if include_osm and not missing_layers:
         attribution.append(ATTRIBUTIONS["osm"])
     meshes = [value for value in (ground, major, minor, low, high, roofs, trim, water, trunks, crowns) if value["triangles"]]
     building_materials = [{"name": "Lowrise", "color": [245, 245, 243]}, {"name": "Highrise", "color": [245, 245, 243]}]
@@ -395,9 +470,11 @@ def build(params, *, progress=lambda *_: None, cancel=None, getter=fetch, osm_ge
               "materials": [material, {"name": "Main_roads", "color": [110, 116, 126]}, {"name": "Local_roads", "color": [156, 162, 171]}, *building_materials,
                             {"name": "Roof", "color": [116, 103, 94] if p["roof_style"] == "parapet_vietnam" else [175, 178, 176]}, {"name": "Parapet", "color": [221, 219, 210]},
                             {"name": "Water", "color": [64, 143, 180], "alpha": .8}, {"name": "Trunks", "color": [116, 90, 65]}, {"name": "Leaves", "color": [65, 133, 74]}],
-              "meshes": meshes, "attribution": attribution, "warnings": (["%d khối nhà không có footprint hợp lệ đã được bỏ qua." % skipped] if skipped else []),
+              "meshes": meshes, "attribution": attribution, "warnings": warnings + (["%d khối nhà không có footprint hợp lệ đã được bỏ qua." % skipped] if skipped else []),
+              "partial": bool(missing_layers), "missing_layers": missing_layers,
+              "imagery_requested_zoom": imagery_requested_zoom, "imagery_source_zoom": imagery_source_zoom,
               "triangles": sum(len(value["triangles"]) for value in meshes), "parameters": p}
-    update(100, "Đã dựng xong mô hình")
+    update(100, "Đã dựng nền/địa hình; còn thiếu lớp OSM" if missing_layers else "Đã dựng xong mô hình")
     return result
 
 
@@ -427,7 +504,9 @@ def export_obj(result):
     with zipfile.ZipFile(stream, "w", zipfile.ZIP_DEFLATED) as archive:
         archive.writestr("model.obj", "\n".join(obj) + "\n")
         archive.writestr("model.mtl", "\n".join(mtl) + "\n")
-        archive.writestr("metadata.json", json.dumps({key: result[key] for key in ("schema", "anchor", "center", "bbox", "attribution", "warnings", "parameters")}, ensure_ascii=False, indent=2))
+        metadata = {key: result[key] for key in ("schema", "anchor", "center", "bbox", "attribution", "warnings", "parameters")}
+        metadata.update(partial=result.get("partial", False), missing_layers=result.get("missing_layers", []), imagery_requested_zoom=result.get("imagery_requested_zoom"), imagery_source_zoom=result.get("imagery_source_zoom"))
+        archive.writestr("metadata.json", json.dumps(metadata, ensure_ascii=False, indent=2))
         for i, material in enumerate(result["materials"]):
             if material.get("texture_png") or material.get("texture_jpeg"):
                 archive.writestr("texture_%d.%s" % (i, "jpg" if material.get("texture_jpeg") else "png"), base64.b64decode(material.get("texture_jpeg") or material["texture_png"]))

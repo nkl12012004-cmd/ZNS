@@ -1,3 +1,48 @@
+# Validation — Windows Full 0.3.0
+
+- 62 Python unit/integration tests pass, including geocoder/provider fallback,
+  Vietnamese autocomplete, safe Google Maps redirects, OSM retry/cancellation,
+  no-data imagery detection, partial-job API and export metadata.
+- Full Playwright UI run passes: single sidebar at 1040/650px, immediate Hà Nội
+  jump, keyboard/click suggestions and stale response rejection, clean satellite
+  tile source, preview/export source sync, partial OSM no-auto-import/manual
+  import, 3D/export, startup/restart and remote-to-local recovery. API/native
+  responses and image tiles are fixtures; screenshots are labeled fixtures.
+- Ruby syntax and real Ruby Wasm importer preflight pass on the live Hà Nội
+  model, including stored tile-reference validation and old/invalid metadata.
+- Native Windows gate runs packaged CPython/Pillow/OCR, all 62 server tests,
+  legacy preferences, actual Core startup/HTTP, new geocode route with a Maps
+  coordinate URL, mesh/GLB, Unicode paths, restart and parent-exit cleanup.
+
+Live network checks (measurements are samples, not performance guarantees):
+
+- ArcGIS submit: Hà Nội 0.30s; 123 Nguyễn Huệ, Hồ Chí Minh 0.23s; Đà Nẵng 0.24s.
+- Forced submit fallbacks: Photon Hà Nội 0.94s; Nominatim 0.38s.
+- Photon autocomplete with center in HCMC: Hà Nộ 0.68s; Hà Nội 0.23s;
+  Nguyễn Huệ Hồ Chí Minh 0.20s. Nominatim is never used for autocomplete.
+- Full Google Maps @lat,lon, query=encoded-coordinates and !3d!4d parse correctly.
+  Shortlink safety/redirect bounds are fixture tested; no live shared shortlink
+  was available, so live shortlink parity is not claimed.
+- Hà Nội and HCMC 350x350m, DEM grid16, Esri1024, all requested OSM layers,
+  textured/parapet buildings: 2.72s / 7,868 triangles and 1.81s / 7,593 triangles,
+  respectively. Both partial:false and no warnings. HCMC contained water;
+  Hà Nội contained trees/high-rise/low-rise/roads, with no water in that bbox.
+- Restored default Hà Nội 380x380m, grid64, Esri4096, all OSM: 9.73s,
+  17,641 triangles, no missing layers, peak RSS155.6MiB. Texture4072x4096,
+  16.06MB; JSON22.93MB; GLB17.14MB. The source image was visually inspected
+  and is actual aerial imagery, not Esri's gray no-data placeholder.
+- This test discovered Esri z20 returned a gray placeholder with HTTP200.
+  The fixed builder uses blankTile=false, known-placeholder rejection and
+  native-zoom/lower-zoom handling. Source19/requested20 and the fact that
+  upsampling does not create native image detail are stored/warned explicitly.
+
+SketchUp Desktop itself is unavailable locally and in CI. Actual geometry API
+import, materials, Undo and placement callbacks still need a SketchUp smoke test.
+The old encrypted geocoder/OSM/geometry core and Google Photorealistic 3D mesh
+were not recovered; the new backend implementations remain independent.
+
+Historical validation follows; older layouts/login requirements are superseded.
+
 # Validation — Windows Full 0.2.3
 
 - Regression host now retains preferences instead of always returning defaults.

@@ -51,6 +51,8 @@ begin
   status, user = rpc(runtime, '/api/me')
   raise 'Local access incorrectly requires login' unless status == 200 && user['id'] == 'local-device'
   raise 'Local mode not enabled' unless health['auth_mode'] == 'local'
+  status, place = rpc(runtime, '/api/geocode', { 'query' => 'https://www.google.com/maps/@21.028511,105.854444,16z' })
+  raise 'Geocode route did not read a full Maps URL' unless status == 200 && place['results'][0]['lat'] == 21.028511
   status, config = rpc(runtime, '/api/runtime/config')
   raise 'Local config not available' unless status == 200 && !config['auth_configured']
   raise 'Local mode unexpectedly wrote Supabase configuration' if File.file?(File.join(runtime.state_root, 'config.env'))
