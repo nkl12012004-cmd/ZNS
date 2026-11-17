@@ -1,3 +1,19 @@
+# SiteCraft 0.4.1 — kết quả kiểm tra
+
+[Windows Full run 44030388218](https://github.com/nkl12012004-cmd/ZNS/actions/runs/44030388218) đã đạt với commit `49a0b5862fb7a11a880db9efe61b856bc25db033`:
+
+- 140 bài: 138 đạt, hai bỏ qua đúng điều kiện. OCR, HTTPS, Ruby HTTP, restart và dừng worker theo tiến trình cha đạt.
+- 11 bài dò tán và 21 bài tích hợp kiểm tra tâm lấy từ ảnh, không rải theo vùng/lưới, bỏ ảnh trống/cỏ/mái xanh trong bộ mẫu, đối chiếu OSM gần nhất, bám mặt tam giác và tránh lớp nhà/đường/nước.
+- Bốn bài địa hình kiểm tra DEM đầy đủ sau mốc phẳng, bốn góc giữ cao độ, thành đế 4m, offset cao độ một lần; trám đồi chỉ chạy khi chọn rõ.
+- UI xác nhận DEM là mặc định, tùy chọn trám đồi riêng và được xóa khi đổi chế độ/mốc/mô hình. Bảy tệp Ruby qua kiểm tra cú pháp.
+- GLB cảnh có cây qua Validator với 0 lỗi/0 cảnh báo. Tệp Release tải lại qua SHA-256 và CRC; RBZ trong ZIP nguồn trùng RBZ phát hành.
+
+Nhận diện tán dùng bằng chứng đường nét/kết cấu/tương phản RGB, không phải mô hình học sâu đã được huấn luyện và đánh giá độ chính xác. Ảnh mờ có thể gây bỏ sót hoặc nhầm. Không có vị trí cây nào được rải ngẫu nhiên/từ nhãn khu đất. Nạp/lưu SKP native trong SketchUp Desktop thật vẫn chưa được kiểm tra bởi runner.
+
+Xem [báo cáo Windows 0.4.1](recovery_proof/WINDOWS_0.4.1.json) và [Release 0.4.1](RELEASE_0.4.1.md).
+
+---
+
 # SiteCraft 0.4.0 — phạm vi kiểm tra
 
 Tài liệu này ghi các kiểm tra đã thực hiện cho mã khôi phục và chỉ rõ phần chưa

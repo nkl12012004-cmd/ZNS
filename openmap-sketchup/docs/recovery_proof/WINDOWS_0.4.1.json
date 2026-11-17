@@ -1,0 +1,26 @@
+{
+  "version": "0.4.1",
+  "code_commit": "49a0b5862fb7a11a880db9efe61b856bc25db033",
+  "workflow_run": 44030388218,
+  "workflow_job": 133860647463,
+  "windows_status": "success",
+  "tests": {
+    "total": 140,
+    "passed": 138,
+    "skipped": 2
+  },
+  "ocr": "Tesseract5.5.0 PASS",
+  "https": "PASS",
+  "ruby_runtime_restart_and_parent_cleanup": "PASS",
+  "release_download_sha256_and_crc": "PASS",
+  "source_nested_installer_identical": true,
+  "final_tree_scene_glb": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "native_sketchup_sdk_save_load": "not tested",
+  "sha256": {
+    "SiteCraft_Full_0.4.1_Windows_x64.rbz": "c1d189ca46b20928bf736b73c8d7225b921df7edc6f28cc8f315ca1b63367cea",
+    "SiteCraft_Source_0.4.1.zip": "f1f72289383188a898d6300499473ea4f9b70b0dfa6da36c6920bb7b184ae3d7"
+  }
+}
