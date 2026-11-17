@@ -55,7 +55,7 @@ print('Bundled HTTPS/OpenSSL: PASS')
         run(['ruby',str(ROOT/'tools/runtime-smoke.rb'),str(plugin)],env=env)
         probe = path/'parent-probe.json'
         run(['ruby',str(ROOT/'tools/runtime-smoke.rb'),str(plugin),'--parent-exit'],env={**env,'OPENMAP_PARENT_PROBE':str(probe)})
-        data=json.loads(probe.read_text())
+        data=json.loads(probe.read_text(encoding="utf8"))
         port=int(data['url'].rsplit(':',1)[1])
         closed=False
         for _ in range(40):

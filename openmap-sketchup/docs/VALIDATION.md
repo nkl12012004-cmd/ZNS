@@ -17,7 +17,10 @@ credentials are intentionally not provided; the user chose to enter them later.
 The implementation retains the feature limits in FEATURE_PORT.md; the encrypted
 MapSKP proprietary core was not recovered.
 
-Previous live-data / geometry validation:
+The earlier section below describes version 0.1.0; its packaging and OCR limitations
+are superseded by the Full Windows checks above.
+
+Previous live-data / geometry validation (0.1.0):
 
 # Validation — 2026-11-16
 

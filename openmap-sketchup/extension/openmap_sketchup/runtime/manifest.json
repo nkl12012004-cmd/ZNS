@@ -2,13 +2,13 @@
   "schema": "openmap.runtime.v1",
   "platform": "windows-x64",
   "format": "OPENMAPR1+zlib",
-  "package_sha256": "f14e5b500ea8ec2310a04cd7c63164120728d5cf6bc3c3ab140b24f0683db0ef",
-  "package_size": 24960471,
+  "package_sha256": "8f9d59f9b148ba209045d90af3235c23d4b5f6994baf1cc2b26b70102ed8a2c7",
+  "package_size": 24960469,
   "file_count": 175,
   "unpacked_bytes": 51763875,
   "python_version": "3.14.10",
   "pillow_version": "12.3.0",
-  "tesseract_version": "5.5.1",
+  "tesseract_version": "5.5.0",
   "dependencies": {
     "python.zip": {
       "url": "https://www.python.org/ftp/python/3.14.10/python-3.14.10-embed-amd64.zip",
@@ -31,7 +31,7 @@
       "size": 4113088
     },
     "TESSERACT_LICENSE.txt": {
-      "url": "https://raw.githubusercontent.com/tesseract-ocr/tesseract/5.5.1/LICENSE",
+      "url": "https://raw.githubusercontent.com/tesseract-ocr/tesseract/5.5.0/LICENSE",
       "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
       "size": 11358
     },
@@ -646,7 +646,7 @@
     },
     "licenses/SOURCE_LINKS.json": {
       "size": 2237,
-      "sha256": "e8482a3f09ea10151e25c492e69eae820d79c59e9ea5256007fef1cbbf1d67f0"
+      "sha256": "2afa4d99d2da89c604c6cdab456d006e9a4d2dc0bea6fe9fdd9b22a89c2594ba"
     },
     "licenses/TESSDATA_LICENSE.txt": {
       "size": 11358,

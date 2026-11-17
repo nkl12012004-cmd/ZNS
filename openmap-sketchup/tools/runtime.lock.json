@@ -2,7 +2,7 @@
   "schema": "openmap.runtime.lock.v1",
   "python_version": "3.14.10",
   "pillow_version": "12.3.0",
-  "tesseract_version": "5.5.1",
+  "tesseract_version": "5.5.0",
   "tesseract_package_version": "5.5.2",
   "leptonica_version": "1.85.0",
   "platform": "windows-x64",
@@ -28,7 +28,7 @@
       "size": 4113088
     },
     "TESSERACT_LICENSE.txt": {
-      "url": "https://raw.githubusercontent.com/tesseract-ocr/tesseract/5.5.1/LICENSE",
+      "url": "https://raw.githubusercontent.com/tesseract-ocr/tesseract/5.5.0/LICENSE",
       "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
       "size": 11358
     },

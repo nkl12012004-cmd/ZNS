@@ -1,6 +1,6 @@
 Windows x64 Full bundle, with the runtime included.
 
-- CPython 3.14.10, Pillow 12.3.0, Tesseract 5.5.1, Leptonica 1.85.0 and English OCR model.
+- CPython 3.14.10, Pillow 12.3.0, Tesseract 5.5.0 (native engine, distributed by TesseractOCR package 5.5.2), Leptonica 1.85.0 and English OCR model.
 - The worker installs to the user's LocalAppData cache and starts automatically from SketchUp.
 - One private loopback worker/port per SketchUp instance; stops on close or parent-process exit.
 - Configure Supabase Project URL/public key inside the plugin. No Python/pip/terminal setup is required for the bundled Windows mode.
