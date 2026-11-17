@@ -1,8 +1,8 @@
-"""Private integration of the unchanged, locally recovered MapSKP libraries.
+"""Integration of recovered MapSKP geometry and original scene writers.
 
-This adapter is new code. It does not claim the recovered implementations are
-editable source or MIT licensed, and does not modify their policy/projection
-branches. Raw scenes go directly to the original writers.
+This adapter is new code; recovered source retains its original rights.
+Geometry/policy/projection branches are unchanged. Image-detected trees and
+explicit optional validated texture enhancement precede the original writers.
 """
 from __future__ import annotations
 
@@ -187,6 +187,15 @@ class OriginalEngine:
                 feature_data=self.config.get("OPENMAP_TREE_FIXTURE"),
                 allow_network=self.config.get("OPENMAP_ORIGINAL_FIXTURE") is None)
             check()
+            # Analyze the real imagery first. AI is an explicit optional final
+            # texture step and must never influence tree or geometry detection.
+            texture_info = {"enabled": False, "applied": False, "warnings": []}
+            texture_transform = getattr(self, "texture_transform", None)
+            if params.get("ai_texture") and texture_transform:
+                texture_info = texture_transform(scene, params, cancel, progress)
+                check()
+            elif params.get("ai_texture"):
+                texture_info.update(enabled=True, warnings=["Chưa có bộ xử lý ảnh AI; giữ nguyên texture gốc."])
             origin = _json_ready(scene.get("origin", {}))
             normalized_anchor = {"lat": origin.get("anchor_lat", origin.get("lat")),
                                  "lon": origin.get("anchor_lon", origin.get("lon")),
@@ -199,12 +208,13 @@ class OriginalEngine:
                                parameters=params,
                                attribution=["Original MapSKP data pipeline: imagery/data © their respective providers; OpenStreetMap contributors where used."])
             source_degraded = bool(origin.get("peak_hour_degraded") or origin.get("overpass_overloaded") or origin.get("all_subtiles_ok") is False)
-            warnings = []
+            warnings = list(texture_info.get("warnings", []))
             if origin.get("peak_hour_notice"):
                 warnings.append(str(origin["peak_hour_notice"]))
             elif source_degraded:
                 warnings.append("Lõi gốc báo nguồn dữ liệu đang giảm khả dụng; giữ nguyên đường/công trình đã dựng được, không coi toàn bộ lớp OSM là mất.")
             mesh.update(engine="original", source_degraded=source_degraded, warnings=warnings,
+                        ai_texture=texture_info,
                         tree_summary=tree_summary,
                         detected_tree_locations=scene.get("sitecraft", {}).get("detected_tree_locations", []),
                         original_fixture=bool(self.config.get("OPENMAP_ORIGINAL_FIXTURE") is not None))
@@ -216,13 +226,17 @@ class OriginalEngine:
             original_glb = glb_path.read_bytes()
             glb_bytes, glb_compat = repair_untextured_primitives(
                 original_glb, [material.get("color", [210, 210, 210, 255]) for material in scene.get("materials", [])])
+            if texture_info.get("applied"):
+                from .ai_texture import annotate_glb_texture
+                glb_bytes = annotate_glb_texture(glb_bytes, texture_info)
             original_glb_path = glb_path
-            if glb_compat["changed"]:
+            if glb_compat["changed"] or texture_info.get("applied"):
                 original_glb_path = directory / (name + "_original.glb")
                 original_glb_path.write_bytes(original_glb)
                 glb_path.write_bytes(glb_bytes)
                 glb_result = {**glb_result, "size_kb": round(len(glb_bytes) / 1024, 1),
-                              "original_writer_path": str(original_glb_path), "compatibility_applied": True}
+                              "original_writer_path": str(original_glb_path), "compatibility_applied": glb_compat["changed"],
+                              "ai_texture_provenance": bool(texture_info.get("applied"))}
             check()
             fallback = writer.write_ruby_fallback_json(scene, directory / (name + "_fallback.json"), directory / (name + "_ruby_textures"))
             check()
@@ -248,7 +262,8 @@ class OriginalEngine:
             check()
             manifest = {"engine": "original", "job_id": job_id, "name": name,
                         "origin": origin, "original_parameters": _json_ready(original_params),
-                        "geometry_preserved": True, "texture_bytes_preserved": True,
+                        "geometry_preserved": True, "texture_bytes_preserved": not texture_info.get("applied", False),
+                        "ai_texture": texture_info,
                         "editable_adapter_only": False, "fully_editable_original_source": True,
                         "source_degraded": source_degraded, "warnings": warnings,
                         "tree_summary": tree_summary, "original_non_tree_geometry_preserved": True,

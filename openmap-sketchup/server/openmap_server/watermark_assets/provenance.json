@@ -1,0 +1,72 @@
+{
+  "source_repository": "https://github.com/allenk/GeminiWatermarkTool",
+  "source_commit": "7c6a99f2c3df97eb3c430ef87a0c962aea5cb80e",
+  "source_file": "assets/embedded_assets.hpp",
+  "license": "MIT",
+  "copyright": [
+    "2024 AllenK (Kwyshell)",
+    "2025 Jad (legacy shared-mask notice retained)"
+  ],
+  "masks": [
+    {
+      "name": "bg_48_png",
+      "bytes": 1677,
+      "dimensions": [
+        48,
+        48
+      ],
+      "mode": "RGB",
+      "sha256": "4afc99afe0ef108d67acc45bf4dc5da867ddb793bebc89c9243bb121ce7f0f57",
+      "git_blob_sha": "ed11f16110fa5eb2da90fcf37384db4e1783c054",
+      "maximum_channel": 129
+    },
+    {
+      "name": "bg_96_png",
+      "bytes": 8165,
+      "dimensions": [
+        96,
+        96
+      ],
+      "mode": "RGB",
+      "sha256": "3e26f2233a12a5829acac174d8df1f3db40e07fef04ecdd0e035732154077911",
+      "git_blob_sha": "6a73b5869113103cc6c6ba731bb679ff6bd26ac0",
+      "maximum_channel": 131
+    },
+    {
+      "name": "bg_b_36_png",
+      "bytes": 657,
+      "dimensions": [
+        36,
+        36
+      ],
+      "mode": "L",
+      "sha256": "a3e7d5ca932e6acf9ff826a4db47d597458480e72089da81a40bd4b52668cd31",
+      "git_blob_sha": "1e734f639e25e91eb483e9b0b59f71f02f79addd",
+      "maximum_channel": 84
+    },
+    {
+      "name": "bg_b_96_png",
+      "bytes": 3371,
+      "dimensions": [
+        96,
+        96
+      ],
+      "mode": "L",
+      "sha256": "3911f3b68b3083096326cee24f09868ec87f8d39d248e97057cd14ee838c5552",
+      "git_blob_sha": "b43d677e0918ada61d30455537e89b2b0e8a83d1",
+      "maximum_channel": 94
+    }
+  ],
+  "algorithm_files": [
+    "src/core/blend_modes.cpp",
+    "src/core/watermark_engine.cpp"
+  ],
+  "additional_design_reference": {
+    "repository": "https://github.com/long66666/gemini-watermark-remover",
+    "commit": "d2c585f3935904ebb019f42184c3184d51a657a4",
+    "file": "src/detect.ts",
+    "license": "MIT",
+    "copyright": "2026"
+  },
+  "implementation": "New Pillow/NumPy port with stricter conservative gates; no bundled model/OpenCV or supplied vendor scripts. Confidence is heuristic, not a probability."
+}

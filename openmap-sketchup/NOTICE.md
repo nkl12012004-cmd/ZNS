@@ -1,4 +1,4 @@
-# SiteCraft 0.4.2 — source, font and data provenance
+# SiteCraft 0.5.0 beta — source, font and data provenance
 
 SiteCraft is the product name of this SketchUp integration. It is not an official
 MapSKP release. Internal `openmap_sketchup` paths and `OPENMAP_*` names remain
@@ -38,6 +38,27 @@ The user explicitly approved publication of these recovered source files in
 nkl12012004-cmd/ZNS on 2026-11-17. Their original rights remain unchanged. An
 earlier automatic-review rejection concerned a protected original payload, which
 is not bundled. The build script only creates local archives.
+
+## Recovered AI prompt text and external AI
+
+`reference/nano_render_prompts.json` records 94 inert text/template records
+extracted from the user-supplied Nano Banana Render 2.6.14 installer, with
+original hashes/locations and limits. Embedded copies in
+`extension/openmap_sketchup/ui/ai-reference-prompts.js` retain their original
+rights and are excluded from SiteCraft's MIT license. The new adapter logic is
+MIT. No general open-source license for the vendor wrapper/text was inferred.
+The two readable base examples are preview fixtures; encrypted production
+defaults were not recovered. Vendor runtime/code/account keys are not bundled.
+
+`server/openmap_server/gemini_watermark.py` and `watermark_assets/` use the
+public MIT GeminiWatermarkTool/Gemini watermark remover lineage. The retained
+LICENSE.txt and provenance.json identify pinned upstream commits, asset hashes,
+and AllenK/Jad/other applicable notices. Known-marker detection is conservative;
+it is not a trained generative model or a promise of perfect reconstruction.
+
+Google Flow is an external service used through the user's own browser session.
+Its availability, account access, limits and terms remain separate. No Google
+model, cookie, private API key or unlimited quota is supplied by SiteCraft.
 
 ## SVN-Avo fonts
 

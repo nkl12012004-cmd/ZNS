@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header id="app-header"><div class="brand"><img src="icon.png" alt=""><div><strong>SiteCraft</strong><small>Bản đồ · Địa hình · Khối kiến trúc</small></div></div><button id="settings" class="quiet">Cấu hình</button></header>
+  <header id="app-header"><div class="brand"><img src="icon.png" alt=""><div><strong>SiteCraft</strong><small>Bản đồ · Địa hình · Khối kiến trúc</small></div></div><div class="header-actions"><button id="render-ai" class="quiet" title="Mở SiteCraft Render AI qua Google Flow">Render AI</button><button id="settings" class="quiet">Cấu hình</button></div></header>
   <div id="notice" role="status" aria-live="polite" hidden></div>
   <main id="login">
     <section class="intro"><span class="eyebrow">SKETCHUP · MAPS · TERRAIN</span><h1>Bắt đầu từ<br>một địa điểm.</h1><p>Ảnh vệ tinh, địa hình và dữ liệu đường, nhà — trong cùng một mô hình SketchUp.</p><div class="tags"><span>Nền phẳng</span><span>Địa hình DEM</span><span>OpenStreetMap</span></div><p class="fine">SiteCraft · Bản đồ, địa hình và bối cảnh kiến trúc.</p></section>
@@ -35,6 +35,7 @@
       <label>Tên component<input id="project-name" value="SiteCraft_Context" maxlength="80"></label>
       <label>Ảnh xuất · theo lớp bản đồ đã chọn<select id="imagery"><option value="satellite">Vệ tinh sạch (Esri)</option><option value="google_sat">Google vệ tinh</option><option value="google_hybrid">Google vệ tinh + tên đường</option><option value="google_street">Google đường phố</option></select></label><p id="imagery-note" class="fine">Ảnh xuất dùng cùng nguồn với bản đồ đang xem.</p>
       <div class="pair"><label>Độ phân giải ảnh<select id="image_size"><option>1024</option><option>2048</option><option selected>4096</option><option>8192</option></select></label><label>Độ chia lưới<select id="grid"><option>24</option><option>48</option><option selected>64</option><option>96</option><option>128</option></select></label></div>
+      <label class="check"><input id="ai-texture" type="checkbox"> Xử lý ảnh nền qua Flow trước khi xuất</label><p class="fine">Cần ghép nối Render AI. Luồng hiện tại tải 2K; ảnh 2K/4K/8K giữ nguyên, không hạ độ phân giải.</p>
       <label class="check"><input id="terrain" type="checkbox"> Dựng địa hình 3D từ DEM</label><label id="hill-patch-option" class="check" hidden><input id="hill-patch" type="checkbox" disabled> Trám đồi lên nền phẳng</label><label>Hệ số cao độ<input id="exaggeration" type="number" min="0.1" max="10" step="0.1" value="1"></label>
       <div id="tree-options"><label class="check"><input id="trees-from-imagery" type="checkbox" checked> Bổ sung tán nhận diện từ ảnh</label><p class="fine">Chỉ đặt cây tại tán nhận diện được; vùng ảnh không rõ có thể bỏ trống.</p><label>Mức nhận diện<select id="tree-density"><option value="sparse">Thận trọng</option><option value="medium" selected>Chuẩn</option><option value="dense">Nhiều hơn</option></select></label></div>
       <label>Số tầng mặc định<input id="default-floors" type="number" min="1" max="100" step="0.5" value="3.5"></label>

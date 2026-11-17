@@ -53,7 +53,7 @@ def parameters(body):
     imagery = body.get("imagery", "satellite")
     if imagery != "none" and imagery not in IMAGERY:
         raise PublicError("Nguồn ảnh không hợp lệ.")
-    for key in ("terrain", "hill_patch", "roads", "roads_main", "roads_local", "buildings", "buildings_high", "buildings_low", "water", "trees", "trees_from_imagery"):
+    for key in ("terrain", "hill_patch", "roads", "roads_main", "roads_local", "buildings", "buildings_high", "buildings_low", "water", "trees", "trees_from_imagery", "ai_texture"):
         if key in body and not isinstance(body[key], bool):
             raise PublicError("Tùy chọn %s phải là boolean." % key)
     anchor = body.get("anchor")
@@ -80,7 +80,7 @@ def parameters(body):
                 terrain=body.get("terrain", False), hill_patch=body.get("hill_patch", False), roads=body.get("roads", True), buildings=body.get("buildings", True),
                 buildings_high=body.get("buildings_high", True), buildings_low=body.get("buildings_low", True),
                 roads_main=body.get("roads_main", True), roads_local=body.get("roads_local", True), water=body.get("water", False), trees=body.get("trees", False),
-                trees_from_imagery=body.get("trees_from_imagery", True), tree_density=tree_density,
+                trees_from_imagery=body.get("trees_from_imagery", True), tree_density=tree_density, ai_texture=body.get("ai_texture", False),
                 building_style=style, roof_style=roof, default_floors=geo.number(body.get("default_floors", 3.5), "số tầng mặc định", 1, 100), project_name=project_name,
                 exaggeration=geo.number(body.get("exaggeration", 1), "hệ số cao độ", 0.1, 10), anchor=anchor, bbox=geo.bounds(lat, lon, width, height))
 

@@ -1,4 +1,20 @@
-# SiteCraft 0.4.2 — bản đồ và địa hình cho SketchUp
+# SiteCraft 0.5.0 beta — bản đồ, địa hình và Render AI cho SketchUp
+
+Bản thử nghiệm 0.5.0 bổ sung **Render AI trong SiteCraft**, kết nối tab Google
+Flow bằng extension Chrome riêng: chụp camera, ảnh tham chiếu, chỉ dẫn theo
+vùng, render/chỉnh tiếp, so sánh trước–sau, Flow 2K và lịch sử trên máy.
+Hướng dẫn cài/ghép nối và giới hạn thực tế: [AI_RENDER_VI.md](docs/AI_RENDER_VI.md).
+Đây là mã tích hợp mới, không đóng gói mã/bộ cài Nano Render đã dùng tham khảo.
+Đã trích 94 mục prompt/preset/template đọc được và giữ nguồn gốc/quyền gốc
+trong [catalog](reference/nano_render_prompts.json); các câu nền trong Ruby mã
+hóa chưa được phục hồi. Khung viewport, crop tùy chỉnh, preset/ảnh tham chiếu,
+lịch sử ảnh và fallback tải về được đối chiếu với bản mẫu. Công cụ ảnh riêng
+có nhận diện dấu Gemini theo mẫu MIT và dọn vùng/chạy loạt trên máy.
+Google Flow dùng tài khoản và hạn mức của Google; SiteCraft không thêm xu hay
+tài khoản riêng. Chưa kiểm chứng tạo ảnh thật trên một phiên Google đã đăng
+nhập, vì vậy không cam kết chất lượng hoặc tốc độ vượt model gốc.
+
+Các liên kết phát hành 0.4.2 bên dưới là phiên bản ổn định trước đó.
 
 SiteCraft mở thẳng bản đồ khi chạy Windows Full, không cần đăng nhập hoặc
 Supabase, không có xu, tín dụng hay tính lượt xuất. Điều khiển vùng chọn,

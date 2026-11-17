@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "SiteCraft Flow Bridge",
+  "version": "0.5.0",
+  "version_name": "0.5.0-beta.1",
+  "description": "Kết nối SiteCraft Render AI với tab Google Flow do bạn chọn.",
+  "minimum_chrome_version": "110",
+  "permissions": ["storage", "alarms", "activeTab", "scripting"],
+  "optional_permissions": ["debugger"],
+  "host_permissions": [
+    "http://127.0.0.1/*",
+    "https://flow.google.com/*",
+    "https://labs.google/*",
+    "https://*.googleusercontent.com/*",
+    "https://flow-content.google/*",
+    "https://*.flow-content.google/*",
+    "https://storage.googleapis.com/*"
+  ],
+  "background": {"service_worker": "worker.js"},
+  "icons": {"128": "icon.png"},
+  "action": {"default_title": "SiteCraft Flow Bridge", "default_popup": "popup.html", "default_icon": "icon.png"},
+  "content_scripts": [{
+    "matches": ["https://flow.google.com/*", "https://labs.google/fx/*"],
+    "js": ["core.js", "flow-dom.js", "content.js"],
+    "run_at": "document_idle"
+  }],
+  "content_security_policy": {"extension_pages": "script-src 'self'; object-src 'none'"}
+}

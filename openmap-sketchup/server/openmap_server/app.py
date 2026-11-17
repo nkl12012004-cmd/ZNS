@@ -17,6 +17,7 @@ from .net import PublicError, fetch_json
 from .local_runtime import save_config, validate_public_config
 from .geocode import Geocoder
 from .original_engine import OriginalEngine
+from .ai_render import AIRenderService, MAX_BODY as AI_MAX_BODY
 
 
 class Application:
@@ -30,6 +31,11 @@ class Application:
         self.last_search = 0
         self.geocoder = Geocoder()
         self.original_engine = OriginalEngine(config) if config.get("OPENMAP_ENGINE") == "original" else None
+        self.ai_render = AIRenderService(config)
+        if self.original_engine:
+            from .ai_texture import enhance_map_textures
+            self.original_engine.texture_transform = lambda scene, params, cancel, progress: enhance_map_textures(
+                scene, params, self.ai_render, cancel=cancel, progress=progress)
 
     @property
     def local_access(self):
@@ -50,6 +56,9 @@ class Application:
         with self.lock:
             for job in self.jobs.values():
                 job["cancel"].set()
+        # Release any map job waiting for the optional AI texture before joining
+        # the map executor. The paired bridge and state lock close with the app.
+        self.ai_render.close()
         self.pool.shutdown(wait=True, cancel_futures=True)
 
     def _run(self, job):
@@ -102,6 +111,11 @@ class Application:
 
     def route(self, method, path, query, headers, body):
         self.check_transport(headers)
+        if path.startswith("/api/ai/"):
+            self.require_local(headers)
+            if not self.local_access:
+                raise PublicError("Render AI chỉ dùng trong bộ xử lý cục bộ được quản lý.", 403)
+            return self.ai_render.route(method, path, body)
         if method == "GET" and path == "/health":
             import platform
             import PIL
@@ -194,6 +208,7 @@ class Application:
                                 "partial": job["result"].get("partial", False), "missing_layers": job["result"].get("missing_layers", []),
                                 "source_degraded": job["result"].get("source_degraded", False),
                                 "tree_summary": job["result"].get("tree_summary"),
+                                "ai_texture": job["result"].get("ai_texture"),
                                 "name": job["result"]["name"], "bbox": job["result"]["bbox"], "parameters": job["result"].get("parameters", {}),
                                 "triangles": job["result"]["triangles"], "warnings": job["result"].get("warnings", []),
                                 "attribution": job["result"]["attribution"]}
@@ -245,9 +260,11 @@ def handler_for(application):
                     threading.Thread(target=self.server.shutdown, daemon=True).start()
                     return self.send(200, {"ok": True})
                 length = self.headers.get("Content-Length", "0")
-                maximum = 12_000_000 if target.path == "/api/ocr" else 65_536
+                maximum = AI_MAX_BODY if target.path.startswith("/api/ai/") else 12_000_000 if target.path == "/api/ocr" else 65_536
                 if not length.isdigit() or int(length) > maximum:
                     raise PublicError("Nội dung yêu cầu quá lớn.", 413)
+                if target.path.startswith("/api/ai/") and (self.client_address[0] != "127.0.0.1" or self.headers.get("Transfer-Encoding")):
+                    raise PublicError("Yêu cầu AI phải đến trực tiếp từ bộ xử lý cục bộ.", 403)
                 body = {}
                 if self.command in ("POST", "DELETE") and int(length):
                     self.connection.settimeout(15)

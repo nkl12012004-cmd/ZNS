@@ -7,6 +7,14 @@ on:
       - 'openmap-sketchup/extension/**'
       - 'openmap-sketchup/server/**'
       - 'openmap-sketchup/tools/**'
+      - 'openmap-sketchup/browser_extension/**'
+      - '.github/workflows/openmap-windows-full.yml'
+  pull_request:
+    paths:
+      - 'openmap-sketchup/extension/**'
+      - 'openmap-sketchup/server/**'
+      - 'openmap-sketchup/tools/**'
+      - 'openmap-sketchup/browser_extension/**'
       - '.github/workflows/openmap-windows-full.yml'
   workflow_dispatch:
 
@@ -36,19 +44,54 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - name: Build pinned Windows runtime and OCR
         run: python tools/prepare_runtime.py
       - name: Build Full RBZ and source ZIP
         run: python tools/build.py
       - name: Test packaged Python, OCR and Ruby lifecycle on Windows
         run: python tools/windows-smoke.py
+      - name: Install pinned UI validation tools
+        working-directory: openmap-sketchup/tools
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Install browser for local UI fixtures
+        working-directory: openmap-sketchup/tools
+        run: npx playwright install chromium
+      - name: Test AI bridge, SketchUp adapter and renderer UI without Google calls
+        run: |
+          node tools/ai-flow-smoke.cjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node tools/ai-presets-smoke.cjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node tools/ai-reference-prompts-smoke.cjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node tools/ai-ruby-smoke.cjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node tools/ai-downloads-smoke.cjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node tools/ai-cleanup-smoke.cjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node tools/ai-ui-smoke.cjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test real Chrome extension transport with packaged Python
+        run: |
+          python -c "import sys; from pathlib import Path; sys.path.insert(0,'tools'); from pak import unpack; unpack(Path('extension/openmap_sketchup/runtime/windows-x64.pak'), Path('.cache/ai-browser-runtime'))"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $env:SITECRAFT_AI_PYTHON = Join-Path $PWD '.cache/ai-browser-runtime/python.exe'
+          node tools/ai-browser-transport.cjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         with:
-          name: SiteCraft-Windows-Full-0.4.2
+          name: SiteCraft-Windows-Full-0.5.0-beta.1
           path: |
-            openmap-sketchup/dist/SiteCraft_Full_0.4.2_Windows_x64.rbz
-            openmap-sketchup/dist/SiteCraft_Source_0.4.2.zip
+            openmap-sketchup/dist/SiteCraft_Full_0.5.0-beta.1_Windows_x64.rbz
+            openmap-sketchup/dist/SiteCraft_Source_0.5.0-beta.1.zip
+            openmap-sketchup/dist/SiteCraft_Flow_Bridge_0.5.0-beta.1.zip
             openmap-sketchup/dist/SHA256SUMS.txt
+            openmap-sketchup/test-artifacts/ai-*.png
+            openmap-sketchup/test-artifacts/ai-browser-transport.json
           if-no-files-found: error
       - name: Publish verified SiteCraft release
         if: github.ref == 'refs/heads/main' && success()
@@ -59,24 +102,26 @@ jobs:
           $version = python -c "import runpy; print(runpy.run_path('tools/build.py')['VERSION'])"
           if ($LASTEXITCODE -ne 0) { throw 'Could not read package version.' }
           $version = $version.Trim()
+          $isPrerelease = $version.Contains('-')
           $tag = "sitecraft-v$version"
           $files = @(
             (Join-Path $PWD "dist/SiteCraft_Full_${version}_Windows_x64.rbz"),
             (Join-Path $PWD "dist/SiteCraft_Source_${version}.zip"),
+            (Join-Path $PWD "dist/SiteCraft_Flow_Bridge_${version}.zip"),
             (Join-Path $PWD 'dist/SHA256SUMS.txt')
           )
           foreach ($file in $files) {
             if (!(Test-Path $file -PathType Leaf)) { throw "Missing release asset: $file" }
           }
-          $lines = @(Get-Content -LiteralPath $files[2])
-          if ($lines.Count -ne 2) { throw 'Expected checksums for exactly the installer and source ZIP.' }
+          $lines = @(Get-Content -LiteralPath $files[3])
+          if ($lines.Count -ne 3) { throw 'Expected checksums for the installer, source and Chrome bridge ZIP.' }
           $checksums = @{}
           foreach ($line in $lines) {
             $match = [regex]::Match($line, '^([0-9a-f]{64})  (.+)$')
             if (!$match.Success) { throw 'Malformed release checksum file.' }
             $checksums[$match.Groups[2].Value] = $match.Groups[1].Value
           }
-          foreach ($file in $files[0..1]) {
+          foreach ($file in $files[0..2]) {
             $name = Split-Path $file -Leaf
             $actual = (Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant()
             if ($checksums[$name] -ne $actual) { throw "Local release checksum mismatch: $name" }
@@ -88,7 +133,9 @@ jobs:
             if ($existing.Trim() -ne $env:GITHUB_SHA) { throw 'Release tag belongs to another commit; bump the version.' }
             gh release upload $tag @files --repo $env:GITHUB_REPOSITORY --clobber
           } else {
-            gh release create $tag @files --draft --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title "SiteCraft $version — Windows x64 Full" --notes-file "docs/RELEASE_${version}.md"
+            $releaseOptions = @()
+            if ($isPrerelease) { $releaseOptions += '--prerelease' }
+            gh release create $tag @files @releaseOptions --draft --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title "SiteCraft $version — Windows x64 Full" --notes-file "docs/RELEASE_${version}.md"
           }
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $assets = gh release view $tag --repo $env:GITHUB_REPOSITORY --json assets | ConvertFrom-Json
@@ -98,5 +145,9 @@ jobs:
             $asset = @($assets.assets | Where-Object { $_.name -eq $name })
             if ($asset.Count -ne 1 -or $asset[0].size -ne (Get-Item -LiteralPath $file).Length) { throw "Release asset missing or truncated: $name" }
           }
-          gh release edit $tag --repo $env:GITHUB_REPOSITORY --draft=false --latest
+          if ($isPrerelease) {
+            gh release edit $tag --repo $env:GITHUB_REPOSITORY --draft=false --prerelease --latest=false
+          } else {
+            gh release edit $tag --repo $env:GITHUB_REPOSITORY --draft=false --prerelease=false --latest
+          }
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
