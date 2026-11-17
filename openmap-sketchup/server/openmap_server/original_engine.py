@@ -24,6 +24,7 @@ import zipfile
 from .net import PublicError
 from .original_scene import adapt_scene, _json_ready
 from .glb_compat import repair_untextured_primitives
+from .simple_trees import add_simple_trees
 
 
 _ENGINE_LOCK = threading.Lock()
@@ -110,6 +111,19 @@ class OriginalEngine:
                       "terrain_mode": anchor.get("terrain_mode", terrain_mode)}
             if anchor["terrain_mode"] not in ("flat", "terrain_3d"):
                 raise PublicError("Chế độ nền của mốc không hợp lệ.")
+        if params.get("tree_density", "medium") not in ("sparse", "medium", "dense"):
+            raise PublicError("Mức nhận diện tán cây không hợp lệ.")
+        hill_patch = params.get("hill_patch", False)
+        if not isinstance(hill_patch, bool):
+            raise PublicError("Tùy chọn trám đồi phải là boolean.")
+        if hill_patch and not (terrain and anchor and anchor["terrain_mode"] == "flat"):
+            raise PublicError("Trám đồi chỉ dùng khi chọn địa hình 3D trên mô hình đã có nền phẳng.")
+        if terrain and anchor and anchor["terrain_mode"] == "flat" and not hill_patch:
+            # The recovered builder treats every flat anchor as a request for
+            # feathered hill geometry. A normal DEM must enter its full/plinth
+            # branch. Keep the same coordinate/elevation datum and restore the
+            # canonical anchor mode in metadata after building the geometry.
+            anchor = {**anchor, "terrain_mode": "terrain_3d"}
         roads = bool(params.get("roads", True))
         main = roads and bool(params.get("roads_main", True))
         alley = roads and bool(params.get("roads_local", True))
@@ -117,7 +131,7 @@ class OriginalEngine:
         result = {"project_name": _basename(params.get("project_name")), "lat": lat, "lon": lon,
                   "width_m": width, "height_m": height, "south": south, "west": west, "north": north, "east": east,
                   "anchor": anchor, "terrain_mode": terrain_mode,
-                  "hill_patch": bool(terrain and anchor and anchor["terrain_mode"] == "flat"),
+                  "hill_patch": hill_patch,
                   "sat_provider": providers.get(imagery, "esri_sat"), "sat_px": int(params.get("image_size", 4096)),
                   "dem_grid": int(params.get("grid", 64)), "default_floors": params.get("default_floors", 3.5), "z_exaggeration": z_exag,
                   "include_buildings": buildings,
@@ -125,6 +139,7 @@ class OriginalEngine:
                   "include_buildings_low": buildings and bool(params.get("buildings_low", True)),
                   "include_roads": main or alley, "include_roads_main": main, "include_roads_alley": alley,
                   "include_water": bool(params.get("water", False)), "include_trees": bool(params.get("trees", False)),
+                  "trees_from_imagery": bool(params.get("trees_from_imagery", True)), "tree_density": params.get("tree_density", "medium"),
                   "building_style": "white_box" if params.get("building_style") in ("white", "white_box", "box", "clay") else "textured",
                   "roof_style": params.get("roof_style", "parapet_vietnam")}
         if fixture is not None:
@@ -163,6 +178,15 @@ class OriginalEngine:
             name = original_params["project_name"]
             scene = builder.build_mode1_context_scene(original_params, self.cache_dir, report)
             check()
+            if isinstance(params.get("anchor"), dict):
+                scene["origin"]["anchor_terrain_mode"] = params["anchor"].get("terrain_mode", "terrain_3d")
+            if original_params["include_trees"]:
+                report("Đang nhận diện tán cây trên ảnh và dựng cây tại tâm tán…", 95)
+            tree_summary = add_simple_trees(scene, original_params, cache_dir=self.cache_dir,
+                project=_geo.latlon_to_local_xy, cancel=cancel,
+                feature_data=self.config.get("OPENMAP_TREE_FIXTURE"),
+                allow_network=self.config.get("OPENMAP_ORIGINAL_FIXTURE") is None)
+            check()
             origin = _json_ready(scene.get("origin", {}))
             normalized_anchor = {"lat": origin.get("anchor_lat", origin.get("lat")),
                                  "lon": origin.get("anchor_lon", origin.get("lon")),
@@ -181,6 +205,8 @@ class OriginalEngine:
             elif source_degraded:
                 warnings.append("Lõi gốc báo nguồn dữ liệu đang giảm khả dụng; giữ nguyên đường/công trình đã dựng được, không coi toàn bộ lớp OSM là mất.")
             mesh.update(engine="original", source_degraded=source_degraded, warnings=warnings,
+                        tree_summary=tree_summary,
+                        detected_tree_locations=scene.get("sitecraft", {}).get("detected_tree_locations", []),
                         original_fixture=bool(self.config.get("OPENMAP_ORIGINAL_FIXTURE") is not None))
             report("Đang xuất OBJ bằng bộ ghi gốc", 96)
             obj_result = writer.write_obj_bundle(scene, directory / (name + ".obj"))
@@ -225,6 +251,8 @@ class OriginalEngine:
                         "geometry_preserved": True, "texture_bytes_preserved": True,
                         "editable_adapter_only": False, "fully_editable_original_source": True,
                         "source_degraded": source_degraded, "warnings": warnings,
+                        "tree_summary": tree_summary, "original_non_tree_geometry_preserved": True,
+                        "detected_tree_locations": scene.get("sitecraft", {}).get("detected_tree_locations", []),
                         "fixture": mesh["original_fixture"],
                         "obj": _json_ready(obj_result), "glb": _json_ready(glb_result),
                         "glb_compatibility": glb_compat, "original_glb_path": str(original_glb_path),

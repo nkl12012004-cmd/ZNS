@@ -1,4 +1,4 @@
-# SiteCraft 0.4.0 — source, font and data provenance
+# SiteCraft 0.4.1 — source, font and data provenance
 
 SiteCraft is the product name of this SketchUp integration. It is not an official
 MapSKP release. Internal `openmap_sketchup` paths and `OPENMAP_*` names remain

@@ -76,7 +76,7 @@ class Application:
                 if not job["cancel"].is_set():
                     partial = bool(result.get("partial"))
                     job.update(state="complete", result=result, mesh=payload, export=exported, glb=glb, progress=100,
-                               partial=partial, source_degraded=bool(result.get("source_degraded")), missing_layers=result.get("missing_layers", []), warnings=result.get("warnings", []),
+                               partial=partial, source_degraded=bool(result.get("source_degraded")), tree_summary=result.get("tree_summary"), missing_layers=result.get("missing_layers", []), warnings=result.get("warnings", []),
                                message="Đã dựng nền/địa hình; còn thiếu các lớp OSM được cảnh báo." if partial else "Sẵn sàng nạp vào SketchUp")
                     if original_bundle:
                         job.update(original_bundle={key: value for key, value in original_bundle.items() if key not in ("mesh", "obj_zip", "glb", "raw_scene")}, engine="original")
@@ -176,7 +176,7 @@ class Application:
                     job.update(state="cancelled", message="Đã hủy")
                     return {"ok": True}
                 if method == "GET" and not match[2]:
-                    return {key: job[key] for key in ("id", "state", "progress", "message", "partial", "source_degraded", "missing_layers", "warnings") if key in job}
+                    return {key: job[key] for key in ("id", "state", "progress", "message", "partial", "source_degraded", "tree_summary", "missing_layers", "warnings") if key in job}
                 if method == "GET" and match[2]:
                     if job["state"] != "complete":
                         raise PublicError("Tác vụ chưa hoàn tất.", 409)
@@ -193,6 +193,7 @@ class Application:
                                 "center": job["result"]["center"], "hill_patch": job["result"].get("hill_patch", False),
                                 "partial": job["result"].get("partial", False), "missing_layers": job["result"].get("missing_layers", []),
                                 "source_degraded": job["result"].get("source_degraded", False),
+                                "tree_summary": job["result"].get("tree_summary"),
                                 "name": job["result"]["name"], "bbox": job["result"]["bbox"], "parameters": job["result"].get("parameters", {}),
                                 "triangles": job["result"]["triangles"], "warnings": job["result"].get("warnings", []),
                                 "attribution": job["result"]["attribution"]}

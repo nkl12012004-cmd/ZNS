@@ -29,7 +29,7 @@ const { pathToFileURL } = require('node:url');
     const remote = window.location.search.includes('remote');
     // SketchUp preferences live in the host, not file:// browser storage.
     const override = null;
-    window.testState = { token: null, apiCalls: [], imported: 0, mode: override || (remote ? 'remote' : 'bundled'), configured: remote, failHealth: window.location.search.includes('failed') && !override, runtimePolls: 0, restarts: 0, previousDocument: window.name, nativeCalls: [], anchor: null, nextJobPartial: false, currentJobPartial: false };
+    window.testState = { token: null, apiCalls: [], imported: 0, mode: override || (remote ? 'remote' : 'bundled'), configured: remote, failHealth: window.location.search.includes('failed') && !override, runtimePolls: 0, restarts: 0, previousDocument: window.name, nativeCalls: [], anchor: null, modelContext: 'model-1', nextJobPartial: false, currentJobPartial: false, treeSummary: {total:0,osm:0,inferred:0,source_status:'empty',capped:false} };
     window.addEventListener('beforeunload', () => { window.name = JSON.stringify({stored:sessionStorage.getItem('test-runtime-mode'),url:location.href,calls:window.testState.nativeCalls}); });
     window.sketchup = { async openmap(raw) {
       const message = JSON.parse(raw), a = message.args, s = window.testState;
@@ -39,7 +39,7 @@ const { pathToFileURL } = require('node:url');
       if (message.action === 'config') {
         const preferred = await window.__testModePreference(null);
         if (preferred) { s.mode = preferred; s.failHealth = false; }
-        result.data = { server: 'http://127.0.0.1:50001', mode: s.mode, version: 'test', anchor: s.anchor };
+        result.data = { server: 'http://127.0.0.1:50001', mode: s.mode, version: 'test', anchor: s.anchor, model_context: s.modelContext };
       }
       if (message.action === 'runtime_status') { s.runtimePolls++; result.data = s.runtimePolls < 2 ? { state: 'preparing', progress: 40, mode: s.mode, message: 'Đang cài bộ xử lý' } : { state: 'ready', progress: 100, mode: s.mode, message: 'Bộ xử lý sẵn sàng' }; }
       if (message.action === 'runtime_restart') { s.restarts++; s.runtimePolls = 0; s.token = null; s.failHealth = false; }
@@ -70,7 +70,7 @@ const { pathToFileURL } = require('node:url');
         else if (a.path === '/api/jobs/' + 'a'.repeat(32)) result.data = {
           state: 'complete', progress: 100,
           message: s.currentJobPartial ? 'Đã dựng nền/địa hình; thiếu lớp OSM đường, nhà.' : 'Sẵn sàng nạp vào SketchUp',
-          partial: s.currentJobPartial, missing_layers: s.currentJobPartial ? ['roads','buildings'] : [],
+          partial: s.currentJobPartial, tree_summary: s.treeSummary, missing_layers: s.currentJobPartial ? ['roads','buildings'] : [],
           warnings: s.currentJobPartial ? ['Chưa tải được đường/nhà OSM; chỉ có nền ảnh và địa hình.'] : []
         };
         else throw new Error('Unexpected test API: ' + a.path);
@@ -113,6 +113,24 @@ const { pathToFileURL } = require('node:url');
   assert(!(await page.evaluate(() => window.testState.apiCalls)).some(c => c.path.startsWith('/api/auth/') || c.path === '/api/runtime/config'));
   assert(await page.locator('#anchor-panel').isHidden());
   await assertOnePanel();
+  await page.locator('#advanced-toggle').click();
+  assert(await page.locator('#trees-from-imagery').isChecked());
+  assert.equal(await page.locator('#tree-density').inputValue(),'medium');
+  assert.match(await page.locator('#tree-options').textContent(),/Bổ sung tán nhận diện từ ảnh/);
+  assert.match(await page.locator('#tree-options').textContent(),/vùng ảnh không rõ có thể bỏ trống/);
+  assert.equal((await page.locator('#tree-density option:checked').textContent()).trim(),'Chuẩn');
+  assert(await page.locator('#hill-patch-option').isHidden());
+  assert(await page.locator('#hill-patch').isDisabled());
+  assert(!(await page.locator('#hill-patch').isChecked()));
+  await page.locator('#trees').uncheck();
+  assert(await page.locator('#tree-options').isHidden());
+  assert(await page.locator('#trees-from-imagery').isDisabled());
+  assert(await page.locator('#tree-density').isDisabled());
+  await page.locator('#trees').check();
+  assert(await page.locator('#tree-options').isVisible());
+  assert(!(await page.locator('#trees-from-imagery').isDisabled()));
+  await page.locator('#tree-density').selectOption('dense');
+  await page.locator('#advanced-toggle').click();
   assert.equal(await page.locator('#map-style').inputValue(), 'esri_sat');
   assert.match(await page.locator('#map-style option:checked').textContent(), /Vệ tinh sạch/);
   await page.waitForFunction(() => Array.from(document.querySelectorAll('#tiles img')).some(i => i.src.includes('World_Imagery/MapServer/tile/')));
@@ -153,10 +171,24 @@ const { pathToFileURL } = require('node:url');
   await page.waitForFunction(() => !document.getElementById('import').disabled);
   const builds = (await page.evaluate(() => window.testState.apiCalls)).filter(c => c.path === '/api/jobs' && c.method === 'POST');
   assert.equal(builds.at(-1).body.imagery,'google_sat');
+  assert.equal(builds.at(-1).body.hill_patch,false);
+  assert.equal(builds.at(-1).body.trees_from_imagery,true);
+  assert.equal(builds.at(-1).body.tree_density,'dense');
+  await page.locator('#tree-summary').filter({hasText:'Cây: 0'}).waitFor();
+  assert(await page.locator('#job-warning').isHidden());
   await page.locator('#import').click();
   await page.locator('#job-detail').filter({ hasText: '32 tam giác' }).waitFor();
   assert.equal(await page.evaluate(() => window.testState.imported), 1);
   await page.locator('#anchor-panel').waitFor(); await assertOnePanel();
+  await page.locator('#mode-terrain').click();
+  assert.match(await page.locator('#mode-terrain').textContent(),/Địa hình 3D/);
+  assert.doesNotMatch(await page.locator('#mode-terrain').textContent(),/Trám đồi/);
+  await page.locator('#advanced-toggle').click();
+  await page.locator('#hill-patch-option').waitFor();
+  assert(!(await page.locator('#hill-patch').isChecked()));
+  assert(await page.locator('#hill-hint').isHidden());
+  assert.equal((await page.locator('#build').textContent()).trim(),'Đưa vào SketchUp');
+  await page.locator('#advanced-toggle').click();
   await page.locator('#export').click();
   await page.locator('#notice').filter({ hasText: 'Đã lưu gói OBJ' }).waitFor();
   await page.locator('#export-glb').click();
@@ -171,21 +203,53 @@ const { pathToFileURL } = require('node:url');
   await page.locator('#wireframe').click();
   await page.locator('#reset-camera').click();
   await page.locator('#view2d').click();
+  await page.evaluate(() => { window.testState.treeSummary={total:12,osm:4,inferred:8,source_status:'ok',capped:false}; });
   await page.locator('#auto-import').check();
   await page.locator('#build').click();
   await page.waitForFunction(() => window.testState.imported === 2);
+  await page.locator('#tree-summary').filter({hasText:'Cây: 12'}).waitFor();
+  assert.match(await page.locator('#tree-summary').textContent(),/OSM: 4/);
+  assert.match(await page.locator('#tree-summary').textContent(),/Từ ảnh: 8/);
+  const normalDEM = (await page.evaluate(() => window.testState.apiCalls)).filter(c=>c.path==='/api/jobs' && c.method==='POST').at(-1);
+  assert.equal(normalDEM.body.terrain,true);
+  assert.equal(normalDEM.body.hill_patch,false);
   const artifacts = process.env.OPENMAP_TEST_ARTIFACTS || path.join(root, 'test-artifacts');
   fs.mkdirSync(artifacts, { recursive: true });
   await page.screenshot({ path: path.join(artifacts, 'interface-fixture.png'), fullPage: true });
   assert(Array.from(tileRequests).some(url => url.includes('server.arcgisonline.com')));
   assert(Array.from(tileRequests).some(url => url.includes('google.com/vt/')));
+  await page.locator('#advanced-toggle').click();
+  await page.locator('#hill-patch').check();
+  assert(await page.locator('#hill-hint').isVisible());
+  assert.match(await page.locator('#hill-hint').textContent(),/Z = 0/);
+  assert.match(await page.locator('#build').textContent(),/Trám đồi/);
+  await page.locator('#advanced-toggle').click();
   await page.evaluate(() => { window.testState.nextJobPartial = true; });
   await page.locator('#build').click(); await page.locator('#job-warning').waitFor();
+  const explicitPatch = (await page.evaluate(() => window.testState.apiCalls)).filter(c=>c.path==='/api/jobs' && c.method==='POST').at(-1);
+  assert.equal(explicitPatch.body.hill_patch,true);
   assert.match(await page.locator('#job-warning').textContent(),/OSM|đường|nhà/);
   await page.waitForTimeout(150); // Native fixture replies all complete within 1 ms.
   assert.equal(await page.evaluate(() => window.testState.imported),2);
   assert.match(await page.locator('#import').textContent(),/Nạp.*nền|Nạp.*địa hình/i);
   await page.locator('#import').click(); await page.waitForFunction(() => window.testState.imported === 3);
+  await page.waitForFunction(() => !document.getElementById('build').disabled);
+  await page.locator('#mode-flat').click();
+  assert(!(await page.locator('#hill-patch').isChecked()));
+  assert(await page.locator('#hill-patch').isDisabled());
+  assert(await page.locator('#hill-hint').isHidden());
+  await page.locator('#mode-terrain').click();
+  await page.locator('#advanced-toggle').click();
+  await page.locator('#hill-patch').check();
+  await page.evaluate(async () => { window.testState.modelContext='model-2'; await window.OpenMap.refreshAnchor(); });
+  assert(!(await page.locator('#hill-patch').isChecked()));
+  assert(await page.locator('#hill-hint').isHidden());
+  await page.locator('#hill-patch').check();
+  await page.evaluate(async () => { window.testState.anchor={...window.testState.anchor,terrain_mode:'terrain_3d'}; await window.OpenMap.refreshAnchor(); });
+  assert(!(await page.locator('#hill-patch').isChecked()));
+  assert(await page.locator('#hill-patch').isDisabled());
+  assert(await page.locator('#hill-patch-option').isHidden());
+  await page.locator('#advanced-toggle').click();
   await page.screenshot({path:path.join(artifacts,'partial-osm-fixture.png'),fullPage:true});
   await page.setViewportSize({ width: 650, height: 860 });
   await assertOnePanel();
@@ -241,5 +305,5 @@ const { pathToFileURL } = require('node:url');
   assert(!(await page.evaluate(() => window.testState.apiCalls)).some(c => c.path.startsWith('/api/auth/')));
   assert.deepEqual(errors, []);
   await browser.close();
-  console.log('UI PASS: single sidebar, clean Esri satellite, instant geocoding, keyboard/click suggestions, stale search rejection, linked output imagery, partial OSM manual import, direct local workspace without Supabase/login, worker failure/retry, remote failure to local recovery, optional remote login/Google, decimal/DMS coordinates, manual/automatic import, OBJ/GLB, theme, WebGL 3D/wireframe, responsive layout, logout and worker restart. Native bridge/auth responses are fixtures.');
+  console.log('UI PASS: strict canopy-recognition controls/counts, normal DEM after flat anchor, explicit hill-patch payload/reset, single sidebar, clean Esri satellite, instant geocoding, keyboard/click suggestions, stale search rejection, linked output imagery, partial OSM manual import, direct local workspace without Supabase/login, worker failure/retry, remote failure to local recovery, optional remote login/Google, decimal/DMS coordinates, manual/automatic import, OBJ/GLB, theme, WebGL 3D/wireframe, responsive layout, logout and worker restart. Native bridge/auth responses are fixtures.');
 })().catch(error => { console.error(error); process.exit(1); });

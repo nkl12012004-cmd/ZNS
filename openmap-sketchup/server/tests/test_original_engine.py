@@ -93,7 +93,7 @@ class OriginalEngineTests(unittest.TestCase):
 
     def test_anchor_offset_is_retained_without_translating_vertices(self):
         import numpy as np
-        result=self.build_offline(anchor={'lat':21.027,'lon':105.853,'elevation':0,'terrain_mode':'flat'})
+        result=self.build_offline(anchor={'lat':21.027,'lon':105.853,'elevation':0,'terrain_mode':'flat'},hill_patch=True)
         mesh=result['mesh']
         self.assertTrue(mesh['hill_patch'])
         self.assertEqual(mesh['anchor']['lat'],21.027)
@@ -119,7 +119,8 @@ class OriginalEngineTests(unittest.TestCase):
         self.assertFalse(mapped['include_roads']);self.assertFalse(mapped['include_roads_main']);self.assertFalse(mapped['include_roads_alley'])
         self.assertEqual(mapped['building_style'],'white_box')
         self.assertEqual(mapped['anchor']['elevation_m'],12)
-        self.assertTrue(mapped['hill_patch'])
+        self.assertFalse(mapped['hill_patch'])
+        self.assertEqual(mapped['anchor']['terrain_mode'],'terrain_3d')
 
     def test_production_image_none_and_oversized_region_are_explicit_errors(self):
         engine=OriginalEngine({'OPENMAP_WORK_DIR':self.temp.name})
@@ -279,8 +280,13 @@ class OriginalApplicationTests(unittest.TestCase):
                 self.assertEqual(bytes(source['texture_bytes']),base64.b64decode(encoded))
         tags={layer['tag'] for layer in mesh['original_layers']}
         for tag in ('MapSKP_01_Terrain','MapSKP_02A_Buildings_Highrise','MapSKP_02B_Buildings_Lowrise',
-                    'MapSKP_03A_Roads_Main','MapSKP_03B_Roads_Alley','MapSKP_04_Water','MapSKP_05_Trees'):
+                    'MapSKP_03A_Roads_Main','MapSKP_03B_Roads_Alley','MapSKP_04_Water'):
             self.assertIn(tag,tags)
+        # A mapped node cannot create an arbitrary tree on the uniform fixture
+        # image; the new layer requires a visible crown in satellite imagery.
+        self.assertNotIn('MapSKP_05_Trees', tags)
+        self.assertEqual(mesh['tree_summary']['total'], 0)
+        self.assertFalse(mesh['tree_summary']['random_scattering'])
         status,manifest=self.json_request(path+'/manifest')
         self.assertEqual(status,200);self.assertEqual(manifest['engine'],'original')
         self.assertEqual(manifest['origin'],mesh['original_origin'])

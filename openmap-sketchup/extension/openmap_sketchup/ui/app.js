@@ -5,7 +5,7 @@
   var bridgePage = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
   var jobTimer = null, googleTimer = null, active = false, noticeTimer = null;
   var jobGeneration = 0, operation = null, cancelRequest = null;
-  var modelAnchor = null, lastTile = null, viewMode = '2d', previewJob = null;
+  var modelAnchor = null, lastTile = null, viewMode = '2d', previewJob = null, terrainContext = null;
   var runtimeMode = 'bundled', runtimeReady = false;
   var suggestTimer = null, suggestSequence = 0, suggestItems = [], suggestIndex = -1;
   var $ = function (id) { return document.getElementById(id); };
@@ -46,11 +46,16 @@
     });
   }
   function guard(action) { return function (event) { if (event) event.preventDefault(); Promise.resolve().then(action).catch(function (e) { tell(e.message); }); }; }
+  function anchorIdentity(anchor) {
+    return anchor ? JSON.stringify([anchor.lat, anchor.lon, anchor.elevation, anchor.terrain_mode, anchor.z_exaggeration]) : '';
+  }
   function updateAnchor() {
     var generation = jobGeneration;
     return native('config').then(function (config) {
       if (generation !== jobGeneration) return;
-      var a = config.anchor;
+      var a = config.anchor, context = config.model_context == null ? null : String(config.model_context);
+      if (anchorIdentity(a) !== anchorIdentity(modelAnchor) || (context !== null && terrainContext !== null && context !== terrainContext)) $('hill-patch').checked = false;
+      terrainContext = context;
       modelAnchor = a;
       lastTile = config.last_tile || null;
       $('anchor-panel').hidden = !a;
@@ -78,9 +83,11 @@
   function clearLogin() {
     document.body.insertBefore($('app-header'), document.body.firstChild);
     jobGeneration++; operation = null; cancelRequest = null;
+    terrainContext = null; $('hill-patch').checked = false; terrainModeUI();
     session = null; clearTimeout(googleTimer); clearTimeout(jobTimer); active = false;
     job = null; refreshJobControls();
     $('job-warning').hidden = true; $('job-warning').textContent = ''; $('import').textContent = 'Nạp SU';
+    $('tree-summary').hidden = true; $('tree-summary').textContent = '';
     $('job-message').textContent = 'Chọn một vùng, rồi bấm Dựng bản đồ.';
     $('progress').value = 0; $('job-detail').textContent = '';
     $('login').hidden = false; $('workspace').hidden = true;
@@ -155,9 +162,30 @@
   $('logout').onclick = guard(function () { return api('POST', '/api/auth/logout', {}).catch(function () {}).then(clearLogin); });
   function numeric(id) { var input = $(id); if (!input.checkValidity() || !input.value.trim()) throw new Error('Kiểm tra giá trị ' + id + '.'); return Number(input.value); }
   function buildParams() {
-    return { lat: numeric('lat'), lon: numeric('lon'), width: numeric('width'), height: numeric('height'), grid: numeric('grid'), image_size: numeric('image_size'), imagery: $('imagery').value, terrain: $('terrain').checked, exaggeration: numeric('exaggeration'), roads: $('roads-main').checked || $('roads-local').checked, buildings: $('buildings').checked,
-      roads_main: $('roads-main').checked, roads_local: $('roads-local').checked, water: $('water').checked, trees: $('trees').checked, project_name: $('project-name').value,
+    return { lat: numeric('lat'), lon: numeric('lon'), width: numeric('width'), height: numeric('height'), grid: numeric('grid'), image_size: numeric('image_size'), imagery: $('imagery').value, terrain: $('terrain').checked, hill_patch: hillPatchEligible() && $('hill-patch').checked, exaggeration: numeric('exaggeration'), roads: $('roads-main').checked || $('roads-local').checked, buildings: $('buildings').checked,
+      roads_main: $('roads-main').checked, roads_local: $('roads-local').checked, water: $('water').checked, trees: $('trees').checked, trees_from_imagery: $('trees').checked && $('trees-from-imagery').checked, tree_density: $('tree-density').value, project_name: $('project-name').value,
       default_floors: numeric('default-floors'), building_style: $('building-style').value, roof_style: $('roof-style').value };
+  }
+  function treeControlsUI() {
+    var enabled = $('trees').checked;
+    $('tree-options').hidden = !enabled;
+    $('trees-from-imagery').disabled = !enabled;
+    $('tree-density').disabled = !enabled;
+  }
+  $('trees').onchange = treeControlsUI;
+  treeControlsUI();
+  function renderTreeSummary(target) {
+    var summary = target && target.tree_summary;
+    var validCount = function (value) { return typeof value === 'number' && isFinite(value) && value >= 0 && Math.floor(value) === value; };
+    if (!summary || !validCount(summary.total)) {
+      $('tree-summary').hidden = true; $('tree-summary').textContent = ''; return;
+    }
+    var parts = ['Cây: ' + summary.total.toLocaleString()];
+    if (validCount(summary.osm)) parts.push('OSM: ' + summary.osm.toLocaleString());
+    if (validCount(summary.inferred) && summary.inferred > 0) parts.push('Từ ảnh: ' + summary.inferred.toLocaleString());
+    if (summary.capped) parts.push('đã giới hạn số cây');
+    $('tree-summary').textContent = parts.join(' · ');
+    $('tree-summary').hidden = false;
   }
   function sameJob(target, generation) {
     return job === target && jobGeneration === generation;
@@ -186,7 +214,8 @@
       $('progress').value = status.progress; $('job-message').textContent = status.message;
       if (status.state === 'complete') {
         target.partial = !!status.partial; target.warnings = status.warnings || []; target.missing_layers = status.missing_layers || [];
-        renderJobWarning(target);
+        target.tree_summary = status.tree_summary || null;
+        renderJobWarning(target); renderTreeSummary(target);
         target.state = 'complete'; active = false; refreshJobControls();
         if (target.autoImportSuppressed) {
           $('job-message').textContent = status.message + ' Chưa tự nạp vì bạn đã yêu cầu hủy; có thể nạp thủ công.';
@@ -213,6 +242,7 @@
     operation = token; clearTimeout(jobTimer); refreshJobControls();
     previewJob = null;
     $('job-warning').hidden = true; $('import').textContent = 'Nạp SU';
+    $('tree-summary').hidden = true; $('tree-summary').textContent = '';
     $('progress').value = 0; $('job-detail').textContent = ''; $('job-message').textContent = 'Đang gửi vùng chọn…';
     $('job-panel').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     return api('POST', '/api/jobs', params).then(function (value) {
@@ -220,7 +250,7 @@
       operation = null; job = value; active = true; refreshJobControls(); pollJob(value, generation);
     }).catch(function (error) {
       if (!currentOperation(token)) return;
-      operation = null; active = false; job = previous; renderJobWarning(previous); refreshJobControls();
+      operation = null; active = false; job = previous; renderJobWarning(previous); renderTreeSummary(previous); refreshJobControls();
       $('job-message').textContent = 'Không khởi tạo được tác vụ: ' + error.message;
       $('job-detail').textContent = previous && previous.state === 'complete' ? 'Kết quả trước vẫn còn; bạn có thể nạp/xuất lại hoặc thử dựng mới.' : 'Kiểm tra vùng chọn rồi thử dựng lại.';
       tell(error.message);
@@ -465,10 +495,16 @@
     };
   });
   window.addEventListener('resize', renderMap);
+  function hillPatchEligible() {
+    return $('terrain').checked && !!modelAnchor && modelAnchor.terrain_mode === 'flat';
+  }
   function terrainModeUI() {
-    var enabled = $('terrain').checked, patch = enabled && modelAnchor && modelAnchor.terrain_mode === 'flat';
+    var enabled = $('terrain').checked, eligible = hillPatchEligible();
+    if (!eligible) $('hill-patch').checked = false;
+    $('hill-patch-option').hidden = !eligible; $('hill-patch').disabled = !eligible;
+    var patch = eligible && $('hill-patch').checked;
     $('mode-flat').classList.toggle('selected', !enabled); $('mode-terrain').classList.toggle('selected', enabled);
-    $('mode-terrain').textContent = modelAnchor && modelAnchor.terrain_mode === 'flat' ? '⛰ Trám đồi 3D' : '⛰ Địa hình 3D';
+    $('mode-terrain').textContent = '⛰ Địa hình 3D';
     $('hill-hint').hidden = !patch;
     $('grid').disabled = $('exaggeration').disabled = !enabled;
     $('build').textContent = patch ? 'Trám đồi 3D vào map phẳng' : 'Đưa vào SketchUp';
@@ -476,6 +512,7 @@
   $('mode-flat').onclick = function () { $('terrain').checked = false; terrainModeUI(); };
   $('mode-terrain').onclick = function () { $('terrain').checked = true; terrainModeUI(); };
   $('terrain').onchange = terrainModeUI;
+  $('hill-patch').onchange = terrainModeUI;
   $('advanced-toggle').onclick = function () { $('advanced').hidden = !$('advanced').hidden; $('advanced-toggle').textContent = $('advanced').hidden ? 'Tùy chỉnh chi tiết ▾' : 'Thu gọn chi tiết ▴'; };
   document.querySelectorAll('[data-size]').forEach(function (button) { button.onclick = function () { $('width').value = $('height').value = button.getAttribute('data-size'); renderMap(); }; });
   document.querySelectorAll('[data-building]').forEach(function (button) { button.onclick = function () { $('building-style').value = button.getAttribute('data-building'); document.querySelectorAll('[data-building]').forEach(function (b) { b.classList.toggle('selected', b === button); }); }; });

@@ -53,7 +53,7 @@ def parameters(body):
     imagery = body.get("imagery", "satellite")
     if imagery != "none" and imagery not in IMAGERY:
         raise PublicError("Nguồn ảnh không hợp lệ.")
-    for key in ("terrain", "roads", "roads_main", "roads_local", "buildings", "buildings_high", "buildings_low", "water", "trees"):
+    for key in ("terrain", "hill_patch", "roads", "roads_main", "roads_local", "buildings", "buildings_high", "buildings_low", "water", "trees", "trees_from_imagery"):
         if key in body and not isinstance(body[key], bool):
             raise PublicError("Tùy chọn %s phải là boolean." % key)
     anchor = body.get("anchor")
@@ -71,12 +71,16 @@ def parameters(body):
     style, roof = body.get("building_style", "white"), body.get("roof_style", "flat_simple")
     if style not in ("white", "textured") or roof not in ("flat_simple", "parapet_vietnam", "parapet_concrete"):
         raise PublicError("Kiểu nhà hoặc mái không hợp lệ.")
+    tree_density = body.get("tree_density", "medium")
+    if tree_density not in ("sparse", "medium", "dense"):
+        raise PublicError("Mức nhận diện tán cây không hợp lệ.")
     project_name = str(body.get("project_name", "SiteCraft_Context")).strip()[:80]
     project_name = re.sub(r"[^\w \-]", "", project_name) or "SiteCraft_Context"
     return dict(lat=lat, lon=lon, width=width, height=height, grid=int(grid), image_size=int(image_size), imagery=imagery,
-                terrain=body.get("terrain", False), roads=body.get("roads", True), buildings=body.get("buildings", True),
+                terrain=body.get("terrain", False), hill_patch=body.get("hill_patch", False), roads=body.get("roads", True), buildings=body.get("buildings", True),
                 buildings_high=body.get("buildings_high", True), buildings_low=body.get("buildings_low", True),
                 roads_main=body.get("roads_main", True), roads_local=body.get("roads_local", True), water=body.get("water", False), trees=body.get("trees", False),
+                trees_from_imagery=body.get("trees_from_imagery", True), tree_density=tree_density,
                 building_style=style, roof_style=roof, default_floors=geo.number(body.get("default_floors", 3.5), "số tầng mặc định", 1, 100), project_name=project_name,
                 exaggeration=geo.number(body.get("exaggeration", 1), "hệ số cao độ", 0.1, 10), anchor=anchor, bbox=geo.bounds(lat, lon, width, height))
 

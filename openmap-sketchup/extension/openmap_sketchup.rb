@@ -4,7 +4,7 @@ require 'sketchup.rb'
 require 'extensions.rb'
 
 module OpenMapSketchUp
-  VERSION = '0.4.0'.freeze unless const_defined?(:VERSION)
+  VERSION = '0.4.1'.freeze unless const_defined?(:VERSION)
   unless file_loaded?(__FILE__)
     extension = SketchupExtension.new('SiteCraft', 'openmap_sketchup/main')
     extension.version = VERSION

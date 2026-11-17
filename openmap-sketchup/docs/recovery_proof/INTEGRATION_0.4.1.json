@@ -1,0 +1,18 @@
+{
+  "version": "0.4.1",
+  "linux_cpython": "3.14.10",
+  "server_tests": {
+    "total": 140,
+    "passed": 139,
+    "skipped": 1
+  },
+  "ui": "PASS including explicit hill patch and model-context reset",
+  "ruby_syntax_files": 7,
+  "tree_geometry": "3 tests;200triangles/tree",
+  "tree_data": "13 bounded provider/cache/cancel tests",
+  "crown_detection": "11 image-evidence tests",
+  "tree_integration": "21 placement/exclusion/preservation tests",
+  "terrain_modes": "4 tests;full DEM rims/plinth,explicitpatch,datum once",
+  "original_recovered_source": "five modules unchanged; original checksums retained",
+  "native_sketchup_sdk_save_load": "not tested"
+}
