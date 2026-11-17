@@ -1,3 +1,15 @@
+# SiteCraft 0.4.2 — kích thước và cụm cây
+
+[Windows Full run 44037230905](https://github.com/nkl12012004-cmd/ZNS/actions/runs/44037230905) đã đạt: 150 bài, 148 đạt và hai bỏ qua đúng điều kiện; OCR, HTTPS và vòng đời Ruby/worker đạt.
+
+Mười ca mới kiểm tra tán rộng/cao OSM lớn vẫn dựng cây bán kính ≤2m và cao ≤6,5m; cụm ba đỉnh có ba cây nhỏ tại tâm ảnh, tán trơn giữ một cây nhỏ, không đặt trong khoảng trống/cỏ/ảnh thiếu bằng chứng. Mặt đất, DEM và hình học ngoài cây được giữ nguyên. Tệp Release tải lại đã qua SHA-256/CRC và bộ cài lồng trong ZIP nguồn trùng tệp RBZ phát hành.
+
+Nạp/lưu SKP native trong SketchUp Desktop thật chưa được runner xác nhận. Nhận diện từ RGB có thể bỏ sót/nhầm; đây là cây minh họa theo ảnh, không phải kiểm kê cây được khảo sát.
+
+Xem [báo cáo Windows 0.4.2](recovery_proof/WINDOWS_0.4.2.json) và [Release 0.4.2](RELEASE_0.4.2.md).
+
+---
+
 # SiteCraft 0.4.1 — kết quả kiểm tra
 
 [Windows Full run 44030388218](https://github.com/nkl12012004-cmd/ZNS/actions/runs/44030388218) đã đạt với commit `49a0b5862fb7a11a880db9efe61b856bc25db033`:

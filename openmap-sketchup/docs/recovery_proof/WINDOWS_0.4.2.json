@@ -1,0 +1,24 @@
+{
+  "version": "0.4.2",
+  "code_commit": "cf3ceae91ee509fd40fbcf77f6e45dfe4b0f9ea9",
+  "workflow_run": 44037230905,
+  "workflow_job": 133882925287,
+  "windows_status": "success",
+  "tests": {
+    "total": 150,
+    "passed": 148,
+    "skipped": 2
+  },
+  "tree_radius_max_m": 2,
+  "tree_height_max_m": 6.5,
+  "new_scale_cluster_tests": 10,
+  "clusters": "2–6 children only when separate image peaks and valleys exist",
+  "terrain_and_non_tree_geometry": "unchanged",
+  "release_download_sha256_and_crc": "PASS",
+  "nested_installer_identical": true,
+  "native_sketchup_sdk_save_load": "not tested",
+  "sha256": {
+    "SiteCraft_Full_0.4.2_Windows_x64.rbz": "8ce2819fad7690b56b9ee06631b945c676dce5a785e7c0d582324eb93a5a61d4",
+    "SiteCraft_Source_0.4.2.zip": "6f5b8ef58506ce1797ba47be5420687e8450b8f4a1cec68b6595978cb3f873ce"
+  }
+}
