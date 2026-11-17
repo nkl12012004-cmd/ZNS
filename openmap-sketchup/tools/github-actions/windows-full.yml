@@ -44,10 +44,10 @@ jobs:
         run: python tools/windows-smoke.py
       - uses: actions/upload-artifact@v4
         with:
-          name: SiteCraft-Windows-Full-0.4.1
+          name: SiteCraft-Windows-Full-0.4.2
           path: |
-            openmap-sketchup/dist/SiteCraft_Full_0.4.1_Windows_x64.rbz
-            openmap-sketchup/dist/SiteCraft_Source_0.4.1.zip
+            openmap-sketchup/dist/SiteCraft_Full_0.4.2_Windows_x64.rbz
+            openmap-sketchup/dist/SiteCraft_Source_0.4.2.zip
             openmap-sketchup/dist/SHA256SUMS.txt
           if-no-files-found: error
       - name: Publish verified SiteCraft release

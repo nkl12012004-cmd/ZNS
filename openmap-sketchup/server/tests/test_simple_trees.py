@@ -126,7 +126,9 @@ class SimpleTreesTests(unittest.TestCase):
         self.assertLess(np.linalg.norm(centers(scene)[0,:2]-expected),14*60/256/4)
         location=scene['sitecraft']['detected_tree_locations'][0]
         self.assertEqual(location['method'],'outlined_crown');self.assertGreater(location['confidence'],.5)
-        self.assertAlmostEqual(location['radius_m'],14*60/256,delta=.5)
+        self.assertAlmostEqual(location['measured_radius_m'],14*60/256,delta=.5)
+        self.assertLessEqual(location['radius_m'],2.)
+        self.assertLessEqual(location['height_m'],6.5)
 
     def test_blank_photo_osm_points_forests_parks_and_rows_never_create_trees(self):
         outline=[(-40.,-40.),(40.,-40.),(40.,40.),(-40.,40.),(-40.,-40.)]
@@ -157,7 +159,7 @@ class SimpleTreesTests(unittest.TestCase):
         location=scene['sitecraft']['detected_tree_locations'][0]
         self.assertTrue(location['osm_match']);self.assertEqual(location['radius_m'],2.)
         crown=next(m for m in scene['layers'][-1]['meshes'] if 'Crown' in scene['materials'][m['mat_idx']]['name'])
-        self.assertAlmostEqual(float(crown['verts'][:,2].max()),7.,places=5)
+        self.assertAlmostEqual(float(crown['verts'][:,2].max()),6.5,places=5)
 
     def test_osm_node_only_corroborates_its_closest_visible_small_crown(self):
         scene=self.photo_scene()

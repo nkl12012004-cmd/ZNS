@@ -1,12 +1,12 @@
-# SiteCraft 0.4.1 — bản đồ và địa hình cho SketchUp
+# SiteCraft 0.4.2 — bản đồ và địa hình cho SketchUp
 
 SiteCraft mở thẳng bản đồ khi chạy Windows Full, không cần đăng nhập hoặc
 Supabase, không có xu, tín dụng hay tính lượt xuất. Điều khiển vùng chọn,
 địa hình, công trình, tiến trình, xuất tệp và ghép mảnh nằm trong một thanh bên.
 Giao diện dùng các tệp SVN-Avo do người dùng cung cấp, có đủ bốn kiểu chữ.
-Bản 0.4.1 thêm cây thân trụ ngắn, tán tròn với năm sắc xanh nhẹ, đặt tại tâm
-ứng viên tán cây riêng trên ảnh vệ tinh. Địa hình DEM mặc định giữ đủ vùng
-chữ nhật cùng thành/đáy khối, kể cả khi mô hình đã có nền phẳng.
+Bản 0.4.2 thu nhỏ cây về chiều cao 4–6,5 m, tán rộng tối đa 4 m. Cụm tán lớn
+trên ảnh có thể tạo 2–6 cây nhỏ khi có các đỉnh ảnh riêng rõ ràng. Địa hình DEM
+vẫn giữ đủ vùng chữ nhật cùng thành/đáy khối, kể cả khi đã có nền phẳng.
 
 Bản 0.4.0 chuyển sang **mã Python có thể đọc và sửa của bộ dựng MapSKP cũ**:
 51 hàm dựng cảnh, 11 hàm tọa độ, 22 hàm texture mặt đứng/mái, 14 hàm ghi tệp
@@ -16,14 +16,14 @@ của SiteCraft vẫn có mã nguồn riêng.
 
 Người dùng đã xác nhận công bố SiteCraft cùng năm mô-đun nguồn khôi phục trong
 repository `nkl12012004-cmd/ZNS` ngày 17/11/2026, theo giờ Việt Nam.
-Các gói của Release `sitecraft-v0.4.1`:
+Các gói của Release `sitecraft-v0.4.2`:
 
-- [SiteCraft_Full_0.4.1_Windows_x64.rbz](https://github.com/nkl12012004-cmd/ZNS/releases/download/sitecraft-v0.4.1/SiteCraft_Full_0.4.1_Windows_x64.rbz): bộ cài có runtime Windows.
-- [SiteCraft_Source_0.4.1.zip](https://github.com/nkl12012004-cmd/ZNS/releases/download/sitecraft-v0.4.1/SiteCraft_Source_0.4.1.zip): mã nguồn, tài liệu và bộ cài trong `install/`.
-- [SHA256SUMS.txt](https://github.com/nkl12012004-cmd/ZNS/releases/download/sitecraft-v0.4.1/SHA256SUMS.txt): checksum của hai gói.
+- [SiteCraft_Full_0.4.2_Windows_x64.rbz](https://github.com/nkl12012004-cmd/ZNS/releases/download/sitecraft-v0.4.2/SiteCraft_Full_0.4.2_Windows_x64.rbz): bộ cài có runtime Windows.
+- [SiteCraft_Source_0.4.2.zip](https://github.com/nkl12012004-cmd/ZNS/releases/download/sitecraft-v0.4.2/SiteCraft_Source_0.4.2.zip): mã nguồn, tài liệu và bộ cài trong `install/`.
+- [SHA256SUMS.txt](https://github.com/nkl12012004-cmd/ZNS/releases/download/sitecraft-v0.4.2/SHA256SUMS.txt): checksum của hai gói.
 
-Kiểm tra Windows của đúng gói là điều kiện phát hành bản 0.4.1.
-Ghi chú thay đổi: [RELEASE_0.4.1.md](docs/RELEASE_0.4.1.md).
+Kiểm tra Windows của đúng gói là điều kiện phát hành bản 0.4.2.
+Ghi chú thay đổi: [RELEASE_0.4.2.md](docs/RELEASE_0.4.2.md).
 
 Bằng chứng của **bản 0.4.0** vẫn được giữ để đối chiếu: bản đó đã công bố sau [kiểm tra Windows đầy đủ](https://github.com/nkl12012004-cmd/ZNS/actions/runs/44022035961): 86 bài đạt, hai bài bỏ qua đúng điều kiện; OCR Tesseract, HTTPS, kết nối Ruby, khởi động lại và dừng worker theo tiến trình cha đều đạt.
 Tệp 0.4.0 đã tải lại và kiểm tra SHA-256/CRC; bộ cài trong ZIP nguồn của bản đó trùng từng byte với RBZ phát hành.
@@ -37,7 +37,7 @@ Xem [NOTICE.md](NOTICE.md).
 ## Cài Windows Full
 
 1. SketchUp → Extension Manager → Install Extension… → chọn
-   `SiteCraft_Full_0.4.1_Windows_x64.rbz`.
+   `SiteCraft_Full_0.4.2_Windows_x64.rbz`.
 2. Thoát hoàn toàn tất cả cửa sổ SketchUp rồi mở lại để nạp mã Ruby mới.
 3. Extensions → SiteCraft → Mở SiteCraft, hoặc bấm biểu tượng trên toolbar.
 4. Chờ bộ xử lý trên máy khởi động. Không cần điền Email, Google hay Supabase.
@@ -55,9 +55,10 @@ Cấu hình mặc định chạy bộ xử lý trên máy. Nếu đang dùng URL
 lỗi, mở Cấu hình và chọn chạy trên máy này; có nút khởi động lại và mở log.
 Đường dẫn nội bộ `openmap_sketchup`, biến `OPENMAP_*` và dữ liệu cấu hình cũ
 được giữ để tương thích nâng cấp. Tên hiển thị của sản phẩm là SiteCraft.
-Hướng dẫn 0.3.0 trong tài liệu cũ chỉ dùng để tham khảo; hướng dẫn 0.4.1 ở đây
-và [ghi chú bản 0.4.1](docs/RELEASE_0.4.1.md) được ưu tiên.
-[Ghi chú 0.4.0](docs/RELEASE_0.4.0.md) giữ bằng chứng của lần phát hành trước.
+Hướng dẫn 0.3.0 trong tài liệu cũ chỉ dùng để tham khảo; hướng dẫn 0.4.2 ở đây
+và [ghi chú bản 0.4.2](docs/RELEASE_0.4.2.md) được ưu tiên.
+[Ghi chú 0.4.1](docs/RELEASE_0.4.1.md) và [0.4.0](docs/RELEASE_0.4.0.md) giữ
+lịch sử thay đổi cùng bằng chứng của các lần kiểm tra trước.
 
 ## Quy trình dựng đã chuyển từ bản cũ
 
@@ -112,7 +113,7 @@ Nếu thiếu một lớp dữ liệu, đọc cảnh báo của tác vụ trư�
 có nhà trong OSM có thể vẫn có nền/DEM hợp lệ. Tệp đã dựng cần được lưu sau khi
 hoàn thành; bộ xử lý có thể dọn tác vụ và cache theo chính sách vận hành.
 
-## Địa hình và cây trong bản 0.4.1
+## Địa hình và cây trong bản 0.4.2
 
 **Địa hình 3D** mặc định dùng DEM đủ vùng chữ nhật, giữ cao độ mép và khối đế
 có thành/đáy như nhánh DEM thường của bộ dựng cũ. Nạp sau một mảnh phẳng
@@ -121,11 +122,19 @@ cần nối đồi với nền phẳng; nhánh này cố ý hạ mép về nền
 Mốc chung và độ dịch của mảnh vẫn được giữ; sửa lựa chọn nhánh không làm
 thay đổi dữ liệu DEM gốc.
 
-Cây có thân trụ ngắn và tán cầu với năm sắc xanh nhẹ, tối đa **900 cây mỗi
-mảnh**, mỗi cây tối đa **200 tam giác**. Vị trí mới lấy từ tâm ứng viên tán
-riêng trên ảnh vệ tinh, xét viền, kết cấu và tương phản ở nhiều tỷ lệ. Không
-rải cây ngẫu nhiên hoặc theo lưới vào vùng xanh, rừng hay công viên. Cây được
-đặt trên mặt địa hình đã dựng và lọc vị trí có nhà/đường/nước trong cảnh.
+Cây có thân trụ ngắn và tán cầu với năm sắc xanh nhẹ, chiều cao **4–6,5 m**,
+bán kính tán tối đa **2 m** (rộng 4 m). Giới hạn hiển thị này áp dụng cả khi
+OSM có chiều cao lớn hơn. Tối đa **900 cây mỗi mảnh**, mỗi cây tối đa **200
+tam giác**. Vị trí lấy từ tâm ứng viên tán riêng trên ảnh vệ tinh, xét viền,
+kết cấu và tương phản ở nhiều tỷ lệ. Không rải cây ngẫu nhiên hoặc theo lưới
+vào vùng xanh, rừng hay công viên. Cây được đặt trên mặt địa hình đã dựng và
+lọc vị trí có nhà/đường/nước trong cảnh.
+
+Với ứng viên tán rộng hơn 3 m theo bán kính, chỉ tạo nhóm **2–6 cây nhỏ** khi
+ảnh có các đỉnh sáng/kết cấu riêng, cách nhau bởi vùng thấp hơn và nằm trong
+vùng xanh đã xác nhận của tán gốc. Tán rộng nhưng trơn, không có thêm đỉnh rõ
+ràng, vẫn dùng một cây nhỏ. Bán kính nhận từ ảnh được lưu riêng với bán kính
+và chiều cao dùng để hiển thị mô hình.
 
 Truy vấn OSM riêng bổ sung cây mà đường lấy MVT nhanh của bản cũ có thể bỏ
 qua, để đối chiếu với ứng viên trên ảnh. Điểm OSM, nhãn rừng/hàng cây hoặc

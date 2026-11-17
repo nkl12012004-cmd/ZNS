@@ -7,7 +7,7 @@ import re
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "0.4.1"
+VERSION = "0.4.2"
 DIST = ROOT / "dist"
 ORIGINAL_MODULES = {
     "geo_math", "facade_texture_gen", "mode1_osm_dem_builder",
@@ -27,7 +27,7 @@ GENERATED_SUFFIXES = {
     ".pyc", ".pyo", ".marshal", ".log", ".tmp", ".bak",
     ".swp", ".swo", ".orig", ".rej",
 }
-PACKAGE_NOTICE = """# SiteCraft 0.4.1 — editable source and runtime
+PACKAGE_NOTICE = """# SiteCraft 0.4.2 — editable source and runtime
 
 The five recovered MapSKP engine modules are editable Python source, not
 bytecode loading wrappers. Their original rights are retained. No open-source

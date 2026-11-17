@@ -197,3 +197,105 @@ def detect_canopies(image, width_m, height_m, *, level='medium', blocked=None, c
     return [{'u':px/max(1,width-1), 'v':1-py/max(1,height-1), 'radius_m':round(radius,3),
              'confidence':round(float(confidence),3), 'method':method}
             for px,py,radius,confidence,method in selected]
+
+
+def refine_large_canopies(image, crowns, width_m, height_m, *, level='medium', cancel=None):
+    """Represent broad verified crowns with a few distinct image-supported peaks.
+
+    A smooth single dome is retained as one candidate (rendered smaller by the
+    caller). Only separated peaks with a visible valley can create children;
+    no circle offsets, grid points, area fill or random placement are used.
+    """
+    _check(cancel)
+    if not crowns or image is None:
+        return [dict(c) for c in (crowns or [])[:2500]]
+    image = image.convert('RGB')
+    width, height = image.size
+    metres = max(width_m/width, height_m/height)
+    if metres <= 0:
+        return [dict(c) for c in crowns[:2500]]
+    large = [c for c in crowns if c['radius_m'] > 3.0]
+    if not large:
+        return [dict(c) for c in crowns[:2500]]
+    gray_image = image.convert('L')
+    gray = np.asarray(gray_image, dtype=np.float32)
+    rgb = np.asarray(image, dtype=np.float32)
+    r,g,b = rgb[:,:,0],rgb[:,:,1],rgb[:,:,2]
+    green = (g > r*1.055) & (g > b*1.10) & (gray > 20) & (gray < 185)
+    smooth = np.asarray(gray_image.filter(ImageFilter.GaussianBlur(max(.7,.55/metres))),dtype=np.float32)
+    background = np.asarray(gray_image.filter(ImageFilter.GaussianBlur(max(1.5,1.6/metres))),dtype=np.float32)
+    response = smooth-background
+    encoded = np.clip(response*5+128,0,255).astype(np.uint8)
+    maxima = np.asarray(Image.fromarray(encoded).filter(ImageFilter.MaxFilter(5)))
+    minimum_response = {'sparse':8.0,'medium':7.0,'dense':6.0}.get(level,7.0)
+    available = (encoded == maxima) & (response >= minimum_response) & green
+    result = []
+
+    def supported(x,y,radius_m):
+        radius = max(2.0,radius_m/metres)
+        reach = int(math.ceil(radius))
+        left,right=max(0,x-reach),min(width,x+reach+1)
+        top,bottom=max(0,y-reach),min(height,y+reach+1)
+        yy,xx=np.ogrid[top:bottom,left:right]
+        disk=(xx-x)**2+(yy-y)**2 <= radius**2
+        selected = green[top:bottom,left:right][disk]
+        if len(selected)<10 or selected.mean()<.65:
+            return False
+        values=gray[top:bottom,left:right][disk & green[top:bottom,left:right]]
+        return len(values)>=10 and values.std()>=5.0
+
+    def separate_valley(first,second):
+        # A gentle dome slope or noisy leaf fragment does not separate crowns.
+        samples=np.linspace(.2,.8,9)
+        xx=np.rint(first[0]+samples*(second[0]-first[0])).astype(int)
+        yy=np.rint(first[1]+samples*(second[1]-first[1])).astype(int)
+        valley=float(smooth[yy,xx].min())
+        lower_peak=min(float(smooth[first[1],first[0]]),float(smooth[second[1],second[0]]))
+        return lower_peak-valley>=5.0
+
+    for parent_index,parent in enumerate(crowns):
+        _check(cancel)
+        source_radius=float(parent['radius_m'])
+        if source_radius<=3.0:
+            result.append(dict(parent));continue
+        cx=parent['u']*(width-1);cy=(1-parent['v'])*(height-1)
+        radius=source_radius/metres
+        reach=int(math.ceil(radius))
+        left,right=max(0,int(cx)-reach),min(width,int(cx)+reach+1)
+        top,bottom=max(0,int(cy)-reach),min(height,int(cy)+reach+1)
+        yy,xx=np.where(available[top:bottom,left:right])
+        xx,yy=xx+left,yy+top
+        inside=(xx-cx)**2+(yy-cy)**2 <= (radius*.94)**2
+        xx,yy=xx[inside],yy[inside]
+        ranking=sorted(zip(xx.tolist(),yy.tolist()),key=lambda p:(-float(response[p[1],p[0]]),p[1],p[0]))[:1200]
+        child_radius=min(2.0,max(1.3,source_radius*.42))
+        minimum_distance=max(3.2,child_radius*1.8)/metres
+        maximum_children=min(6,max(2,int(math.ceil((source_radius/2.0)**2*.5))))
+        peaks=[]
+        for x,y in ranking:
+            if not supported(x,y,min(child_radius,1.5)):
+                continue
+            if any((x-old[0])**2+(y-old[1])**2 < minimum_distance**2 for old in peaks):
+                continue
+            if any(not separate_valley((x,y),old) for old in peaks):
+                continue
+            peaks.append((x,y))
+            if len(peaks)>=maximum_children:
+                break
+        if len(peaks)<2:
+            result.append(dict(parent));continue
+        for x,y in peaks:
+            result.append({**parent,'u':x/max(1,width-1),'v':1-y/max(1,height-1),
+                           'radius_m':round(child_radius,3),'method':'crown_cluster_peak',
+                           'parent_u':parent['u'],'parent_v':parent['v'],
+                           'parent_radius_m':source_radius,'parent_canopy_id':parent_index})
+    # Neighboring parent regions can share peaks. Keep one small tree per peak.
+    selected=[]
+    for crown in result:
+        if any(((crown['u']-old['u'])*(width-1)*metres)**2+((crown['v']-old['v'])*(height-1)*metres)**2
+               < (.8*(min(2.0,crown['radius_m'])+min(2.0,old['radius_m'])))**2 for old in selected):
+            continue
+        selected.append(crown)
+        if len(selected)>=2500:
+            break
+    return selected

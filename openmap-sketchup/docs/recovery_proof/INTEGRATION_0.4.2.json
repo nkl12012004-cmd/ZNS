@@ -1,0 +1,21 @@
+{
+  "version": "0.4.2",
+  "linux_cpython": "3.14.10",
+  "server_tests": {
+    "total": 150,
+    "passed": 149,
+    "skipped": 1
+  },
+  "new_scale_cluster_tests": 10,
+  "crown_radius_cap_m": 2,
+  "tree_height_cap_m": 6.5,
+  "single_dome": "one small tree if no separate peaks",
+  "three_peak_fixture": "three measured children",
+  "no_random_scattering": true,
+  "terrain_geometry": "unchanged",
+  "glb_scene_validation": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "native_sketchup_sdk_save_load": "not tested"
+}

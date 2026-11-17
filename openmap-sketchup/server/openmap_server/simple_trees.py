@@ -17,7 +17,7 @@ from PIL import Image, ImageDraw, ImageFilter
 from .net import PublicError
 from .tree_geometry import make_round_tree
 from .tree_data import fetch_tree_features
-from .canopy_detector import detect_canopies
+from .canopy_detector import detect_canopies, refine_large_canopies
 
 GREENS = ((61, 127, 57), (72, 143, 61), (81, 154, 68), (91, 163, 76), (68, 137, 59))
 TRUNK = (116, 86, 56)
@@ -192,6 +192,10 @@ def add_simple_trees(scene, params, *, cache_dir, project, cancel=None, feature_
     physical_height = float(np.linalg.norm(ground.fit[1]))
     crowns = detect_canopies(image, physical_width, physical_height, level=density, cancel=cancel)
     summary['detected_candidates'] = len(crowns)
+    crowns = refine_large_canopies(image, crowns, physical_width, physical_height, level=density, cancel=cancel)
+    summary['refined_candidates'] = len(crowns)
+    summary['max_render_radius_m'] = 2.0
+    summary['max_render_height_m'] = 6.5
     summary['recognition_level'] = density
     if not crowns:
         return finish()
@@ -260,16 +264,28 @@ def add_simple_trees(scene, params, *, cache_dir, project, cancel=None, feature_
         if len(selected) >= maximum:
             summary['capped'] = True
             break
+        measured_radius = radius
+        radius = min(2.0, max(.9, measured_radius))
         mapped_height = float(known[matches[index][1]][2]) if mapped else 0
-        height = max(2*radius+.7, min(22.0, mapped_height if mapped else max(4.5, radius*2.7)))
+        height = max(2*radius+.8, min(6.5, max(4.0, mapped_height if mapped else radius*2.3+1.0)))
         selected.append((float(x),float(y),z,height,radius,'osm' if mapped else 'image'))
         locations.append({'x_m':round(float(x),4), 'y_m':round(float(y),4), 'ground_z_m':round(z,4),
                           'image_u':crown['u'], 'image_v':crown['v'], 'radius_m':radius,
-                          'confidence':crown['confidence'], 'method':crown['method'], 'osm_match':mapped})
+                          'confidence':crown['confidence'], 'method':crown['method'], 'osm_match':mapped,
+                          'measured_radius_m':float(crown.get('parent_radius_m',measured_radius)),
+                          'candidate_radius_m':measured_radius, 'height_m':height,
+                          'source_height_m':mapped_height if mapped else None,
+                          **({key:crown[key] for key in ('parent_u','parent_v','parent_radius_m','parent_canopy_id')} if 'parent_canopy_id' in crown else {})})
     summary.update(total=len(selected), osm=sum(tree[5]=='osm' for tree in selected),
                    inferred=sum(tree[5]=='image' for tree in selected), triangles=len(selected)*200,
                    source_status='image_confirmed_crowns' if selected else 'no_confirmed_crowns',
                    image_confirmed=True)
+    groups = defaultdict(int)
+    for item in locations:
+        if 'parent_canopy_id' in item:
+            groups[item['parent_canopy_id']] += 1
+    summary['split_canopies'] = sum(count > 1 for count in groups.values())
+    summary['cluster_trees'] = sum(groups.values())
     if not selected:
         return finish()
     material_offset = len(scene['materials'])

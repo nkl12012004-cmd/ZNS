@@ -3,19 +3,21 @@ Zenith System - SketchUp plugin thiết kế &amp; sản xuất nội thất g�
 
 ---
 
-## SiteCraft 0.4.1 — bản đồ và địa hình cho SketchUp
+## SiteCraft 0.4.2 — bản đồ và địa hình cho SketchUp
 
 Mở thẳng bản đồ, không cần đăng nhập/Supabase, xu hoặc tín dụng. Giao diện một
 thanh bên, tên và icon SiteCraft, font SVN-Avo được kèm sẵn.
 
-- [Bộ cài Windows Full (.rbz)](https://github.com/nkl12012004-cmd/ZNS/releases/download/sitecraft-v0.4.1/SiteCraft_Full_0.4.1_Windows_x64.rbz)
-- [Mã nguồn và bộ cài (.zip)](https://github.com/nkl12012004-cmd/ZNS/releases/download/sitecraft-v0.4.1/SiteCraft_Source_0.4.1.zip)
-- [Release và SHA-256](https://github.com/nkl12012004-cmd/ZNS/releases/tag/sitecraft-v0.4.1)
+- [Bộ cài Windows Full (.rbz)](https://github.com/nkl12012004-cmd/ZNS/releases/download/sitecraft-v0.4.2/SiteCraft_Full_0.4.2_Windows_x64.rbz)
+- [Mã nguồn và bộ cài (.zip)](https://github.com/nkl12012004-cmd/ZNS/releases/download/sitecraft-v0.4.2/SiteCraft_Source_0.4.2.zip)
+- [Release và SHA-256](https://github.com/nkl12012004-cmd/ZNS/releases/tag/sitecraft-v0.4.2)
 
 Cài qua Extension Manager, thoát hoàn toàn SketchUp rồi mở lại.
 Extensions → SiteCraft → Mở SiteCraft.
 
-### Bản 0.4.1
+### Bản 0.4.2
+
+- Cây vừa tỷ lệ: cao 4–6,5 m, tán rộng tối đa 4 m. Cụm tán lớn có thể tách thành 2–6 cây nhỏ tại các đỉnh tán rõ trên ảnh; tán trơn không có thêm đỉnh chỉ giữ một cây nhỏ. Kích thước nhận từ ảnh được lưu riêng với kích thước mô hình.
 
 - Cây có thân trụ và tán tròn với năm sắc xanh. Vị trí lấy từ tâm tán dò được
   trên ảnh vệ tinh bằng đường nét, kết cấu và tương phản; vùng thiếu bằng chứng
@@ -33,7 +35,7 @@ SketchUp Desktop/SDK save-load thật vẫn cần xác nhận trên máy đích.
 không thay thế việc mở mô hình và kiểm tra hiển thị/Undo trong SketchUp.
 
 - [Nguồn chỉnh sửa được](openmap-sketchup/)
-- [Ghi chú 0.4.1](openmap-sketchup/docs/RELEASE_0.4.1.md)
+- [Ghi chú 0.4.2](openmap-sketchup/docs/RELEASE_0.4.2.md)
 - [Kiểm tra và giới hạn](openmap-sketchup/docs/VALIDATION.md)
 - [Windows build](https://github.com/nkl12012004-cmd/ZNS/actions/workflows/openmap-windows-full.yml)
 - [Quyền của mã gốc, font và thư viện](openmap-sketchup/NOTICE.md)
