@@ -1,7 +1,8 @@
 # Đối chiếu phần chuyển từ giao diện/tính năng cũ
 
 Gói ZIP cũ được dùng làm tài liệu và nguồn tham chiếu. Mã runtime mới được viết
-độc lập để hoạt động với Supabase và bộ dựng bản đồ mở, không có thanh toán.
+độc lập với bộ dựng bản đồ mở, không có thanh toán. Windows Full 0.2.1 mở
+thẳng bản đồ, không cần Supabase hoặc tài khoản.
 11 tệp gốc đọc được đã được giữ nguyên trong `reference/mapskp_original_readable/`.
 
 | Hạng mục quan sát được ở bản cũ | Bản mới |
@@ -34,8 +35,8 @@ Gói ZIP cũ được dùng làm tài liệu và nguồn tham chiếu. Mã runti
 | Lõi Google Photorealistic 3D độc quyền | Không có nguồn gốc; không khôi phục |
 | Auto-update dùng chữ ký nhà phát hành cũ | Không dùng; có script đóng gói mã mới |
 | Runtime Windows tự chứa | Có, Python/Pillow/OCR; tự khởi động và dừng theo SketchUp |
-| Cấu hình Supabase trong giao diện | Có, lưu public config ở LocalAppData |
-| Đăng nhập | Supabase Email/Google của dự án người dùng |
+| Cấu hình Supabase trong giao diện | Không cần trong Windows Full 0.2.1 |
+| Đăng nhập | Windows Full 0.2.1 không yêu cầu; máy chủ riêng nâng cao vẫn có Supabase |
 | Xu/tín dụng/gói trả phí/referral/đếm lượt | Không có trong runtime mới |
 
 `reference/` không được nạp khi cài RBZ. Những tên API/callback, quota hay nội dung

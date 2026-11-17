@@ -26,6 +26,12 @@ class Application:
         self.search_lock = threading.Lock()
         self.last_search = 0
 
+    @property
+    def local_access(self):
+        # No account is needed for the private per-SketchUp worker. A standalone
+        # network server still uses Supabase and never enables anonymous access.
+        return bool(self.config.get("OPENMAP_LOCAL_TOKEN")) and self.config.get("OPENMAP_AUTH_MODE", "local") == "local"
+
     def require_local(self, headers):
         token = self.config.get("OPENMAP_LOCAL_TOKEN", "")
         if not token or not secrets.compare_digest(token, headers.get("X-OpenMap-Local", "")):
@@ -82,7 +88,7 @@ class Application:
             import platform
             import PIL
             return {"name": "OpenMap SketchUp", "version": VERSION, "auth_configured": self.auth.configured, "ocr_available": ocr.available(self.config.get("TESSERACT_BIN")),
-                    "instance": self.config.get("OPENMAP_INSTANCE_ID", ""), "python": platform.python_version(), "pillow": PIL.__version__}
+                    "auth_mode": "local" if self.local_access else "supabase", "instance": self.config.get("OPENMAP_INSTANCE_ID", ""), "python": platform.python_version(), "pillow": PIL.__version__}
         if path == "/api/runtime/config" and method in ("GET", "POST"):
             self.require_local(headers)
             if method == "POST":
@@ -102,6 +108,8 @@ class Application:
             return {"supabase_url": self.config.get("SUPABASE_URL", ""), "public_key": self.config.get("SUPABASE_ANON_KEY", ""), "auth_configured": self.auth.configured,
                     "redirect_url": "http://127.0.0.1:*/auth/callback**"}
         if method == "POST" and path.startswith("/api/auth/"):
+            if self.local_access:
+                raise PublicError("Chế độ cục bộ mở thẳng bản đồ, không cần đăng nhập.")
             action = path.removeprefix("/api/auth/")
             if action in ("login", "signup", "refresh"):
                 return getattr(self.auth, action)(body)
@@ -111,7 +119,7 @@ class Application:
                 return self.auth.logout(headers.get("Authorization", ""))
         if method == "GET" and path == "/api/auth/google/status":
             return self.auth.google_status(query.get("flow_id", [""])[0], headers.get("X-Flow-Secret", ""))
-        user = self.auth.user(headers.get("Authorization", ""))
+        user = {"id": "local-device", "email": "Trên máy này"} if self.local_access else self.auth.user(headers.get("Authorization", ""))
         if method == "GET" and path == "/api/me":
             return {"id": user["id"], "email": user.get("email", "")}
         if method == "POST" and path == "/api/ocr":

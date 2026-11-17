@@ -4,7 +4,9 @@ import json
 from pathlib import Path
 import tempfile
 import threading
+import time
 import unittest
+from unittest.mock import patch
 import urllib.error
 import urllib.request
 
@@ -20,7 +22,7 @@ class LocalRuntimeTests(unittest.TestCase):
         self.config_file = Path(self.temp.name) / 'cấu hình/config.env'
         self.fake = ThreadingHTTPServer(('127.0.0.1', 0), FakeSupabase)
         self.fake_thread = threading.Thread(target=self.fake.serve_forever, daemon=True); self.fake_thread.start()
-        self.config = {'OPENMAP_LOCAL_TOKEN':'local-test-token', 'OPENMAP_INSTANCE_ID':'test-instance', 'OPENMAP_CONFIG_FILE':str(self.config_file), 'PUBLIC_BASE_URL':'http://127.0.0.1:8877'}
+        self.config = {'OPENMAP_LOCAL_TOKEN':'local-test-token', 'OPENMAP_AUTH_MODE':'supabase', 'OPENMAP_INSTANCE_ID':'test-instance', 'OPENMAP_CONFIG_FILE':str(self.config_file), 'PUBLIC_BASE_URL':'http://127.0.0.1:8877'}
         self.server, self.app = create_server(self.config, port=0)
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True); self.thread.start()
         self.base = 'http://127.0.0.1:%d' % self.server.server_port
@@ -85,6 +87,42 @@ class LocalRuntimeTests(unittest.TestCase):
     def test_config_file_values_bounded(self):
         with self.assertRaises(PublicError): validate_public_config({'supabase_url':'http://remote.example','public_key':'public'})
         with self.assertRaises(PublicError): save_config(self.config_file, {'SUPABASE_ANON_KEY':'one\ntwo'})
+
+    def test_default_managed_mode_needs_no_supabase(self):
+        self.config.pop('OPENMAP_AUTH_MODE')
+        status, health = self.request('/health')
+        self.assertEqual(status, 200)
+        self.assertEqual(health['auth_mode'], 'local')
+        self.assertFalse(health['auth_configured'])
+        with patch.object(self.app.auth, 'user', side_effect=AssertionError('Local mode contacted authentication')):
+            status, user = self.request('/api/me')
+            self.assertEqual(status, 200)
+            self.assertEqual(user['id'], 'local-device')
+            status, job = self.request('/api/jobs', {'lat':10,'lon':106,'width':20,'height':20,'grid':8,'imagery':'none','roads':False,'buildings':False})
+            self.assertEqual(status, 200)
+            path = '/api/jobs/' + job['id']
+            for _ in range(100):
+                _, result = self.request(path)
+                if result['state'] == 'complete': break
+                time.sleep(.02)
+            self.assertEqual(result['state'], 'complete')
+            status, mesh = self.request(path + '/mesh')
+            self.assertEqual(status, 200)
+            self.assertEqual(mesh['schema'], 'openmap.mesh.v1')
+        self.assertFalse(self.config_file.exists())
+
+    def test_local_mode_still_requires_private_transport(self):
+        self.config.pop('OPENMAP_AUTH_MODE')
+        for token in (None, 'wrong'):
+            self.assertEqual(self.request('/api/me', local=token)[0],403)
+            self.assertEqual(self.request('/api/jobs', {'lat':10,'lon':106}, local=token)[0],403)
+        self.assertEqual(self.request('/api/auth/login', {'email':'unused@example.org','password':'unused'})[0],400)
+
+    def test_standalone_server_does_not_enable_local_access(self):
+        self.config.pop('OPENMAP_LOCAL_TOKEN')
+        self.config['OPENMAP_AUTH_MODE'] = 'local'
+        self.assertEqual(self.request('/api/me', local=None)[0],401)
+        self.assertEqual(self.request('/health', local=None)[1]['auth_mode'],'supabase')
 
 
 if __name__ == '__main__': unittest.main()

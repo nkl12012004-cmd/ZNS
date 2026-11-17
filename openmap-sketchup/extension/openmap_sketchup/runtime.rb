@@ -181,7 +181,7 @@ module OpenMapSketchUp
           log = File.join(state_root, 'worker-%d.log' % Process.pid)
           shim = 'import runpy,sys;p=sys.argv.pop(1);sys.path.insert(0,p);runpy.run_path(p+"/run.py",run_name="__main__")'
           paths = [root, executable_dir, ENV['PATH']].compact.reject(&:empty?).join(File::PATH_SEPARATOR)
-          env = { 'OPENMAP_LOCAL_TOKEN' => token, 'OPENMAP_OCR_DIR' => File.join(root, 'ocr'), 'OPENMAP_LOG_PATH' => log, 'OMP_THREAD_LIMIT' => '2', 'PATH' => paths, 'PYTHONIOENCODING' => 'utf-8' }
+          env = { 'OPENMAP_LOCAL_TOKEN' => token, 'OPENMAP_AUTH_MODE' => 'local', 'OPENMAP_OCR_DIR' => File.join(root, 'ocr'), 'OPENMAP_LOG_PATH' => log, 'OMP_THREAD_LIMIT' => '2', 'PATH' => paths, 'PYTHONIOENCODING' => 'utf-8' }
           publish(epoch, 'starting', 85, 'Đang khởi động bộ xử lý bản đồ và OCR')
           pid = Process.spawn(env, File.join(root, 'pythonw.exe'), '-c', shim, server_dir, '--port', '0', '--env', config, '--ready-file', ready, '--parent-pid', Process.pid.to_s, '--instance', instance, out: log, err: log, new_pgroup: true)
           waiter = Process.detach(pid)

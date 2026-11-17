@@ -1,3 +1,23 @@
+# Validation — Windows Full 0.2.1
+
+- 28 server tests passed locally. New cases build and retrieve geometry in local
+  mode without a Supabase project, verify the private IPC token is still required,
+  and verify standalone servers do not accidentally enable local access.
+- Playwright passed: direct workspace with no auth/config API calls, map/build,
+  manual/automatic import, OBJ/GLB, WebGL, restart, and startup failure/retry.
+  Remote Email/Google flows remain fixture tested.
+- All changed Ruby files passed Prism syntax validation.
+- Native Windows release gate now loads the actual Core.http method rather than
+  testing a separate Net::HTTP client. The host stub rejects Sketchup::Http in
+  managed mode and checks that callbacks/timers stay on the main thread.
+- That gate checks health, /me, job creation, mesh and binary GLB without login,
+  with a broken proxy environment, then restart and parent-exit cleanup.
+- SketchUp Desktop is not installed locally or on CI. We cannot yet confirm
+  the fix on the user's machine or actual geometry API import/Undo/placement.
+
+Historical checks below refer to versions 0.2.0 and 0.1.0. Their mandatory
+Supabase/login instructions do not apply to Windows Full 0.2.1.
+
 # Validation — Windows Full 0.2.0
 
 [Native Windows run 43996909891 passed](https://github.com/nkl12012004-cmd/ZNS/actions/runs/43996909891).

@@ -1,39 +1,31 @@
-# Cài Windows Full 0.2.0
+# Cài Windows Full 0.2.1 — không cần đăng nhập
 
-1. Tải `OpenMap_SketchUp_Full_0.2.0_Windows_x64.rbz` từ GitHub Release.
-2. SketchUp Desktop → Extension Manager → Install Extension… → chọn RBZ.
-3. Đóng và mở lại SketchUp, đặc biệt khi nâng từ bản 0.1.0.
-4. Mở Extensions → OpenMap SketchUp → Mở OpenMap.
-5. Lần đầu, plugin tự cài runtime vào LocalAppData và mở bộ xử lý trên cổng riêng.
-   Chờ thanh tiến trình hoàn tất; không cần Python, pip hoặc cửa sổ terminal.
-6. Trong màn hình Cấu hình, nhập Supabase Project URL và public anon/publishable
-   key của dự án bạn dùng. Không dùng service_role hoặc secret key.
-7. Bấm Lưu, rồi đăng nhập Email/Google và dựng bản đồ.
+1. Tải `OpenMap_SketchUp_Full_0.2.1_Windows_x64.rbz` trong GitHub Release.
+2. SketchUp → Extension Manager → Install Extension… → chọn RBZ mới.
+3. Thoát hoàn toàn tất cả cửa sổ SketchUp, rồi mở lại. Chỉ đóng hộp thoại
+   OpenMap chưa đủ để nạp mã Ruby mới khi nâng cấp từ 0.2.0.
+4. Extensions → OpenMap SketchUp → Mở OpenMap.
+5. Chờ bộ xử lý khởi động. Plugin tự mở bản đồ, không yêu cầu Email/Google,
+   Supabase URL/public key, Python/pip hoặc terminal.
 
-Google cần bật provider Google ở dự án Supabase. Trong Authentication → URL
-Configuration → Redirect URLs thêm `http://127.0.0.1:*/auth/callback**` vì mỗi
-phiên SketchUp chọn cổng loopback riêng. Google Cloud redirect vẫn là callback
-của Supabase, thường `https://YOUR_PROJECT.supabase.co/auth/v1/callback`.
+Nếu trước đây đã nhập Supabase, không cần xóa cấu hình: chế độ Windows Full mới
+không dùng Supabase để mở bản đồ. Trong Cấu hình, chọn “Tự chạy trên máy Windows
+này” nếu máy đang đặt chế độ máy chủ riêng.
 
-Gói Full gồm CPython 3.14.10, Pillow 12.3.0, OCR Tesseract 5.5.0, Leptonica 1.85.0
-và mô hình OCR tiếng Anh. OCR nhận tọa độ qua nút chọn ảnh hoặc Ctrl+V ảnh.
-Bộ xử lý tự dừng khi đóng SketchUp, kể cả khi tiến trình cha kết thúc bất thường.
+Gói gồm CPython 3.14.10, Pillow 12.3.0, Tesseract 5.5.0, Leptonica 1.85.0 và OCR
+model tiếng Anh. OCR đọc tọa độ qua nút chọn ảnh hoặc Ctrl+V ảnh.
+Bộ xử lý tự dừng khi đóng SketchUp hoặc khi tiến trình cha kết thúc.
 
-Cấu hình và cache nằm ở `%LOCALAPPDATA%/OpenMapSketchUp/`:
+Bản 0.2.1 sửa đường gọi API cục bộ từng báo HTTP 0. Kết nối loopback trực tiếp
+không đi qua proxy hệ thống; các callback UI vẫn chạy trên luồng chính SketchUp.
+Nếu còn lỗi, mở Cấu hình → Khởi động lại bộ xử lý. Nút Mở thư mục cấu hình / log
+mở `%LOCALAPPDATA%/OpenMapSketchUp/`; xem `worker-<pid>.log` để chẩn đoán.
 
-- `config.env`: Project URL và public key; không lưu mật khẩu/token đăng nhập.
-- `runtime/`: runtime đã giải nén, có khóa cài đặt để nhiều SketchUp không xung đột.
-- `worker-<pid>.log`: nhật ký khởi động bộ xử lý.
+Hỗ trợ Windows 10/11 x64, SketchUp Desktop có Ruby/HtmlDialog (mục tiêu 2021+).
+Nguồn dữ liệu bản đồ, DEM và OSM cần Internet. Không có xu hoặc tín dụng.
 
-Có thể mở thư mục này hoặc khởi động lại bộ xử lý từ Cấu hình. Bản Full hỗ trợ
-Windows 10/11 x64 với SketchUp Desktop có Ruby/HtmlDialog. SketchUp cần cho phép
-extension nguồn mở chưa ký theo chính sách cài đặt đang dùng trên máy đó.
-
-macOS/Linux và cách chạy máy chủ riêng vẫn có mã nguồn trong gói ZIP, nhưng
-runtime tự chứa trong bản phát hành này là Windows x64.
-
-Nguồn dữ liệu bản đồ/DEM/OSM và Supabase cần Internet. Plugin không có ví xu,
-tín dụng hoặc tính lượt xuất; dịch vụ bên ngoài vẫn có chính sách vận hành riêng.
+Máy chủ riêng là chế độ nâng cao, có cấu hình/xác thực riêng; không cần dùng
+chế độ đó khi cài Windows Full.
 
 Đây là bản viết lại độc lập. Phần lõi mã hóa/Google Photorealistic 3D của MapSKP
 gốc chưa được khôi phục. Xem FEATURE_PORT.md để biết phạm vi chức năng cụ thể.

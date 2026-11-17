@@ -55,11 +55,14 @@
   function loggedIn(value) {
     return native('session', value).then(function () {
       session = value; return api('GET', '/api/me');
-    }).then(function (me) {
-      $('password').value = ''; $('login').hidden = true; $('workspace').hidden = false;
-      document.body.classList.add('workspace-open');
-      $('account-email').textContent = me.email || me.id; renderMap(); return updateAnchor();
-    }).catch(function (error) { session = null; native('session', { access_token: null }); throw error; });
+    }).then(enterWorkspace).catch(function (error) { session = null; native('session', { access_token: null }); throw error; });
+  }
+  function enterWorkspace(me) {
+    $('password').value = ''; $('login').hidden = true; $('workspace').hidden = false;
+    document.body.classList.add('workspace-open');
+    $('account-email').textContent = me.email || me.id;
+    $('logout').hidden = runtimeMode === 'bundled';
+    renderMap(); return updateAnchor();
   }
   function clearLogin() {
     session = null; clearTimeout(googleTimer); clearTimeout(jobTimer); active = false;
@@ -77,7 +80,6 @@
   function openSettings() {
     $('setup-overlay').hidden = false;
     $('setup-message').textContent = '';
-    $('setup-save').disabled = true;
     native('ack_settings').catch(function () {});
     return native('config').then(function (config) {
       runtimeMode = config.mode || 'remote'; $('setup-mode').value = runtimeMode;
@@ -86,19 +88,12 @@
       return native('runtime_status');
     }).then(function (state) {
       $('setup-runtime').textContent = state.message || 'Bộ xử lý đã sẵn sàng';
-      if (runtimeMode === 'bundled' && state.state === 'ready') {
-        return api('GET', '/api/runtime/config').then(function (config) {
-          $('setup-url').value = config.supabase_url || ''; $('setup-key').value = config.public_key || '';
-          $('setup-redirect').value = config.redirect_url || 'http://127.0.0.1:*/auth/callback**';
-          $('setup-save').disabled = false;
-        });
-      }
     }).catch(function (error) { $('setup-message').textContent = error.message; });
   }
   window.OpenMap.openSettings = openSettings;
   function updateSetupMode() {
     var local = $('setup-mode').value === 'bundled';
-    $('setup-remote').hidden = local; $('setup-form').hidden = !local;
+    $('setup-remote').hidden = local; $('setup-local-info').hidden = !local;
     $('setup-restart').hidden = !local;
   }
   $('setup-mode').onchange = updateSetupMode;
@@ -106,15 +101,6 @@
   $('settings').onclick = guard(openSettings);
   $('setup-apply-mode').onclick = guard(function () {
     return native('set_mode', { mode: $('setup-mode').value, server: $('setup-server').value }).then(function () { window.location.reload(); });
-  });
-  $('setup-form').onsubmit = guard(function () {
-    $('setup-save').disabled = true; $('setup-message').textContent = 'Đang lưu cấu hình…';
-    return api('POST', '/api/runtime/config', { supabase_url: $('setup-url').value, public_key: $('setup-key').value }).then(function () {
-      return clearLogin();
-    }).then(function () {
-      loginEnabled(true); $('setup-overlay').hidden = true; $('connection').textContent = 'Đã cấu hình Supabase · Sẵn sàng đăng nhập';
-      tell('Đã lưu cấu hình trên máy này. Bạn có thể đăng nhập.', true);
-    }).catch(function (error) { $('setup-message').textContent = error.message; }).finally(function () { $('setup-save').disabled = false; });
   });
   function restartRuntime() {
     if (active && !window.confirm('Khởi động lại sẽ dừng tác vụ đang dựng. Tiếp tục?')) return;
@@ -352,6 +338,9 @@
   $('reset-camera').onclick = function () { window.OpenMapViewer.reset(); };
   function bootRuntime() {
     loginEnabled(false); runtimeReady = false; $('runtime-retry').hidden = true; $('runtime-progress').hidden = false;
+    $('login-options').hidden = true;
+    $('signin-title').textContent = 'Đang mở bản đồ';
+    $('signin-description').textContent = 'Đang kết nối bộ xử lý bản đồ…';
     var started = Date.now(), config;
     function poll() {
       return native('runtime_status').then(function (state) {
@@ -367,15 +356,24 @@
       runtimeReady = true; $('runtime-progress').hidden = true;
       return api('GET', '/health');
     }).then(function (info) {
+      $('ocr').title = info.ocr_available ? 'OCR đã có sẵn trong bộ xử lý' : 'Máy chủ chưa có bộ OCR';
+      if (info.auth_mode === 'local') {
+        session = null;
+        return native('session', { access_token: null }).then(function () { return api('GET', '/api/me'); }).then(enterWorkspace).then(function () {
+          if (config.open_settings) return openSettings();
+        });
+      }
+      $('login-options').hidden = false; $('signin-title').textContent = 'Đăng nhập máy chủ riêng';
+      $('signin-description').textContent = 'Đăng nhập Email hoặc Google của máy chủ bạn đã cấu hình.';
       loginEnabled(info.auth_configured);
       $('connection').textContent = info.auth_configured ? 'Bộ xử lý sẵn sàng · OpenMap ' + info.version : 'Mở Cấu hình để nhập Project URL và public key Supabase.';
-      $('ocr').title = info.ocr_available ? 'OCR đã có sẵn trong bộ xử lý' : 'Máy chủ chưa có bộ OCR';
-      if ((runtimeMode === 'bundled' && !info.auth_configured) || config.open_settings) return openSettings();
+      if (config.open_settings) return openSettings();
       if (info.auth_configured && config.session) return loggedIn(config.session);
     }).catch(function (error) {
+      runtimeReady = false; loginEnabled(false);
       $('connection').textContent = error.message; $('runtime-progress').hidden = true;
       $('runtime-retry').hidden = runtimeMode !== 'bundled';
-      if (config && config.open_settings) return openSettings();
+      if (runtimeMode === 'bundled' || (config && config.open_settings)) return openSettings();
     });
   }
   bootRuntime();

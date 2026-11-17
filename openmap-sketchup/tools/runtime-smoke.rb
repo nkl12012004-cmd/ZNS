@@ -5,13 +5,11 @@ require 'fileutils'
 require 'tmpdir'
 require 'net/http'
 require 'base64'
-module Sketchup
-  class AppObserver; end
-end
+require_relative 'bridge-host'
 
 plugin_dir = File.expand_path(ARGV.fetch(0))
 leave_running = ARGV[1] == '--parent-exit'
-require File.join(plugin_dir, 'runtime.rb')
+require File.join(plugin_dir, 'main.rb')
 runtime = OpenMapSketchUp::Runtime
 raise 'Windows x64 runner required' unless runtime.supported?
 
@@ -30,14 +28,7 @@ def wait_ready(runtime)
 end
 
 def rpc(runtime, path, body = nil, token = nil)
-  uri = URI(runtime.base_url + path)
-  request = body ? Net::HTTP::Post.new(uri) : Net::HTTP::Get.new(uri)
-  request['X-OpenMap-Local'] = runtime.transport_token
-  request['Authorization'] = 'Bearer ' + token if token
-  request['Content-Type'] = 'application/json'
-  request.body = JSON.generate(body) if body
-  response = Net::HTTP.start(uri.host, uri.port, nil, nil, nil, nil, read_timeout: 15) { |http| http.request(request) }
-  [response.code.to_i, JSON.parse(response.body)]
+  bridge_request(runtime, path, body, token)
 end
 
 begin
@@ -53,20 +44,36 @@ begin
   uri = URI(runtime.base_url + '/health')
   rejected = Net::HTTP.start(uri.host, uri.port, nil, nil, nil, nil) { |http| http.get(uri.request_uri) }
   raise 'Transport nonce bypassed' unless rejected.code == '403'
-  status, _data = rpc(runtime, '/api/me')
-  raise 'Anonymous login bypassed' unless status == 401
+  ENV['http_proxy'] = 'http://127.0.0.1:9'
+  status, user = rpc(runtime, '/api/me')
+  raise 'Local access incorrectly requires login' unless status == 200 && user['id'] == 'local-device'
+  raise 'Local mode not enabled' unless health['auth_mode'] == 'local'
   status, config = rpc(runtime, '/api/runtime/config')
   raise 'Local config not available' unless status == 200 && !config['auth_configured']
-  status, _data = rpc(runtime, '/api/runtime/config', { 'supabase_url' => 'https://example.supabase.co', 'public_key' => 'test-public-key' })
-  raise 'Could not persist config' unless status == 200 && File.file?(File.join(runtime.state_root, 'config.env'))
+  raise 'Local mode unexpectedly wrote Supabase configuration' if File.file?(File.join(runtime.state_root, 'config.env'))
+  status, job = rpc(runtime, '/api/jobs', { 'lat' => 10, 'lon' => 106, 'width' => 20, 'height' => 20, 'grid' => 8, 'imagery' => 'none', 'roads' => false, 'buildings' => false })
+  raise 'Local build could not start' unless status == 200
+  progress = nil
+  100.times do
+    status, progress = rpc(runtime, '/api/jobs/' + job['id'])
+    break if progress['state'] == 'complete'
+    sleep 0.05
+  end
+  raise 'Local build did not complete' unless status == 200 && progress['state'] == 'complete'
+  status, mesh = rpc(runtime, '/api/jobs/' + job['id'] + '/mesh')
+  raise 'Could not fetch local geometry' unless status == 200 && mesh['schema'] == 'openmap.mesh.v1'
+  binary = bridge_response('/api/jobs/' + job['id'] + '/glb')
+  raise 'Binary GLB damaged by HTTP bridge' unless binary.status_code == 200 && binary.body.byteslice(0, 4) == 'glTF'
+  ENV.delete('http_proxy')
   first_url = runtime.base_url
   runtime.stop
   sleep 1.0
   runtime.start(File.join(plugin_dir, 'server'))
   wait_ready(runtime)
   status, health = rpc(runtime, '/health')
-  raise 'Restart did not restore config' unless status == 200 && health['auth_configured']
-  puts JSON.generate({ 'runtime_smoke' => 'PASS', 'python' => health['python'], 'pillow' => health['pillow'], 'ocr' => health['ocr_available'], 'unicode_path' => true, 'restart' => true })
+  raise 'Restart requires Supabase' unless status == 200 && health['auth_mode'] == 'local' && !health['auth_configured']
+  raise 'HTTP bridge leaked UI timers' unless UI.timer_count == 0
+  puts JSON.generate({ 'runtime_smoke' => 'PASS', 'core_http_bridge' => true, 'main_thread_callbacks' => true, 'python' => health['python'], 'pillow' => health['pillow'], 'ocr' => health['ocr_available'], 'unicode_path' => true, 'restart' => true })
 rescue StandardError
   Dir.glob(File.join(runtime.state_root, 'worker-*.log')).each { |path| warn(File.read(path, encoding: 'UTF-8')) }
   raise

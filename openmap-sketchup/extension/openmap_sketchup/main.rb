@@ -6,6 +6,7 @@ require 'uri'
 require_relative 'importer'
 require_relative 'linking'
 require_relative 'runtime'
+require_relative 'local_http'
 
 module OpenMapSketchUp
   module Core
@@ -72,22 +73,27 @@ module OpenMapSketchUp
     def self.http(method, path, body, extra_headers = {}, &callback)
       raise 'Bộ xử lý đang khởi động. Đợi thông báo sẵn sàng hoặc mở Cấu hình để thử lại.' if managed? && Runtime.status['state'] != 'ready'
       raise 'Đường dẫn API không hợp lệ.' unless path.is_a?(String) && path.bytesize <= 2048 && path =~ %r{\A/(?:api/[A-Za-z0-9_/?=&%.+\-]+|health)\z}
-      methods = { 'GET' => Sketchup::Http::GET, 'POST' => Sketchup::Http::POST, 'DELETE' => Sketchup::Http::DELETE }
-      raise 'Phương thức HTTP không hợp lệ.' unless methods.key?(method)
-      request = Sketchup::Http::Request.new(valid_base!(base_url) + path, methods[method])
+      raise 'Phương thức HTTP không hợp lệ.' unless %w[GET POST DELETE].include?(method)
+      url = valid_base!(base_url) + path
       headers = { 'Content-Type' => 'application/json' }
       headers['X-OpenMap-Local'] = Runtime.transport_token if managed?
       headers['Authorization'] = 'Bearer ' + @token if @token
       if extra_headers['X-Flow-Secret'].is_a?(String) && extra_headers['X-Flow-Secret'].length <= 256
         headers['X-Flow-Secret'] = extra_headers['X-Flow-Secret']
       end
+      encoded = body ? JSON.generate(body) : nil
+      if managed?
+        return LocalHTTP.start(url, method, headers, encoded, &callback)
+      end
+      methods = { 'GET' => Sketchup::Http::GET, 'POST' => Sketchup::Http::POST, 'DELETE' => Sketchup::Http::DELETE }
+      request = Sketchup::Http::Request.new(url, methods[method])
       request.headers = headers
-      request.body = JSON.generate(body) if body
+      request.body = encoded if encoded
       key = request.object_id
       @requests[key] = request
       request.start do |_req, response|
         @requests.delete(key)
-        if response.nil?
+        if response.nil? || response.status_code.to_i <= 0
           callback.call(nil, managed? ? 'Bộ xử lý cục bộ chưa phản hồi. Mở Cấu hình và bấm Khởi động lại.' : 'Không kết nối được máy chủ riêng. Kiểm tra URL trong Cấu hình.')
         elsif response.body && response.body.bytesize > 140_000_000
           callback.call(nil, 'Phản hồi quá lớn. Chia vùng thành mảnh nhỏ hơn.')
@@ -99,6 +105,7 @@ module OpenMapSketchUp
 
     def self.error_response(response, failure)
       return failure if failure
+      return 'Không nhận được phản hồi HTTP hợp lệ. Mở Cấu hình để kiểm tra kết nối.' unless response && response.status_code.to_i > 0
       return nil if response.status_code.between?(200, 299)
       parsed = JSON.parse(response.body) rescue {}
       parsed['error'] || 'Máy chủ trả lỗi HTTP %d.' % response.status_code
@@ -189,7 +196,7 @@ module OpenMapSketchUp
             error = error_response(response, failure)
             raise error if error
             if action == 'import'
-              raise 'Phiên đăng nhập đã kết thúc.' unless @token
+              raise 'Phiên đăng nhập đã kết thúc.' unless managed? || @token
               raise 'Bạn đã chuyển mô hình trong lúc tải. Quay lại mô hình ban đầu.' unless Sketchup.active_model.equal?(model)
               result = Importer.import!(model, JSON.parse(response.body, max_nesting: 32), job_id)
               reply(id, { 'ok' => true, 'data' => result })

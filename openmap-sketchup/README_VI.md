@@ -1,33 +1,30 @@
-# OpenMap SketchUp 0.2.0 — Windows Full
+# OpenMap SketchUp 0.2.1 — Windows Full, mở thẳng bản đồ
 
-Bản viết lại nguồn mở độc lập theo yêu cầu: **đăng nhập Email/Google qua Supabase,
-không ví xu, không tín dụng, không mua gói, không tính lượt dựng/nạp/xuất.**
-Toàn bộ mã runtime của bản mới có trong `extension/` và `server/`, phát hành MIT.
-Nguồn gốc đọc được đi kèm trong `reference/` để đối chiếu, giữ riêng thông tin
-bản quyền ban đầu; giấy phép MIT của mã mới không áp dụng cho phần tham chiếu đó.
+**Không cần đăng nhập, tài khoản hoặc Supabase khi dùng bản Windows Full.**
+Không có xu, tín dụng, gói trả phí hoặc tính lượt xuất.
 
-Đây là một triển khai mới, không phải bản giải mã đầy đủ MapSKP v2.8.1.
-Các tệp lõi mã hóa, thư viện native và dịch vụ tài khoản thương mại của bản gốc
-không được dùng. Vì vậy, tài khoản Email/Google thuộc **dự án Supabase do bạn
-cấu hình**, không tự động dùng dữ liệu tài khoản/dịch vụ của nhà cung cấp cũ.
+[Tải bộ cài Full 0.2.1](https://github.com/nkl12012004-cmd/ZNS/releases/download/openmap-v0.2.1/OpenMap_SketchUp_Full_0.2.1_Windows_x64.rbz).
+Cài qua Extension Manager, thoát hoàn toàn mọi cửa sổ SketchUp rồi mở lại.
+Vào Extensions → OpenMap SketchUp → Mở OpenMap; chờ bộ xử lý khởi động,
+plugin tự vào bản đồ. Không cần điền cấu hình xác thực.
 
-## Cài bản Windows Full
+Đã kèm CPython 3.14.10, Pillow 12.3.0 và OCR Tesseract 5.5.0/English.
+Bản đồ/DEM/OSM cần Internet để tải dữ liệu. Bộ xử lý cục bộ chỉ nhận lệnh
+có mã kết nối riêng của phiên SketchUp, không phải máy chủ truy cập công khai.
 
-Tải [bộ cài Full 0.2.0](https://github.com/nkl12012004-cmd/ZNS/releases/download/openmap-v0.2.0/OpenMap_SketchUp_Full_0.2.0_Windows_x64.rbz),
-cài qua Extension Manager rồi đóng/mở lại SketchUp. Python 3.14.10,
-Pillow 12.3.0 và OCR Tesseract 5.5.0/English đã được đóng kèm.
+Bản 0.2.1 thay đường gọi API cục bộ gây lỗi HTTP 0 bằng kết nối loopback
+trực tiếp, bỏ proxy cho kết nối này và trả kết quả về luồng UI của SketchUp.
+Nếu khởi động lỗi, Cấu hình cho phép khởi động lại và mở log.
 
-Mở OpenMap, chờ runtime tự cài và khởi động, sau đó nhập Project URL và
-public key Supabase trong nút **Cấu hình**. Không cần cài Python/pip hoặc
-chạy server/terminal riêng trong chế độ Windows tự chứa.
-
-[Hướng dẫn Windows Full từng bước](docs/INSTALL_WINDOWS_FULL_VI.md).
-Các bước cấu hình file và chạy server bằng terminal ở phần dưới dành cho
-nhà phát triển hoặc chế độ máy chủ riêng.
+[Hướng dẫn cài/nâng cấp Windows Full](docs/INSTALL_WINDOWS_FULL_VI.md).
+Mã mới trong `extension/` và `server/` phát hành MIT. Tệp gốc đọc được trong
+`reference/` giữ quyền riêng. Đây là bản viết lại độc lập; lõi MapSKP mã hóa
+và Google Photorealistic 3D của bản gốc chưa khôi phục.
 
 ## Tính năng đã triển khai
 
-- Đăng nhập, đăng ký Email, đăng nhập Google PKCE, làm mới phiên và đăng xuất.
+- Chế độ Windows Full mở thẳng bản đồ, không cần tài khoản hoặc Supabase.
+- Máy chủ riêng nâng cao vẫn hỗ trợ Supabase Email/Google.
 - Giữ phiên trong bộ nhớ của phiên SketchUp; không ghi mật khẩu/token xuống đĩa.
 - Giao diện bản đồ toàn màn hình, thẻ điều khiển nổi, sáng/tối, preset kích thước,
   địa điểm mẫu, tùy chỉnh thu gọn; giữ luồng thao tác của giao diện cũ.
@@ -66,12 +63,17 @@ chọn vùng, không phải cam kết sai số hình học 0 mm ở mọi vĩ đ
 
 - SketchUp Desktop có Ruby API/HtmlDialog, mục tiêu SketchUp 2021 trở lên.
 - Bản Windows Full đã kèm Python/Pillow/OCR. Cách chạy máy chủ riêng cần Python 3.10+ và Pillow.
-- Một dự án Supabase với URL và **public anon/publishable key**.
-- Internet để xác thực và tải dữ liệu bản đồ/DEM/OSM.
+- Chỉ máy chủ riêng mới cần dự án Supabase; Windows Full không cần.
+- Internet để tải dữ liệu bản đồ/DEM/OSM.
 - OCR Tesseract và `eng` đã có trong bản Full; chỉ cài riêng khi dùng server tùy chỉnh.
   Đặt đường dẫn chương trình vào `TESSERACT_BIN` trong `.env` nếu chưa có trong PATH.
 
-## 1. Cấu hình Supabase
+## Máy chủ riêng nâng cao — cấu hình Supabase
+
+Phần dưới chỉ dành cho người tự triển khai máy chủ riêng. Windows Full không cần
+các bước Supabase, `.env` hoặc terminal này.
+
+### 1. Cấu hình Supabase
 
 1. Tạo hoặc chọn dự án Supabase của bạn.
 2. Trong Project Settings → API, lấy Project URL và public anon/publishable key.
@@ -132,7 +134,7 @@ HTTP server để phục vụ trực tiếp mật khẩu/token qua HTTP trên m�
 
 ## 3. Cài extension
 
-Trong gói nguồn ZIP có `install/OpenMap_SketchUp_Full_0.2.0_Windows_x64.rbz`.
+Trong gói nguồn ZIP có `install/OpenMap_SketchUp_Full_0.2.1_Windows_x64.rbz`.
 
 1. SketchUp → Extension Manager → Install Extension… → chọn file RBZ.
 2. Mở Extensions → OpenMap SketchUp → Mở OpenMap hoặc bấm icon toolbar.
