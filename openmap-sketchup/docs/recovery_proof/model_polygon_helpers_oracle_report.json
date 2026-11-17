@@ -1,0 +1,36 @@
+{
+  "functions": [
+    "_signed_area_2d",
+    "_longest_edge_axis_2d",
+    "_point_in_polygon_2d",
+    "_min_dist_to_poly_edges_2d",
+    "_segments_properly_intersect_2d",
+    "_ear_clip_indexed_ccw",
+    "_merge_mesh_parts",
+    "_merge_uv_mesh_parts",
+    "_clip_segment_liang_barsky",
+    "_clip_polyline_to_rect"
+  ],
+  "comparison_count": 11123,
+  "counts": {
+    "_signed_area_2d": 536,
+    "_longest_edge_axis_2d": 536,
+    "_point_in_polygon_2d": 1591,
+    "_min_dist_to_poly_edges_2d": 1591,
+    "_segments_properly_intersect_2d": 2005,
+    "_ear_clip_indexed_ccw": 536,
+    "_merge_mesh_parts": 366,
+    "_merge_uv_mesh_parts": 366,
+    "_clip_segment_liang_barsky": 2005,
+    "_clip_polyline_to_rect": 1591
+  },
+  "exact_scalar_float_bits": true,
+  "exact_numpy_bytes_dtype_shape": true,
+  "exact_result_types_and_errors": true,
+  "unrecovered_requested": [
+    "triangulate_polygon_2d",
+    "_clean_ccw_ring_2d",
+    "_inset_polygon_2d_safe",
+    "_clip_triangles_to_rect_2d"
+  ]
+}

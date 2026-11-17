@@ -1,0 +1,67 @@
+{
+  "passed": true,
+  "tests": 5,
+  "oracle_comparisons": 2224,
+  "function_count": 22,
+  "comparison": "exact array bytes/dtype/shape; exact scalar bits/errors; all13 default JPEG bytes",
+  "default_jpegs": [
+    {
+      "size": 137981,
+      "sha256": "2daaa10d78e95256e50881cc390ee0cfc42abcbae8d1da3cf90805eaeb864fb1"
+    },
+    {
+      "size": 120064,
+      "sha256": "7458057b4860602af8e0c0deb9da95659e3b4416ddb5d4c53d6157ea5d4473a7"
+    },
+    {
+      "size": 156124,
+      "sha256": "4dedc5d2c677480e83dba9f225df7adb074836f91577d77394bcd2e60c2845fb"
+    },
+    {
+      "size": 165136,
+      "sha256": "d5b1852e9ae466f63c61898350b8321ee8edf297920f1e5f4fcabf0bfaa91644"
+    },
+    {
+      "size": 108830,
+      "sha256": "55a869dfc1308b54a4fd75eb9564445ca6f749c9d8c8cebdb251c1b1a726dceb"
+    },
+    {
+      "size": 97058,
+      "sha256": "607b2eaefba2b79972d6761a18e161ad76aa904f7c23e187b7ad2d4e2b9a3e6c"
+    },
+    {
+      "size": 197992,
+      "sha256": "592eb34a2ddf27e97b1fcbefa75b005e71a4255b9e25f89a4733fef76af5106a"
+    },
+    {
+      "size": 183352,
+      "sha256": "4740c000a934d04bb7f1e204c2d31bfbf69034e5b6d42a1fe776d06f3d5e9bb0"
+    },
+    {
+      "size": 2861,
+      "sha256": "1abce682946e053e1826f0ab6fe282b6ed6011e10b0bf890053607f5aab513f6"
+    },
+    {
+      "size": 10202,
+      "sha256": "343bc1fbeb043fc8503dc0d08cac503270e1654d6ddb1b4abc178d71b9033566"
+    },
+    {
+      "size": 19349,
+      "sha256": "11da2f410d68c66e6aaaad856521a44e0c874e01b5bde7a8a21c7cb21f283dbf"
+    },
+    {
+      "size": 17867,
+      "sha256": "4b2c474fb6390d6af36e8ee552b0ccbc2decb137f9a65f6335363ed0e60efcbe"
+    },
+    {
+      "size": 17059,
+      "sha256": "6c3616262e0afcda56215a97d740d67ae4e0a747cf72727d0b9fa372e74c5d10"
+    }
+  ],
+  "python": "3.14.10 (main, Oct 26 2026, 14:09:22) [Clang 23.1.3 ]",
+  "numpy": "2.5.5",
+  "pillow": "13.0.0",
+  "original_pyc_sha256": "3822f2da301fcedfd60eaa6df0d3e82e6ffd38b7e823ed181f1ea2ca81726414",
+  "readable_source_sha256": "da7ecdfec556957b167e6c2e16f05ca5cf3046c57653e6cad97de24413bf6fb3",
+  "scope": "local-only reconstruction; original rights retained; no public uploads"
+}

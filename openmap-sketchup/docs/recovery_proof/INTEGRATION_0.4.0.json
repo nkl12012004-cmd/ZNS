@@ -1,0 +1,31 @@
+{
+  "version": "0.4.0",
+  "product": "SiteCraft",
+  "status": "local_candidate",
+  "linux_cpython": "3.14.10",
+  "server_tests": {
+    "total": 88,
+    "passed": 87,
+    "skipped": 1
+  },
+  "ui_smoke": "pass; fixtures for host bridge",
+  "ui_lifecycle": "pass",
+  "fonts": "four unmodified SVN-Avo faces; Chromium load and glyph checks pass",
+  "ruby_syntax_files": 7,
+  "ruby_projection_checks": 311,
+  "mesh_material_validation": [
+    14,
+    21
+  ],
+  "glb_compat": {
+    "errors": 0,
+    "warnings": 0,
+    "infos": 4,
+    "corrected_primitives": 2,
+    "material_clones": 1,
+    "binary_stream_unchanged": true
+  },
+  "windows_dependency_run": 44017165169,
+  "native_sketchup_save_load": "not tested",
+  "public_distribution": "Explicitly approved by the user in this session on 2026-11-17"
+}

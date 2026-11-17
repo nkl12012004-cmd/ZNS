@@ -19,13 +19,13 @@ def safe_path(name):
 
 
 def prepare(cache, output):
-    lock = json.loads((ROOT / "tools/runtime.lock.json").read_text())
+    lock = json.loads((ROOT / "tools/runtime.lock.json").read_text(encoding="utf8"))
     cache.mkdir(parents=True, exist_ok=True)
     for name, metadata in lock["downloads"].items():
         target = cache / name
-        if not target.is_file() or sha256(target.read_bytes()).hexdigest() != metadata["sha256"]:
+        if not target.is_file() or target.stat().st_size != metadata["size"] or sha256(target.read_bytes()).hexdigest() != metadata["sha256"]:
             temporary = target.with_suffix(target.suffix + ".download")
-            request = urllib.request.Request(metadata["url"], headers={"User-Agent": "OpenMap-runtime-build/0.2"})
+            request = urllib.request.Request(metadata["url"], headers={"User-Agent": "OpenMap-runtime-build/0.4"})
             with urllib.request.urlopen(request, timeout=90) as response, temporary.open("wb") as destination:
                 total = 0
                 while chunk := response.read(1024 * 1024):
@@ -33,20 +33,26 @@ def prepare(cache, output):
                     if total > metadata["size"]:
                         raise ValueError("Download exceeds pinned size: " + name)
                     destination.write(chunk)
-            if sha256(temporary.read_bytes()).hexdigest() != metadata["sha256"]:
+            if temporary.stat().st_size != metadata["size"] or sha256(temporary.read_bytes()).hexdigest() != metadata["sha256"]:
                 raise ValueError("Dependency checksum mismatch: " + name)
             temporary.replace(target)
         print("Verified", name, flush=True)
-    entries = {}
+    entries, seen = {}, set()
 
     def put(name, data):
-        if not safe_path(name) or name.casefold() in {key.casefold() for key in entries}:
+        if not safe_path(name) or name.casefold() in seen:
             raise ValueError("Unsafe or duplicate runtime path: " + name)
+        if len(name.encode("utf8")) > 240 or len(data) > 80 * 1024 * 1024:
+            raise ValueError("Runtime entry exceeds extractor bounds: " + name)
+        seen.add(name.casefold())
         entries[name] = data
 
-    for archive_name, prefix in (("python.zip", ""), ("pillow.whl", "Lib/site-packages/")):
+    archives = [("python.zip", "")]
+    archives.extend((name, "Lib/site-packages/") for name in lock["downloads"] if name.endswith(".whl"))
+    for archive_name, prefix in archives:
         with zipfile.ZipFile(cache / archive_name) as archive:
-            assert archive.testzip() is None
+            if archive.testzip() is not None:
+                raise ValueError("Dependency archive CRC failed: " + archive_name)
             for item in archive.infolist():
                 if item.is_dir():
                     continue
@@ -69,6 +75,8 @@ def prepare(cache, output):
     for name in ("TESSERACT_LICENSE.txt", "LEPTONICA_LICENSE.txt", "TESSDATA_LICENSE.txt"):
         put("licenses/" + name, (cache / name).read_bytes())
     put("licenses/SOURCE_LINKS.json", json.dumps(lock, indent=2).encode())
+    if len(entries) > 5000 or sum(map(len, entries.values())) > 512 * 1024 * 1024:
+        raise ValueError("Runtime exceeds installer total/file-count bounds")
     output.mkdir(parents=True, exist_ok=True)
     catalog = {}
     package = output / "windows-x64.pak"
@@ -85,8 +93,10 @@ def prepare(cache, output):
     manifest = {"schema": "openmap.runtime.v1", "platform": "windows-x64", "format": "OPENMAPR1+zlib", "package_sha256": sha256(package.read_bytes()).hexdigest(),
                 "package_size": package.stat().st_size, "file_count": len(entries), "unpacked_bytes": sum(map(len, entries.values())),
                 "python_version": lock["python_version"], "pillow_version": lock["pillow_version"], "tesseract_version": lock["tesseract_version"],
+                "numpy_version": lock["numpy_version"], "requests_version": lock["requests_version"], "dependency_versions": lock["dependency_versions"],
+                "runtime_role": "public-dependencies-only; original engine files are separate",
                 "dependencies": lock["downloads"], "files": catalog}
-    (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+    (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf8")
     print("Built", package.name, manifest["package_size"], "bytes;", len(entries), "files", flush=True)
     return manifest
 

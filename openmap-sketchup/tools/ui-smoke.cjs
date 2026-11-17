@@ -8,6 +8,11 @@ const { pathToFileURL } = require('node:url');
 (async () => {
   const browser = await chromium.launch({ headless: true, args: ['--no-sandbox', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
   const page = await browser.newPage({ viewport: { width: 1040, height: 860 } });
+  let modePreference = null;
+  await page.exposeFunction('__testModePreference', value => {
+    if (typeof value === 'string') modePreference = value;
+    return modePreference;
+  });
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   const root = path.resolve(__dirname, '..');
@@ -22,19 +27,24 @@ const { pathToFileURL } = require('node:url');
   });
   await page.addInitScript(() => {
     const remote = window.location.search.includes('remote');
-    const override = sessionStorage.getItem('test-runtime-mode');
+    // SketchUp preferences live in the host, not file:// browser storage.
+    const override = null;
     window.testState = { token: null, apiCalls: [], imported: 0, mode: override || (remote ? 'remote' : 'bundled'), configured: remote, failHealth: window.location.search.includes('failed') && !override, runtimePolls: 0, restarts: 0, previousDocument: window.name, nativeCalls: [], anchor: null, nextJobPartial: false, currentJobPartial: false };
     window.addEventListener('beforeunload', () => { window.name = JSON.stringify({stored:sessionStorage.getItem('test-runtime-mode'),url:location.href,calls:window.testState.nativeCalls}); });
-    window.sketchup = { openmap(raw) {
+    window.sketchup = { async openmap(raw) {
       const message = JSON.parse(raw), a = message.args, s = window.testState;
       s.nativeCalls.push({action:message.action,args:a,id:message.id,time:Date.now()});
       let result = { ok: true, data: {} }, delay = 1;
       const session = { access_token: 'ui-valid-token', refresh_token: 'ui-refresh', user: { email: 'test@example.org' } };
-      if (message.action === 'config') result.data = { server: 'http://127.0.0.1:50001', mode: s.mode, version: 'test', anchor: s.anchor };
+      if (message.action === 'config') {
+        const preferred = await window.__testModePreference(null);
+        if (preferred) { s.mode = preferred; s.failHealth = false; }
+        result.data = { server: 'http://127.0.0.1:50001', mode: s.mode, version: 'test', anchor: s.anchor };
+      }
       if (message.action === 'runtime_status') { s.runtimePolls++; result.data = s.runtimePolls < 2 ? { state: 'preparing', progress: 40, mode: s.mode, message: 'Đang cài bộ xử lý' } : { state: 'ready', progress: 100, mode: s.mode, message: 'Bộ xử lý sẵn sàng' }; }
       if (message.action === 'runtime_restart') { s.restarts++; s.runtimePolls = 0; s.token = null; s.failHealth = false; }
       if (message.action === 'session') s.token = a.access_token;
-      if (message.action === 'set_mode') sessionStorage.setItem('test-runtime-mode', a.mode);
+      if (message.action === 'set_mode') await window.__testModePreference(a.mode);
       if (message.action === 'api') {
         s.apiCalls.push({ method: a.method, path: a.path, body: a.body });
         if (a.path === '/health') result = s.failHealth ? { ok: false, status: 0, error: 'Không nhận được phản hồi hợp lệ từ bộ xử lý cục bộ.' } : { ok: true, data: { auth_mode: s.mode === 'bundled' ? 'local' : 'supabase', auth_configured: s.configured, ocr_available: true, version: 'test' } };

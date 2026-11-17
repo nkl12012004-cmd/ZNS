@@ -1,0 +1,59 @@
+{
+  "source": "fully readable 51-function builder + readable geo/facade dependencies",
+  "status": "PASS",
+  "network_sent": 0,
+  "exact_scene_match": true,
+  "exact_progress_match": true,
+  "matches_previous_live_original_export": true,
+  "cache_files": 53,
+  "cache_unchanged": true,
+  "geometry_fingerprint": "b013b958853c85ec824510e554703a624256b5905b62a6b71ae52a0386d7a980",
+  "implementations": [
+    {
+      "implementation": "original",
+      "seconds": 3.3864,
+      "geometry_fingerprint": "b013b958853c85ec824510e554703a624256b5905b62a6b71ae52a0386d7a980",
+      "materials": 13,
+      "layers": 4,
+      "vertices": 7316,
+      "triangles": 10500
+    },
+    {
+      "implementation": "readable",
+      "seconds": 2.8377,
+      "geometry_fingerprint": "b013b958853c85ec824510e554703a624256b5905b62a6b71ae52a0386d7a980",
+      "materials": 13,
+      "layers": 4,
+      "vertices": 7316,
+      "triangles": 10500
+    }
+  ],
+  "attempted_cache_miss_requests": [
+    {
+      "host": "tiles.openfreemap.org",
+      "path": "/planet"
+    },
+    {
+      "host": "overpass.private.coffee",
+      "path": "/api/interpreter"
+    },
+    {
+      "host": "overpass-api.de",
+      "path": "/api/interpreter"
+    },
+    {
+      "host": "tiles.openfreemap.org",
+      "path": "/planet"
+    },
+    {
+      "host": "overpass.private.coffee",
+      "path": "/api/interpreter"
+    },
+    {
+      "host": "overpass-api.de",
+      "path": "/api/interpreter"
+    }
+  ],
+  "no_vendor_requests": true,
+  "elapsed_seconds": 6.2324
+}

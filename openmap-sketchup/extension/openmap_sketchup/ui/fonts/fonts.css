@@ -1,0 +1,39 @@
+/* User-supplied SVN-Avo files retain their original rights. See NOTICE.md. */
+@font-face {
+  font-family: "SVN-Avo";
+  src: url("SVN-Avo-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SVN-Avo";
+  src: url("SVN-Avo-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SVN-Avo";
+  src: url("SVN-Avo-Italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SVN-Avo";
+  src: url("SVN-Avo-BoldItalic.ttf") format("truetype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+:root {
+  --openmap-ui-font: "SVN-Avo", "Segoe UI", Arial, sans-serif;
+}
+/* Keep one user-selected family across controls, dialogs and map widgets,
+   including widgets that declare a font shorthand elsewhere. Weight, size,
+   italic styling and fallback glyphs are preserved. */
+html, body, body *, body::before, body::after, body *::before, body *::after {
+  font-family: var(--openmap-ui-font) !important;
+  font-synthesis: none;
+}

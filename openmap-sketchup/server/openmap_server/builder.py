@@ -53,14 +53,17 @@ def parameters(body):
     imagery = body.get("imagery", "satellite")
     if imagery != "none" and imagery not in IMAGERY:
         raise PublicError("Nguồn ảnh không hợp lệ.")
-    for key in ("terrain", "roads", "roads_main", "roads_local", "buildings", "water", "trees"):
+    for key in ("terrain", "roads", "roads_main", "roads_local", "buildings", "buildings_high", "buildings_low", "water", "trees"):
         if key in body and not isinstance(body[key], bool):
             raise PublicError("Tùy chọn %s phải là boolean." % key)
     anchor = body.get("anchor")
     if anchor is not None:
         if not isinstance(anchor, dict):
             raise PublicError("Mốc tọa độ không hợp lệ.")
+        incoming_anchor = anchor
         anchor = {"lat": geo.number(anchor.get("lat"), "mốc vĩ độ", -80, 80), "lon": geo.number(anchor.get("lon"), "mốc kinh độ", -180, 180), "elevation": geo.number(anchor.get("elevation"), "cao độ mốc", -12_000, 20_000), "terrain_mode": anchor.get("terrain_mode", "terrain_3d")}
+        if "z_exaggeration" in incoming_anchor:
+            anchor["z_exaggeration"] = geo.number(incoming_anchor["z_exaggeration"], "hệ số cao độ mốc", 0.1, 10)
         if anchor["terrain_mode"] not in ("flat", "terrain_3d"):
             raise PublicError("Chế độ nền của mốc không hợp lệ.")
         if math.hypot(*geo.xy(lat, lon, anchor)) > 250_000:
@@ -68,10 +71,11 @@ def parameters(body):
     style, roof = body.get("building_style", "white"), body.get("roof_style", "flat_simple")
     if style not in ("white", "textured") or roof not in ("flat_simple", "parapet_vietnam", "parapet_concrete"):
         raise PublicError("Kiểu nhà hoặc mái không hợp lệ.")
-    project_name = str(body.get("project_name", "OpenMap_Context")).strip()[:80]
-    project_name = re.sub(r"[^\w \-]", "", project_name) or "OpenMap_Context"
+    project_name = str(body.get("project_name", "SiteCraft_Context")).strip()[:80]
+    project_name = re.sub(r"[^\w \-]", "", project_name) or "SiteCraft_Context"
     return dict(lat=lat, lon=lon, width=width, height=height, grid=int(grid), image_size=int(image_size), imagery=imagery,
                 terrain=body.get("terrain", False), roads=body.get("roads", True), buildings=body.get("buildings", True),
+                buildings_high=body.get("buildings_high", True), buildings_low=body.get("buildings_low", True),
                 roads_main=body.get("roads_main", True), roads_local=body.get("roads_local", True), water=body.get("water", False), trees=body.get("trees", False),
                 building_style=style, roof_style=roof, default_floors=geo.number(body.get("default_floors", 3.5), "số tầng mặc định", 1, 100), project_name=project_name,
                 exaggeration=geo.number(body.get("exaggeration", 1), "hệ số cao độ", 0.1, 10), anchor=anchor, bbox=geo.bounds(lat, lon, width, height))
@@ -479,8 +483,8 @@ def build(params, *, progress=lambda *_: None, cancel=None, getter=fetch, osm_ge
 
 
 def export_obj(result):
-    """Write portable OBJ/MTL/PNG plus geographic metadata; metres, Z up."""
-    obj = ["# OpenMap SketchUp; metres, Z up", "mtllib model.mtl"]
+    """Write portable OBJ/MTL/PNG; match the original metre/Y-up contract."""
+    obj = ["# OpenMap SketchUp; 1 unit = 1 meter; Y-Up (3ds Max / Blender / D5 / Lumion)", "mtllib model.mtl"]
     mtl = []
     offset = 1
     uv_offset = 1
@@ -491,7 +495,9 @@ def export_obj(result):
         if "alpha" in material: mtl.append("d %.4f" % material["alpha"])
     for value in result["meshes"]:
         obj.extend(["o " + value["name"], "usemtl material_%d" % value["material"]])
-        obj.extend("v %.6f %.6f %.6f" % tuple(v) for v in value["vertices"])
+        # Proper rotation (determinant +1): east/up/south, matching GLB.
+        # Face winding and Wavefront UV coordinates are unchanged.
+        obj.extend("v %.6f %.6f %.6f" % (v[0], v[2], -v[1]) for v in value["vertices"])
         has_uv = len(value["uv"]) == len(value["vertices"])
         if has_uv:
             obj.extend("vt %.9f %.9f" % tuple(uv) for uv in value["uv"])
@@ -506,6 +512,7 @@ def export_obj(result):
         archive.writestr("model.mtl", "\n".join(mtl) + "\n")
         metadata = {key: result[key] for key in ("schema", "anchor", "center", "bbox", "attribution", "warnings", "parameters")}
         metadata.update(partial=result.get("partial", False), missing_layers=result.get("missing_layers", []), imagery_requested_zoom=result.get("imagery_requested_zoom"), imagery_source_zoom=result.get("imagery_source_zoom"))
+        metadata.update(units="metres", up_axis="Y", coordinate_system="right-handed", axes={"X": "east", "Y": "up", "Z": "south"})
         archive.writestr("metadata.json", json.dumps(metadata, ensure_ascii=False, indent=2))
         for i, material in enumerate(result["materials"]):
             if material.get("texture_png") or material.get("texture_jpeg"):

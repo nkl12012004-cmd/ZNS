@@ -1,0 +1,46 @@
+[
+  {
+    "file": "SVN-Avo-Regular.ttf",
+    "supplied_name": "SVN-Avo.ttf",
+    "size": 72160,
+    "sha256": "1a1d616d7dc3d56c83466bb0f74d16f9ff61f8ce28b41fb344a2b3bfbf775b2c",
+    "css_family": "SVN-Avo",
+    "weight": 400,
+    "style": "normal",
+    "os2_fsType": 4,
+    "source": "User-supplied font; original rights retained; not covered by SiteCraft MIT license"
+  },
+  {
+    "file": "SVN-Avo-Bold.ttf",
+    "supplied_name": "SVN-Avo bold.ttf",
+    "size": 73676,
+    "sha256": "83bc8479a3a88996b9e031b4527c311609614355a06bfaeda72569aadb1e0bff",
+    "css_family": "SVN-Avo",
+    "weight": 700,
+    "style": "normal",
+    "os2_fsType": 4,
+    "source": "User-supplied font; original rights retained; not covered by SiteCraft MIT license"
+  },
+  {
+    "file": "SVN-Avo-Italic.ttf",
+    "supplied_name": "SVN-Avo italic.ttf",
+    "size": 72740,
+    "sha256": "db97d1c819f77df71674b8b635b376a2f1aeffbf5437475a1b96235aa9d1bdc1",
+    "css_family": "SVN-Avo",
+    "weight": 400,
+    "style": "italic",
+    "os2_fsType": 4,
+    "source": "User-supplied font; original rights retained; not covered by SiteCraft MIT license"
+  },
+  {
+    "file": "SVN-Avo-BoldItalic.ttf",
+    "supplied_name": "SVN-Avo bold italic.ttf",
+    "size": 69712,
+    "sha256": "b4b582857378eb41d6ad2db3c0f8f4ef3ab5a576ab2680ea775cb71d69ee46e5",
+    "css_family": "SVN-Avo",
+    "weight": 700,
+    "style": "italic",
+    "os2_fsType": 4,
+    "source": "User-supplied font; original rights retained; not covered by SiteCraft MIT license"
+  }
+]

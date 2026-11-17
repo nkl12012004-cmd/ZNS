@@ -1,156 +1,133 @@
-# Validation — Windows Full 0.3.0
+# SiteCraft 0.4.0 — phạm vi kiểm tra
 
-- 62 Python unit/integration tests pass, including geocoder/provider fallback,
-  Vietnamese autocomplete, safe Google Maps redirects, OSM retry/cancellation,
-  no-data imagery detection, partial-job API and export metadata.
-- Full Playwright UI run passes: single sidebar at 1040/650px, immediate Hà Nội
-  jump, keyboard/click suggestions and stale response rejection, clean satellite
-  tile source, preview/export source sync, partial OSM no-auto-import/manual
-  import, 3D/export, startup/restart and remote-to-local recovery. API/native
-  responses and image tiles are fixtures; screenshots are labeled fixtures.
-- Ruby syntax and real Ruby Wasm importer preflight pass on the live Hà Nội
-  model, including stored tile-reference validation and old/invalid metadata.
-- Native Windows gate runs packaged CPython/Pillow/OCR, all 62 server tests,
-  legacy preferences, actual Core startup/HTTP, new geocode route with a Maps
-  coordinate URL, mesh/GLB, Unicode paths, restart and parent-exit cleanup.
+Tài liệu này ghi các kiểm tra đã thực hiện cho mã khôi phục và chỉ rõ phần chưa
+xác nhận. Người dùng đã đồng ý công bố SiteCraft 0.4.0 cùng năm mô-đun nguồn
+khôi phục ngày 17/11/2026, theo giờ Việt Nam. Kết quả của OpenMap 0.3.0 hoặc
+của runner cũ không được coi là kiểm tra đầy đủ cho SiteCraft 0.4.0.
 
-Live network checks (measurements are samples, not performance guarantees):
+## Đối chiếu với chương trình gốc
 
-- ArcGIS submit: Hà Nội 0.30s; 123 Nguyễn Huệ, Hồ Chí Minh 0.23s; Đà Nẵng 0.24s.
-- Forced submit fallbacks: Photon Hà Nội 0.94s; Nominatim 0.38s.
-- Photon autocomplete with center in HCMC: Hà Nộ 0.68s; Hà Nội 0.23s;
-  Nguyễn Huệ Hồ Chí Minh 0.20s. Nominatim is never used for autocomplete.
-- Full Google Maps @lat,lon, query=encoded-coordinates and !3d!4d parse correctly.
-  Shortlink safety/redirect bounds are fixture tested; no live shared shortlink
-  was available, so live shortlink parity is not claimed.
-- Hà Nội and HCMC 350x350m, DEM grid16, Esri1024, all requested OSM layers,
-  textured/parapet buildings: 2.72s / 7,868 triangles and 1.81s / 7,593 triangles,
-  respectively. Both partial:false and no warnings. HCMC contained water;
-  Hà Nội contained trees/high-rise/low-rise/roads, with no water in that bbox.
-- Restored default Hà Nội 380x380m, grid64, Esri4096, all OSM: 9.73s,
-  17,641 triangles, no missing layers, peak RSS155.6MiB. Texture4072x4096,
-  16.06MB; JSON22.93MB; GLB17.14MB. The source image was visually inspected
-  and is actual aerial imagery, not Esri's gray no-data placeholder.
-- This test discovered Esri z20 returned a gray placeholder with HTTP200.
-  The fixed builder uses blankTile=false, known-placeholder rejection and
-  native-zoom/lower-zoom handling. Source19/requested20 and the fact that
-  upsampling does not create native image detail are stored/warned explicitly.
+Oracle là các code object lấy cục bộ từ gói MapSKP do người dùng cung cấp,
+không thay đổi logic chương trình gốc. Mã `.py` khôi phục được chạy riêng rồi
+so kết quả. Các ca dữ liệu mạng dùng fixture hoặc cache; không gửi mã gốc lên
+dịch vụ giải mã bên ngoài.
 
-SketchUp Desktop itself is unavailable locally and in CI. Actual geometry API
-import, materials, Undo and placement callbacks still need a SketchUp smoke test.
-The old encrypted geocoder/OSM/geometry core and Google Photorealistic 3D mesh
-were not recovered; the new backend implementations remain independent.
+| Phần | Kết quả đã ghi nhận |
+| --- | --- |
+| Tọa độ/tile: 11 hàm | 60.458 phép đối chiếu, so bit float và byte/dtype/shape mảng |
+| Texture: 22 hàm | 2.224 phép đối chiếu; đủ 13 JPEG mặc định trùng từng byte |
+| Dữ liệu/mạng: 23 hàm trong builder | 37.935 phép đối chiếu; satellite JPEG, DEM float32, URL/cache/dự phòng, MVT/gzip/zlib, Overpass, morphology và vector từ Google roadmap |
+| Hình học/địa hình/nhà | 12.032 phép đối chiếu trong bộ geometry; bao gồm đáy/thành địa hình, đường, nhà có tầng giật cấp và gờ/mái |
+| Bộ dựng đầy đủ: 51 hàm | 61/61 ca khớp kiểu/dtype/shape, mảng, texture, vật liệu, lớp, origin và sự kiện tiến trình |
+| Cảnh Quỳnh Lưu dùng cache | Cảnh gốc và mã nguồn mới cùng 7.316 đỉnh, 10.500 tam giác, 13 vật liệu, 4 lớp và cùng fingerprint hình học |
+| Bộ ghi: 14 hàm | 27 tệp đầu ra thô của ba cảnh đối chiếu trùng byte: OBJ, MTL, texture, GLB, gói cảnh và JSON/ảnh fallback; chưa qua bước sửa tương thích GLB |
+| Lời gọi SketchUp SDK | Đối chiếu qua DLL fixture tới ranh giới lưu, bao gồm chia chunk 16.001 tam giác và cảnh Quỳnh Lưu; không dùng SDK thật |
+| Tọa độ/OCR: 6 hàm | 8 nhóm oracle đạt; parser, bounds, PowerShell template, luồng ảnh/subprocess fixture; chưa chạy OCR Windows thật |
 
-Historical validation follows; older layouts/login requirements are superseded.
+Các bộ kiểm tra con có thể dùng chung hàm hoặc cùng cảnh; không cộng các số trên
+thành một tổng ca độc lập. Kết quả không có nghĩa mọi đầu vào hoặc mọi kết hợp
+tham số đều đã được thử.
 
-# Validation — Windows Full 0.2.3
+Fingerprint cảnh Quỳnh Lưu:
 
-- Regression host now retains preferences instead of always returning defaults.
-- Native Windows gate includes old `server` URL / `mode=remote` preferences,
-  explicit new remote selection persistence, invalid URL rejection and switching
-  back to local. The lifecycle test seeds an unreachable old server, then calls
-  actual Core.start_runtime and Core.http for local health, build and mesh/GLB.
-- Playwright checks automatic Settings after remote connection failure and
-  one-click recovery into the local workspace after reload, with no auth calls.
-- Existing packaged Python/OCR, 28 server tests, restart, Unicode paths and
-  parent-exit checks remain release gates.
-- Native SketchUp Desktop APIs are unavailable in CI. Actual user-machine
-  startup and model import/Undo/placement still require confirmation in SketchUp.
+```text
+b013b958853c85ec824510e554703a624256b5905b62a6b71ae52a0386d7a980
+```
 
-Historical validation:
+Ca Quỳnh Lưu dùng 53 tệp cache không đổi, chặn mạng thực, so cảnh và tiến trình
+với chương trình gốc. Đây không phải lần tải dữ liệu mới từ các nhà cung cấp.
+Texture/data đã có được giữ đúng byte qua quy trình thử.
 
-# Validation — Windows Full 0.2.2
+So oracle chạy cả hai chương trình trong cùng môi trường Linux CPython 3.14.10;
+một số bộ dùng NumPy 2.5.5/Pillow 13.0.0. Runtime Windows được ghim NumPy 2.5.3/
+Pillow 12.2.0 theo dependency gốc. Kết quả cùng môi trường không thay thế việc
+chạy toàn bộ gói Windows với dependency được ghim.
 
-- 28 server tests passed locally. New cases build and retrieve geometry in local
-  mode without a Supabase project, verify the private IPC token is still required,
-  and verify standalone servers do not accidentally enable local access.
-- Playwright passed: direct workspace with no auth/config API calls, map/build,
-  manual/automatic import, OBJ/GLB, WebGL, restart, and startup failure/retry.
-  Remote Email/Google flows remain fixture tested.
-- All changed Ruby files passed Prism syntax validation.
-- Native Windows release gate now loads the actual Core.http method rather than
-  testing a separate Net::HTTP client. The host stub rejects Sketchup::Http in
-  managed mode and checks that callbacks/timers stay on the main thread.
-- That gate checks health, /me, job creation, mesh and binary GLB without login,
-  with a broken proxy environment, then restart and parent-exit cleanup.
-- SketchUp Desktop is not installed locally or on CI. We cannot yet confirm
-  the fix on the user's machine or actual geometry API import/Undo/placement.
+## GLB giao cho người dùng và bản gốc của bộ ghi
 
-Historical checks below refer to versions 0.2.0 and 0.1.0. Their mandatory
-Supabase/login instructions do not apply to Windows Full 0.2.2.
+Bộ ghi gốc có thể gán vật liệu texture cho nhóm mặt (primitive) không có UV. Adapter
+`server/openmap_server/glb_compat.py` chạy sau bộ ghi, tạo bản sao vật liệu màu
+từ RGBA gốc và chỉ chuyển liên kết vật liệu của những mặt bị ảnh hưởng.
+Các mặt có UV giữ vật liệu ban đầu; hình học, chỉ số, UV, byte BIN/ảnh và các
+chunk khác không bị đổi. Tệp đã tương thích trả nguyên byte mà không ghi lại JSON.
 
-# Validation — Windows Full 0.2.0
+Khi có sửa, GLB thô được giữ thành `<tên>_original.glb`; GLB giao qua API là bản
+đã sửa. `original_manifest.glb_compatibility` ghi hash trước/sau, hash BIN,
+số primitive/vật liệu và danh sách chỉnh sửa. Đây là thay đổi có chủ đích ngoài bộ
+ghi gốc: không tuyên bố toàn bộ GLB đã sửa trùng byte chương trình gốc.
 
-[Native Windows run 43996909891 passed](https://github.com/nkl12012004-cmd/ZNS/actions/runs/43996909891).
-Packaged CPython 3.14.10 and Pillow 12.3.0 passed all 25 server tests.
-The native OCR engine reports 5.5.0 (NuGet package TesseractOCR 5.5.2) and
-recognized `10.776889, 106.700806` from a generated image. HTTPS/OpenSSL,
-Ruby start/restart, Unicode install/cache paths and parent-exit cleanup passed.
-The release assets were downloaded again and matched SHA-256 and ZIP CRC.
+Tám ca kiểm tra mới đạt, bao gồm tệp hợp lệ không đổi, dùng chung/tách bản sao vật
+liệu, giữ RGBA và mọi chunk BIN/ảnh, nhiều liên kết texture, từ chối UV set
+khác bị thiếu, extension chưa hỗ trợ và dữ liệu GLB/hình màu sai.
 
-- 25 server tests pass locally, including local transport, Supabase config,
-  persistence, token separation and rejection of secret/service_role keys.
-- First-run progress, Supabase setup and restart are checked in Playwright
-  in addition to the existing map/auth/3D/import/export flows with fixtures.
-- All Ruby files are syntax checked. The runtime archive is independently
-  unpacked and checked entry-by-entry against its SHA-256 catalog.
-- Native Windows release is gated by tools/windows-smoke.py in GitHub Actions:
-  packaged CPython/Pillow, full server tests, OCR recognition, HTTPS/OpenSSL,
-  Ruby first-start/restart, Unicode paths and parent-exit shutdown.
-- GitHub Release is published only after that native Windows job succeeds.
+glTF Validator kiểm tra `original_preview_compat.glb`: **0 lỗi, 0 cảnh báo** và
+4 thông tin về vật liệu gốc không còn được dùng nhưng vẫn giữ lại. Cùng fixture
+thô trước sửa có 2 lỗi thiếu UV; bản sửa chuyển 2 primitive sang 1 bản sao vật
+liệu. Đây là kết quả cho fixture đã nêu, không phải chứng nhận mọi GLB đầu ra.
 
-SketchUp Desktop is not installed here or on the runner. Actual model import,
-textures, Undo and SKP placement still need a SketchUp smoke test. Real Supabase
-credentials are intentionally not provided; the user chose to enter them later.
-The implementation retains the feature limits in FEATURE_PORT.md; the encrypted
-MapSKP proprietary core was not recovered.
+## Kiểm tra trình đóng gói
 
-The earlier section below describes version 0.1.0; its packaging and OCR limitations
-are superseded by the Full Windows checks above.
+Verifier đã được thử riêng bằng thư mục tạm có manifest nguồn hợp lệ, không chạy
+build. Nó chấp nhận năm `.py` đúng kích thước/SHA-256 và từ chối tám tình huống:
+marshal, pyc, đường dẫn armor, đường dẫn vault, DLL, native binary đổi đuôi,
+sửa byte nguồn và đường dẫn manifest vượt khỏi thư mục được phép.
 
-Previous live-data / geometry validation (0.1.0):
+Quy tắc đóng gói loại `.env` và các biến thể chứa cấu hình thật, bytecode/cache,
+log, `test-artifacts`, `test-results`, `node_modules` và các gói cũ. Mẫu `.env.example`,
+mã kiểm tra và thông báo/font SVN-Avo được giữ. `original_kernel` phải chỉ có
+năm nguồn `.py` được kê cùng các thông báo/manifest; build từ chối cache hoặc
+payload nhị phân trong đó.
 
-# Validation — 2026-11-16
+Việc tạo RBZ/ZIP cuối, kiểm tra CRC và ghi `SHA256SUMS.txt` cần được thực hiện
+sau khi chốt nguồn/manifest/runtime. Build ghi tệp và checksum; Release
+`sitecraft-v0.4.0` chỉ được công bố sau kiểm tra Windows của đúng gói.
 
-Passed checks:
+## Kiểm tra tích hợp SiteCraft 0.4.0 trên Linux
 
-- 18 Python unittest cases: actual HTTP requests against a local Supabase protocol
-  fixture; invalid credentials, fabricated tokens, refresh, Google PKCE, polling
-  secret, one-time delivery, ownership checks for mesh/OBJ/GLB/preview, missing
-  configuration and browser-origin rejection.
-- WGS84 in metres, concave/closed building geometry, clipping, terrain/UV,
-  shared patch seams with a constant DEM fixture, flat-base hill patches with
-  zero boundary height, building/roof/water/tree options, OBJ and GLB structure,
-  glTF UV orientation, preview resizing, XML fallback and DTD/entity rejection.
-- OCR dependency error and fixed-argv Tesseract calls tested with fixtures.
-- JavaScript syntax checked with Node.js; all four Ruby files with Prism 2.1.0.
-- Importer preflight run in a real Ruby 3.3 WebAssembly VM on a live generated
-  mesh: valid data accepted, bad indices/NaN/materials rejected, JPEG dimensions,
-  SKP ENU offsets and legacy metadata conversion checked.
-- Playwright/Chromium: Email/Google login, invalid login, decimal/DMS input,
-  manual/automatic import, OBJ/GLB, theme, WebGL preview/wireframe, responsive
-  layout and logout. Native SketchUp bridge/auth responses are fixtures.
-- Live public-data build at 10.776889, 106.700806, area 100 x 100 m:
-  Esri imagery, Terrarium DEM, OSM fallback; 1,376 triangles (Ground 128,
-  Roads_main 10, Roads_local 30, Buildings_lowrise 412, Building_roofs 88,
-  Roof_parapets 708). No OSM water/tree objects occurred in this region;
-  those layers were checked with fixtures.
-- Live-generated GLB passed Khronos glTF Validator: 0 errors, 0 warnings.
-- Original reference files preserved byte-for-byte with SHA-256 inventory.
-- ZIP/RBZ CRC checked. No .env, caches, node_modules, encrypted vault or native
-  runtime binary is bundled in the RBZ.
+- Bộ cuối 88 bài máy chủ: **87 đạt, một bỏ qua đúng điều kiện**, chạy trong
+  18,098 giây trên CPython 3.14 Linux. Gồm tám ca GLB mới và sáu ca HTTP thực
+  với bộ nguồn vừa khôi phục; bài bỏ qua dành cho interpreter không hỗ trợ.
+- Mạng và xác thực ngoài bị chặn trong các ca HTTP: vẫn dựng/xuất bằng dữ liệu
+  fixture nội bộ, đối chiếu mảng, UV, ảnh, tag và byte đầu ra của bộ ghi gốc.
+- Đã thử hủy/tác vụ chưa xong, từ chối SKP native khi chưa có DLL, báo nguồn giảm
+  khả dụng riêng với thiếu lớp, kiểm tra giới hạn đồng bộ, giữ hệ số mốc 2.5.
+- Chromium UI đạt các luồng một thanh bên, tìm kiếm, sáng/tối, xuất, nạp, lỗi/hủy,
+  tránh phản hồi cũ và khôi phục runtime. Phản hồi Ruby/API trong UI dùng fixture.
+- Bốn SVN-Avo TTF tải thành công, computed font đúng ở nút/form/hộp cấu hình/widget;
+  đầy đủ 104 ký tự tiếng Việt, không lỗi trình duyệt/font trong ca thử.
+  Font được người dùng cho phép đóng kèm; quyền gốc và thông báo được giữ.
+- Ruby Prism kiểm tra cú pháp 7 tệp đạt; preflight với 21 vật liệu và mesh gốc đạt.
+  311 ca ghép mảnh so với hàm Ruby gốc đạt, gồm offset/scale/rotation/hill patch.
+- Dependency runtime công khai đã kiểm tra trên Windows thật, run 44017165169:
+  CPython/NumPy BLAS/Pillow JPEG/Unicode/HTTPS đạt, hash runtime trùng cục bộ.
+  Ca này không chứa mã phục hồi và không xác nhận chạy bộ dựng trong Windows.
 
-Requires the operator's environment:
+## Trạng thái kiểm tra Windows của gói đầy đủ
 
-- The user chose to fill Supabase configuration later. Live Email/Google login
-  is not tested against their project; .env.example contains no live keys.
-- SketchUp Desktop is unavailable. Actual import/textures, placement observers,
-  Undo, toolbar and SKP saving need a smoke test in SketchUp 2021 or newer.
-  Ruby VM validation does not emulate SketchUp geometry APIs.
-- Tesseract was not installed here; OCR subprocess behavior uses fixtures.
-- The 8K option, Google tile endpoints and all combinations of roof/terrain
-  settings have not received exhaustive live tests. RAM/provider availability
-  affect large jobs.
-- Overpass was unavailable during the live check; OSM map API fallback worked.
-- New runtime is independent. Recovered original reference files retain their
-  original rights; encrypted/native MapSKP source and signing keys were not recovered.
+Lượt CI cho đúng gói SiteCraft 0.4.0, bao gồm năm mô-đun nguồn khôi phục, đang
+được chuẩn bị/chạy; chưa có kết quả cuối trong tài liệu này. Không dùng run
+dependency công khai 44017165169 để thay thế lượt kiểm tra đầy đủ này. Khi CI
+đạt, gói được phát hành tại [sitecraft-v0.4.0](https://github.com/nkl12012004-cmd/ZNS/releases/tag/sitecraft-v0.4.0).
+
+## Các kiểm tra còn cần trên môi trường đích
+
+- Chạy bộ runtime Windows cho đúng RBZ SiteCraft 0.4.0; mã phục hồi hiện mới
+  chạy tích hợp trên Linux. Kết quả dependency Windows không thay thế kiểm tra đó.
+- Dùng Windows thật với `SketchUpAPI.dll` tương thích để ghi SKP, rồi mở tệp bằng
+  SketchUp Desktop. Chưa tạo hoặc xác minh SKP native thật trong các ca trên.
+- Nạp mesh/texture trong SketchUp, kiểm tra Undo, Group/Tag, bóng nắng, vị trí mảnh,
+  lưu SKP và nâng cấp từ cài đặt cũ. Ruby fixture không mô phỏng geometry API.
+- Chạy Windows OCR với ảnh thật, ngôn ngữ OCR đã cài và fallback Tesseract của
+  runtime. Fixture subprocess không chứng minh Windows OCR có sẵn trên máy.
+- Kiểm tra trực tiếp các nhà cung cấp ảnh/tìm kiếm/OSM/DEM. Fixture và cache không
+  bảo đảm dịch vụ đang truy cập được, dữ liệu đủ hoặc hình mới nhất.
+- Kiểm tra ca 8K/vùng lớn và thời gian/RAM thực trên máy đích.
+
+Nhánh kiểm tra chính sách native tùy chọn được giữ nguyên. Ca thiếu grant hoặc
+lỗi policy có đối chiếu lỗi; nhánh thành công dùng grant có chữ ký thật chưa
+được thử vì không có grant hợp lệ. Không tạo grant hoặc bỏ qua kiểm tra.
+
+Google Photorealistic 3D, backend tài khoản/thanh toán và chữ ký cập nhật của
+MapSKP không thuộc phạm vi đã khôi phục. Mã gốc và font giữ quyền riêng, chưa
+xác minh giấy phép nguồn mở. Việc người dùng đồng ý công bố nguồn khôi phục
+không thay đổi quyền gốc hoặc đưa các tệp đó vào giấy phép MIT của mã tích hợp.

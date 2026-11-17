@@ -1,44 +1,53 @@
-# Đối chiếu phần chuyển từ giao diện/tính năng cũ
+# SiteCraft 0.4.0 — phần đã chuyển từ MapSKP
 
-Gói ZIP cũ được dùng làm tài liệu và nguồn tham chiếu. Mã runtime mới được viết
-độc lập với bộ dựng bản đồ mở, không có thanh toán. Windows Full 0.3.0 mở
-thẳng bản đồ, không cần Supabase hoặc tài khoản.
-11 tệp gốc đọc được đã được giữ nguyên trong `reference/mapskp_original_readable/`.
+Bản 0.4.0 dùng mã Python đọc/sửa được khôi phục từ bộ dựng gốc. Phần giao diện,
+API và cầu nối SketchUp là mã tích hợp mới. Tên sản phẩm là SiteCraft; font
+SVN-Avo do người dùng cung cấp, giữ nguyên tệp và thông báo quyền gốc.
 
-| Hạng mục quan sát được ở bản cũ | Bản mới |
+Đây là đối chiếu phạm vi chức năng, không phải tuyên bố mọi dịch vụ bên ngoài
+hay mọi đầu ra SKP trên mọi máy đã được kiểm tra. Kết quả kiểm tra cụ thể nằm
+trong [VALIDATION.md](VALIDATION.md).
+
+| Phần của bản cũ | SiteCraft 0.4.0 |
 | --- | --- |
-| Bản đồ và bảng điều khiển chung, sáng/tối | Có, điều khiển/tiến trình/xuất/ghép mảnh cùng một thanh bên |
-| Tab xem 2D/3D, xoay/pan/zoom, căn giữa, khung dây | Có, viewer WebGL mới |
-| Map phẳng Z=0 / Địa hình DEM | Có |
-| Trám đồi lên lớp phẳng | Có, nội suy đưa rìa mảnh về Z=0 |
-| Preset 200/380/600/1000 m, kích thước thủ công | Có |
-| Kéo góc khung vùng chọn | Có |
-| Tìm địa chỉ, tọa độ thập phân/DMS, link có tọa độ | Có |
-| Gợi ý tìm kiếm trực tiếp | Có, gợi ý khi gõ + Enter tới ngay; Photon/ArcGIS, Nominatim chỉ khi gửi tìm |
-| OCR ảnh chụp/Ctrl+V ảnh | Có, Tesseract/eng đóng kèm trong Windows Full |
-| Vệ tinh sạch, Google vệ tinh/hybrid/đường phố | Có, giữ tên/nguồn như bản cũ; ảnh xuất đồng bộ lớp đang xem |
-| OSM lớp xem 2D | Có; không dùng tile OSM để tải ảnh xuất hàng loạt |
-| Ảnh 2K/4K/8K | Có, thêm 1K; 8K JPEG, tối đa 8192 |
-| Lưới DEM, hệ số cao độ | Có |
-| Đường chính/ngõ bật riêng | Có, Group/Tag riêng |
-| Nhà cao/thấp tầng, số tầng mặc định | Có, mốc cao tầng 21 m |
-| Box trắng hoặc map công trình | Có; map tạo thủ tục, không phải ảnh mặt đứng thật |
-| Mái phẳng, mái trầm/bê tông, gờ mái | Có, hình học xấp xỉ |
-| Mặt nước | Có, polygon OSM đơn giản; chưa dựng multipolygon có lỗ |
-| Cây | Có, tại node OSM natural=tree; chưa tái tạo rừng tự động |
-| Mốc chung, chọn Bắc/Nam/Đông/Tây | Có, dựa trên mảnh nền gần nhất đã nạp; trám đồi không đổi tham chiếu mảnh nền |
-| Tự nạp sau khi dựng | Có |
-| Lưu SKP, OBJ + texture, GLB | Có |
-| Mở thư mục, bóng nắng, Undo | Có |
-| Kéo-thả SKP tự ghép | Có cho metadata OpenMap; đọc metadata MapSKP cũ khi hợp lệ |
-| Không di chuyển đối tượng cũ đã có khi bật plugin | Có; observer ghi nhận các đối tượng hiện có và chỉ xét mảnh mới thêm |
-| Lõi Google Photorealistic 3D độc quyền | Không có nguồn gốc; không khôi phục |
-| Auto-update dùng chữ ký nhà phát hành cũ | Không dùng; có script đóng gói mã mới |
-| Runtime Windows tự chứa | Có, Python/Pillow/OCR; tự khởi động và dừng theo SketchUp |
-| Cấu hình Supabase trong giao diện | Không cần trong Windows Full 0.3.0 |
-| Đăng nhập | Windows Full 0.3.0 không yêu cầu; máy chủ riêng nâng cao vẫn có Supabase |
-| Xu/tín dụng/gói trả phí/referral/đếm lượt | Không có trong runtime mới |
+| Tải và ghép tile ảnh, cắt theo vùng chọn | Dùng lại hàm gốc, giữ URL/cache/crop/resize và JPEG |
+| Esri sạch, Google vệ tinh/hybrid/đường phố | Giữ nguồn chọn của bộ dựng gốc; cần dịch vụ còn hoạt động |
+| Tọa độ WGS84/ENU, đơn vị mét, tile zoom | 11 hàm gốc đã khôi phục, đối chiếu số học chính xác |
+| DEM Terrarium và nội suy lưới | Dùng lại giải mã, nội suy và mốc cao độ của gốc |
+| Địa hình nổi có thành/đáy khối | Dùng lại `build_terrain_mesh_with_plinth`, không chỉ tấm ảnh phẳng |
+| Nền phẳng và trám đồi | Giữ nhánh dựng phẳng/khối đồi và xử lý mốc/rìa của gốc |
+| Dữ liệu đường, nhà và nước | Giữ giải mã OpenFreeMap MVT, Overpass chia vùng/cache/dự phòng |
+| Giờ cao điểm và nguồn OSM thiếu dữ liệu | Giữ chiến lược MVT/Overpass và cờ suy giảm của gốc |
+| Bù đường/nhà khi vector chưa đủ | Giữ phân loại màu Google đường phố, làm mảnh/truy tim và tìm khối nhà |
+| Đường chính/ngõ theo địa hình | Giữ phân loại bề rộng và quét dải đường của gốc |
+| Chiều cao nhà từ height/levels/footprint | Giữ quy tắc suy ra và biến thiên ổn định theo ID của gốc |
+| Nhà có khối đế, tầng giật cấp, khối mái | Giữ dựng khối công trình của gốc, không chỉ extrude một hộp |
+| Mặt đứng, mái, gờ mái | 22 hàm texture đã khôi phục; 8 mặt đứng + 4 mái + 1 gờ mặc định trùng byte |
+| Nhà box trắng | Giữ nhánh vật liệu/hình học tương ứng của gốc |
+| Mặt nước, công viên, cây | Giữ nhánh dựng cảnh và cây kiến trúc của gốc trong phạm vi dữ liệu có |
+| OBJ + MTL + ảnh | Dùng bộ ghi gốc; tọa độ, UV, vật liệu và byte ảnh được đối chiếu |
+| GLB, gói cảnh, JSON fallback | Dùng bộ ghi gốc; không dựng lại mesh bằng bộ ghi độc lập cũ |
+| Ghi SKP bằng SDK | Mã 14 hàm được khôi phục; cần Windows và DLL tương thích thật, chưa kiểm tra lưu native thật |
+| Nạp khi SDK chưa sẵn sàng | Có JSON/texture fallback thành hình học chỉnh sửa được trong SketchUp |
+| Tọa độ từ văn bản/link và OCR ảnh | 6 hàm nguồn đã khôi phục; OCR Windows thật có giới hạn kiểm tra riêng |
+| Tìm kiếm, gợi ý, tọa độ/DMS/link | Có luồng tìm kiếm trong UI mới; dịch vụ tìm địa danh vẫn là dịch vụ ngoài |
+| Tùy chọn, tiến trình, xuất, ghép mảnh | Cùng một thanh bên; không chia thành ba bảng điều khiển |
+| Chế độ xem 2D/3D, sáng/tối | Có; viewer/giao diện thuộc mã tích hợp mới |
+| Tự nạp, Group/Tag, mở thư mục, bóng nắng, Undo | Có cầu nối Ruby; cần kiểm tra thao tác bằng SketchUp Desktop thật |
+| Mốc chung và ghép các mảnh | Giữ thông tin tọa độ gốc qua adapter; ghép dự án xa nhau vẫn có giới hạn ENU |
+| Runtime tự chứa | Windows Full có Python/NumPy/Pillow/Requests/OCR theo lockfile |
+| Đăng nhập/Supabase | Không cần khi chạy Windows Full; máy chủ riêng là tùy chọn nâng cao |
+| Xu/tín dụng/gói trả phí | Không có trong luồng tích hợp SiteCraft |
+| Google Photorealistic 3D | Chưa khôi phục, không thuộc bộ dựng OSM/DEM này |
+| Tài khoản/backend thương mại, chữ ký cập nhật cũ | Không chuyển thành backend SiteCraft |
+| Chính sách native tùy chọn trong mã gốc | Giữ nhánh kiểm tra bình thường; không tạo giấy phép hoặc chữ ký thay thế |
 
-`reference/` không được nạp khi cài RBZ. Những tên API/callback, quota hay nội dung
-thương mại còn trong tệp tham chiếu là nội dung gốc để đối chiếu, không thuộc
-luồng vận hành của extension mới. Giấy phép của tệp gốc không bị tự thay đổi.
+Địa hình/nhà giống thuật toán gốc khi cùng dữ liệu và tham số trong những ca đã
+đối chiếu. Cùng địa điểm nhưng khác ngày, tile, mức zoom hoặc dữ liệu OSM có thể
+cho cảnh khác. Phần bù từ ảnh màu chỉ suy ra hình khối; không tạo dữ liệu khảo
+sát hoặc mặt đứng thật. Việc chuyển mã không bảo đảm nguồn ảnh/OSM luôn đáp ứng.
+
+`server/original_kernel/` chứa năm tệp `.py` khôi phục và manifest kiểm tra byte.
+`reference/` giữ tệp gốc đọc được để đối chiếu, không được nạp lúc chạy RBZ.
+Các thư mục này và font không tự trở thành MIT. Xem [NOTICE.md](../NOTICE.md).
+Người dùng đã xác nhận công bố phần nguồn khôi phục trong ZNS ngày 17/11/2026; quyền của các thành phần được giữ nguyên.

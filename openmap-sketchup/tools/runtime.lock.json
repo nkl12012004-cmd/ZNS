@@ -1,7 +1,7 @@
 {
   "schema": "openmap.runtime.lock.v1",
   "python_version": "3.14.10",
-  "pillow_version": "12.3.0",
+  "pillow_version": "12.2.0",
   "tesseract_version": "5.5.0",
   "tesseract_package_version": "5.5.2",
   "leptonica_version": "1.85.0",
@@ -13,9 +13,12 @@
       "size": 12619664
     },
     "pillow.whl": {
-      "url": "https://files.pythonhosted.org/packages/f1/e0/492879f69d94f91f60fc8cd05ba03650e9520afebb2fb7aa12777d7c7f38/pillow-12.3.0-cp314-cp314-win_amd64.whl",
-      "sha256": "fdafc9cce40277e0f7a0feabce0ee50dd2fa1800f3b38015e51296b5e814048d",
-      "size": 7237707
+      "url": "https://files.pythonhosted.org/packages/cd/8b/601e6566b957ca50e28725cb6c355c59c2c8609751efbecd980db44e0349/pillow-12.2.0-cp314-cp314-win_amd64.whl",
+      "sha256": "4e6c62e9d237e9b65fac06857d511e90d8461a32adcc1b9065ea0c0fa3a28150",
+      "size": 7217400,
+      "distribution": "pillow",
+      "version": "12.2.0",
+      "upstream_filename": "pillow-12.2.0-cp314-cp314-win_amd64.whl"
     },
     "tesseract-modern.nupkg": {
       "url": "https://api.nuget.org/v3-flatcontainer/tesseractocr/5.5.2/tesseractocr.5.5.2.nupkg",
@@ -46,6 +49,66 @@
       "url": "https://download.microsoft.com/download/4/7/c/47c6134b-d61f-4024-83bd-b9c9ea951c25/Microsoft.VCLibs.x64.14.00.Desktop.appx",
       "sha256": "b56a9101f706f9d95f815f5b7fa6efbac972e86573d378b96a07cff5540c5961",
       "size": 6764349
+    },
+    "numpy.whl": {
+      "url": "https://files.pythonhosted.org/packages/a4/73/d2c08231e4fde7e415501fd02c715d96e98599b2d8384445933944152984/numpy-2.5.3-cp314-cp314-win_amd64.whl",
+      "sha256": "2c25dfa72943e4336ddb6b0ee4277b47a0c85bede0807530ec68103bf58e2c10",
+      "size": 12698179,
+      "distribution": "numpy",
+      "version": "2.5.3",
+      "upstream_filename": "numpy-2.5.3-cp314-cp314-win_amd64.whl"
+    },
+    "requests.whl": {
+      "url": "https://files.pythonhosted.org/packages/d7/8e/7540e8a2036f79a125c1d2ebadf69ed7901608859186c856fa0388ef4197/requests-2.33.1-py3-none-any.whl",
+      "sha256": "4e6d1ef462f3626a1f0a0a9c42dd93c63bad33f9f1c1937509b8c5c8718ab56a",
+      "size": 64947,
+      "distribution": "requests",
+      "version": "2.33.1",
+      "upstream_filename": "requests-2.33.1-py3-none-any.whl"
+    },
+    "charset-normalizer.whl": {
+      "url": "https://files.pythonhosted.org/packages/48/77/72dcb0921b2ce86420b2d79d454c7022bf5be40202a2a07906b9f2a35c97/charset_normalizer-3.4.7-cp314-cp314-win_amd64.whl",
+      "sha256": "92a0a01ead5e668468e952e4238cccd7c537364eb7d851ab144ab6627dbbe12f",
+      "size": 159634,
+      "distribution": "charset-normalizer",
+      "version": "3.4.7",
+      "upstream_filename": "charset_normalizer-3.4.7-cp314-cp314-win_amd64.whl"
+    },
+    "urllib3.whl": {
+      "url": "https://files.pythonhosted.org/packages/7f/3e/5db95bcf282c52709639744ca2a8b149baccf648e39c8cc87553df9eae0c/urllib3-2.7.0-py3-none-any.whl",
+      "sha256": "9fb4c81ebbb1ce9531cce37674bbc6f1360472bc18ca9a553ede278ef7276897",
+      "size": 131087,
+      "distribution": "urllib3",
+      "version": "2.7.0",
+      "upstream_filename": "urllib3-2.7.0-py3-none-any.whl"
+    },
+    "certifi.whl": {
+      "url": "https://files.pythonhosted.org/packages/22/30/7cd8fdcdfbc5b869528b079bfb76dcdf6056b1a2097a662e5e8c04f42965/certifi-2026.4.22-py3-none-any.whl",
+      "sha256": "3cb2210c8f88ba2318d29b0388d1023c8492ff72ecdde4ebdaddbb13a31b1c4a",
+      "size": 135707,
+      "distribution": "certifi",
+      "version": "2026.4.22",
+      "upstream_filename": "certifi-2026.4.22-py3-none-any.whl"
+    },
+    "idna.whl": {
+      "url": "https://files.pythonhosted.org/packages/58/a2/bb081bab032533a855d44de1d56f8e8426114ff1ba5d1f07a438a0a654f8/idna-3.20-py3-none-any.whl",
+      "sha256": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c",
+      "size": 69583,
+      "distribution": "idna",
+      "version": "3.20",
+      "upstream_filename": "idna-3.20-py3-none-any.whl"
     }
+  },
+  "numpy_version": "2.5.3",
+  "requests_version": "2.33.1",
+  "dependency_profile": "original-geometry-algorithm-public-dependencies",
+  "dependency_versions": {
+    "numpy": "2.5.3",
+    "pillow": "12.2.0",
+    "requests": "2.33.1",
+    "charset-normalizer": "3.4.7",
+    "urllib3": "2.7.0",
+    "certifi": "2026.4.22",
+    "idna": "3.20"
   }
 }

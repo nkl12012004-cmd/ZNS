@@ -1,0 +1,518 @@
+{
+  "scope": "build_mode1_context_scene and all nested closures; original helpers injected only in test namespace",
+  "cases": 61,
+  "passed": 61,
+  "network": "blocked by audit hook",
+  "source_file": "/workspace/work/runtime_recovery/readable/model_scene.py",
+  "projection_grants_fabricated": false,
+  "comparison": "exact dtype/shape/array values,texture bytes,origin/material/layer metadata and progress events",
+  "limitations": [
+    "Signed authoritative projection success branch not exercised: no real signed grant is supplied.",
+    "Native SketchUp/C SDK output is outside this orchestration test.",
+    "Geometry/data helper implementation parity is tested by sibling source-recovery suites."
+  ],
+  "results": [
+    {
+      "name": "synthetic-default-terrain",
+      "passed": true,
+      "elapsed_sec": 1.7023,
+      "materials": 14,
+      "layers": 6,
+      "triangles": 640
+    },
+    {
+      "name": "terrain-mode-flat",
+      "passed": true,
+      "elapsed_sec": 0.0086,
+      "materials": 14,
+      "layers": 6,
+      "triangles": 86
+    },
+    {
+      "name": "terrain-mode-flat_z0",
+      "passed": true,
+      "elapsed_sec": 0.0083,
+      "materials": 14,
+      "layers": 6,
+      "triangles": 86
+    },
+    {
+      "name": "terrain-mode-plane",
+      "passed": true,
+      "elapsed_sec": 0.0084,
+      "materials": 14,
+      "layers": 6,
+      "triangles": 86
+    },
+    {
+      "name": "terrain-mode-2d",
+      "passed": true,
+      "elapsed_sec": 0.0078,
+      "materials": 14,
+      "layers": 6,
+      "triangles": 86
+    },
+    {
+      "name": "terrain-mode-terrain_3d",
+      "passed": true,
+      "elapsed_sec": 0.0084,
+      "materials": 14,
+      "layers": 6,
+      "triangles": 640
+    },
+    {
+      "name": "building-style-white_box",
+      "passed": true,
+      "elapsed_sec": 0.0079,
+      "materials": 8,
+      "layers": 6,
+      "triangles": 608
+    },
+    {
+      "name": "building-style-white",
+      "passed": true,
+      "elapsed_sec": 0.0079,
+      "materials": 8,
+      "layers": 6,
+      "triangles": 608
+    },
+    {
+      "name": "building-style-box",
+      "passed": true,
+      "elapsed_sec": 0.008,
+      "materials": 8,
+      "layers": 6,
+      "triangles": 608
+    },
+    {
+      "name": "building-style-clay",
+      "passed": true,
+      "elapsed_sec": 0.0079,
+      "materials": 8,
+      "layers": 6,
+      "triangles": 608
+    },
+    {
+      "name": "building-style-invalid",
+      "passed": true,
+      "elapsed_sec": 0.0084,
+      "materials": 14,
+      "layers": 6,
+      "triangles": 640
+    },
+    {
+      "name": "building-style-textured",
+      "passed": true,
+      "elapsed_sec": 0.0088,
+      "materials": 14,
+      "layers": 6,
+      "triangles": 640
+    },
+    {
+      "name": "roof-style-parapet_vietnam",
+      "passed": true,
+      "elapsed_sec": 0.0088,
+      "materials": 14,
+      "layers": 6,
+      "triangles": 640
+    },
+    {
+      "name": "roof-style-parapet_concrete",
+      "passed": true,
+      "elapsed_sec": 0.0092,
+      "materials": 13,
+      "layers": 6,
+      "triangles": 640
+    },
+    {
+      "name": "roof-style-flat_simple",
+      "passed": true,
+      "elapsed_sec": 0.0087,
+      "materials": 14,
+      "layers": 6,
+      "triangles": 608
+    },
+    {
+      "name": "roof-style-invalid",
+      "passed": true,
+      "elapsed_sec": 0.0086,
+      "materials": 14,
+      "layers": 6,
+      "triangles": 640
+    },
+    {
+      "name": "disabled-include_buildings_high",
+      "passed": true,
+      "elapsed_sec": 0.0081,
+      "materials": 13,
+      "layers": 5,
+      "triangles": 612
+    },
+    {
+      "name": "disabled-include_buildings_low",
+      "passed": true,
+      "elapsed_sec": 0.0082,
+      "materials": 12,
+      "layers": 5,
+      "triangles": 612
+    },
+    {
+      "name": "disabled-include_roads_main",
+      "passed": true,
+      "elapsed_sec": 0.0087,
+      "materials": 14,
+      "layers": 5,
+      "triangles": 638
+    },
+    {
+      "name": "disabled-include_roads_alley",
+      "passed": true,
+      "elapsed_sec": 0.0084,
+      "materials": 14,
+      "layers": 5,
+      "triangles": 638
+    },
+    {
+      "name": "disabled-include_water",
+      "passed": true,
+      "elapsed_sec": 0.0085,
+      "materials": 14,
+      "layers": 6,
+      "triangles": 640
+    },
+    {
+      "name": "disabled-include_trees",
+      "passed": true,
+      "elapsed_sec": 0.0083,
+      "materials": 14,
+      "layers": 5,
+      "triangles": 632
+    },
+    {
+      "name": "everything-disabled",
+      "passed": true,
+      "elapsed_sec": 0.0076,
+      "materials": 8,
+      "layers": 1,
+      "triangles": 572
+    },
+    {
+      "name": "explicit-bbox",
+      "passed": true,
+      "elapsed_sec": 0.0086,
+      "materials": 14,
+      "layers": 6,
+      "triangles": 640
+    },
+    {
+      "name": "grid-lower-clamp",
+      "passed": true,
+      "elapsed_sec": 0.0077,
+      "materials": 8,
+      "layers": 2,
+      "triangles": 574
+    },
+    {
+      "name": "grid-upper-clamp",
+      "passed": true,
+      "elapsed_sec": 0.0441,
+      "materials": 8,
+      "layers": 1,
+      "triangles": 51836
+    },
+    {
+      "name": "prior-terrain-anchor",
+      "passed": true,
+      "elapsed_sec": 0.0092,
+      "materials": 14,
+      "layers": 5,
+      "triangles": 638
+    },
+    {
+      "name": "flat-over-terrain-anchor",
+      "passed": true,
+      "elapsed_sec": 0.0082,
+      "materials": 14,
+      "layers": 5,
+      "triangles": 76
+    },
+    {
+      "name": "hill-patch-custom-dem",
+      "passed": true,
+      "elapsed_sec": 0.0151,
+      "materials": 14,
+      "layers": 5,
+      "triangles": 386
+    },
+    {
+      "name": "hill-patch-explicit",
+      "passed": true,
+      "elapsed_sec": 0.0096,
+      "materials": 14,
+      "layers": 5,
+      "triangles": 386
+    },
+    {
+      "name": "hill-zero-relief",
+      "passed": true,
+      "elapsed_sec": 0.0085,
+      "materials": 8,
+      "layers": 1,
+      "triangles": 450
+    },
+    {
+      "name": "custom-dem-shape-fallback",
+      "passed": true,
+      "elapsed_sec": 0.0084,
+      "materials": 14,
+      "layers": 6,
+      "triangles": 640
+    },
+    {
+      "name": "mock-relations-water-parks",
+      "passed": true,
+      "elapsed_sec": 0.0101,
+      "materials": 16,
+      "layers": 7,
+      "triangles": 760
+    },
+    {
+      "name": "mock-hill-relations",
+      "passed": true,
+      "elapsed_sec": 0.0109,
+      "materials": 16,
+      "layers": 5,
+      "triangles": 486
+    },
+    {
+      "name": "normal-data-helper-fixtures",
+      "passed": true,
+      "elapsed_sec": 0.0041,
+      "materials": 18,
+      "layers": 7,
+      "triangles": 792
+    },
+    {
+      "name": "normal-flat-data-fixtures",
+      "passed": true,
+      "elapsed_sec": 0.0039,
+      "materials": 18,
+      "layers": 7,
+      "triangles": 262
+    },
+    {
+      "name": "normal-fallback-download_terrarium_dem_grid",
+      "passed": true,
+      "elapsed_sec": 0.0038,
+      "materials": 18,
+      "layers": 7,
+      "triangles": 792
+    },
+    {
+      "name": "normal-fallback-download_stitched_satellite",
+      "passed": true,
+      "elapsed_sec": 0.008,
+      "materials": 18,
+      "layers": 7,
+      "triangles": 792
+    },
+    {
+      "name": "normal-fallback-fetch_osm_overpass",
+      "passed": true,
+      "elapsed_sec": 0.0017,
+      "materials": 13,
+      "layers": 4,
+      "triangles": 604
+    },
+    {
+      "name": "normal-fallback-extract_google_street_vectors",
+      "passed": true,
+      "elapsed_sec": 0.0035,
+      "materials": 16,
+      "layers": 7,
+      "triangles": 760
+    },
+    {
+      "name": "normal-all-data-fail",
+      "passed": true,
+      "elapsed_sec": 0.0047,
+      "materials": 8,
+      "layers": 1,
+      "triangles": 572
+    },
+    {
+      "name": "gapfill-offline-custom-rgb",
+      "passed": true,
+      "elapsed_sec": 0.0094,
+      "materials": 14,
+      "layers": 6,
+      "triangles": 672
+    },
+    {
+      "name": "gapfill-road-error-propagates",
+      "passed": true,
+      "elapsed_sec": 0.0073,
+      "error": [
+        "RuntimeError",
+        "data helper unavailable"
+      ]
+    },
+    {
+      "name": "native-saas-policy-requires-grant",
+      "passed": true,
+      "elapsed_sec": 0.0063,
+      "error": [
+        "PermissionError",
+        "MISSING_AUTHORITATIVE_PROJECTION_GRANT: Bắt buộc có giấy phép chiếu tọa độ Ed25519 từ máy chủ MapSKP SaaS."
+      ]
+    },
+    {
+      "name": "native-policy-error-not-swallowed",
+      "passed": true,
+      "elapsed_sec": 0.0062,
+      "error": [
+        "RuntimeError",
+        "policy unavailable"
+      ]
+    },
+    {
+      "name": "cancel-progress-18",
+      "passed": true,
+      "elapsed_sec": 0.0,
+      "error": [
+        "RuntimeError",
+        "cancel-at-18"
+      ]
+    },
+    {
+      "name": "cancel-progress-82",
+      "passed": true,
+      "elapsed_sec": 0.0065,
+      "error": [
+        "RuntimeError",
+        "cancel-at-82"
+      ]
+    },
+    {
+      "name": "cancel-progress-95",
+      "passed": true,
+      "elapsed_sec": 0.0085,
+      "error": [
+        "RuntimeError",
+        "cancel-at-95"
+      ]
+    },
+    {
+      "name": "cancel-flat-progress-22",
+      "passed": true,
+      "elapsed_sec": 0.0001,
+      "error": [
+        "RuntimeError",
+        "cancel-at-22"
+      ]
+    },
+    {
+      "name": "cancel-normal-progress-42",
+      "passed": true,
+      "elapsed_sec": 0.0002,
+      "error": [
+        "RuntimeError",
+        "cancel-at-42"
+      ]
+    },
+    {
+      "name": "cancel-normal-progress-62",
+      "passed": true,
+      "elapsed_sec": 0.0001,
+      "error": [
+        "RuntimeError",
+        "cancel-at-62"
+      ]
+    },
+    {
+      "name": "cancel-normal-progress-76",
+      "passed": true,
+      "elapsed_sec": 0.0017,
+      "error": [
+        "RuntimeError",
+        "cancel-at-76"
+      ]
+    },
+    {
+      "name": "invalid-lat",
+      "passed": true,
+      "elapsed_sec": 0.0,
+      "error": [
+        "ValueError",
+        "could not convert string to float: 'bad'"
+      ]
+    },
+    {
+      "name": "invalid-dem_grid",
+      "passed": true,
+      "elapsed_sec": 0.0,
+      "error": [
+        "ValueError",
+        "invalid literal for int() with base 10: 'bad'"
+      ]
+    },
+    {
+      "name": "invalid-width_m",
+      "passed": true,
+      "elapsed_sec": 0.0,
+      "error": [
+        "TypeError",
+        "float() argument must be a string or a real number, not 'NoneType'"
+      ]
+    },
+    {
+      "name": "invalid-mock_osm_data",
+      "passed": true,
+      "elapsed_sec": 0.0071,
+      "error": [
+        "AttributeError",
+        "'NoneType' object has no attribute 'get'"
+      ]
+    },
+    {
+      "name": "building-budget-4500-largest-first",
+      "passed": true,
+      "elapsed_sec": 0.3591,
+      "materials": 8,
+      "layers": 3,
+      "triangles": 5072
+    },
+    {
+      "name": "large-peak-hour-notice",
+      "passed": true,
+      "elapsed_sec": 0.0114,
+      "materials": 8,
+      "layers": 1,
+      "triangles": 572
+    },
+    {
+      "name": "tree-budget-350",
+      "passed": true,
+      "elapsed_sec": 0.0258,
+      "materials": 8,
+      "layers": 2,
+      "triangles": 3372
+    },
+    {
+      "name": "building-helper-errors-skip-element",
+      "passed": true,
+      "elapsed_sec": 0.0105,
+      "materials": 8,
+      "layers": 4,
+      "triangles": 584
+    },
+    {
+      "name": "articulated-helper-errors-skip-element",
+      "passed": true,
+      "elapsed_sec": 0.0094,
+      "materials": 8,
+      "layers": 4,
+      "triangles": 584
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "tests": 6,
+  "comparisons": 49922,
+  "functions": [
+    "_cell_hash",
+    "_periodic_value_noise_2d",
+    "_seamless_cloud_fbm",
+    "_sample_sky_environment_field",
+    "_avalanche_u16",
+    "select_facade_variant_index",
+    "select_lowrise_roof_variant_index"
+  ],
+  "scalar_comparison": "exact type/value or float64 bits",
+  "array_comparison": "exact dtype/shape/bytes",
+  "numpy": "2.5.5",
+  "source_sha256": "6e93246a0cbfdd78352dad73a3a7a20af8cc3c0ce4501ff25f1d2d46a4853388",
+  "scope": "local only; original rights retained; no project/public uploads"
+}

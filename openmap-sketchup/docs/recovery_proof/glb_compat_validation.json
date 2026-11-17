@@ -1,0 +1,140 @@
+{
+  "uri": "sitecraft_compat.glb",
+  "mimeType": "model/gltf-binary",
+  "validatorVersion": "2.0.0-dev.3.10",
+  "validatedAt": "2026-11-17T04:49:10.549Z",
+  "issues": {
+    "numErrors": 0,
+    "numWarnings": 0,
+    "numInfos": 4,
+    "numHints": 0,
+    "messages": [
+      {
+        "code": "UNUSED_OBJECT",
+        "message": "This object may be unused.",
+        "severity": 2,
+        "pointer": "/materials/2"
+      },
+      {
+        "code": "UNUSED_OBJECT",
+        "message": "This object may be unused.",
+        "severity": 2,
+        "pointer": "/materials/3"
+      },
+      {
+        "code": "UNUSED_OBJECT",
+        "message": "This object may be unused.",
+        "severity": 2,
+        "pointer": "/materials/5"
+      },
+      {
+        "code": "UNUSED_OBJECT",
+        "message": "This object may be unused.",
+        "severity": 2,
+        "pointer": "/materials/11"
+      }
+    ],
+    "truncated": false
+  },
+  "info": {
+    "version": "2.0",
+    "generator": "HiepAI MapSKP Hybrid v1.0.0",
+    "resources": [
+      {
+        "pointer": "/buffers/0",
+        "mimeType": "application/gltf-buffer",
+        "storage": "glb",
+        "byteLength": 867548
+      },
+      {
+        "pointer": "/images/0",
+        "mimeType": "image/jpeg",
+        "storage": "buffer-view",
+        "image": {
+          "width": 1024,
+          "height": 1024,
+          "format": "rgb",
+          "bits": 8
+        }
+      },
+      {
+        "pointer": "/images/1",
+        "mimeType": "image/jpeg",
+        "storage": "buffer-view",
+        "image": {
+          "width": 256,
+          "height": 256,
+          "format": "rgb",
+          "bits": 8
+        }
+      },
+      {
+        "pointer": "/images/2",
+        "mimeType": "image/jpeg",
+        "storage": "buffer-view",
+        "image": {
+          "width": 512,
+          "height": 512,
+          "format": "rgb",
+          "bits": 8
+        }
+      },
+      {
+        "pointer": "/images/3",
+        "mimeType": "image/jpeg",
+        "storage": "buffer-view",
+        "image": {
+          "width": 512,
+          "height": 512,
+          "format": "rgb",
+          "bits": 8
+        }
+      },
+      {
+        "pointer": "/images/4",
+        "mimeType": "image/jpeg",
+        "storage": "buffer-view",
+        "image": {
+          "width": 1024,
+          "height": 1024,
+          "format": "rgb",
+          "bits": 8
+        }
+      },
+      {
+        "pointer": "/images/5",
+        "mimeType": "image/jpeg",
+        "storage": "buffer-view",
+        "image": {
+          "width": 1024,
+          "height": 1024,
+          "format": "rgb",
+          "bits": 8
+        }
+      },
+      {
+        "pointer": "/images/6",
+        "mimeType": "image/jpeg",
+        "storage": "buffer-view",
+        "image": {
+          "width": 1024,
+          "height": 1024,
+          "format": "rgb",
+          "bits": 8
+        }
+      }
+    ],
+    "animationCount": 0,
+    "materialCount": 15,
+    "hasMorphTargets": false,
+    "hasSkins": false,
+    "hasTextures": true,
+    "hasDefaultScene": true,
+    "drawCallCount": 13,
+    "totalVertexCount": 4730,
+    "totalTriangleCount": 8512,
+    "maxUVs": 1,
+    "maxInfluences": 0,
+    "maxAttributes": 3
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "original_bytecode_unmodified": true,
+  "checks": [
+    {
+      "name": "byte_exact_exports_real_quynh_luu",
+      "files": 17,
+      "sha256": {
+        "fallback.json": "757bce9409e02117e8b21b43ede8c320e2d7c18c0343dd3a2c3819e3bfabba2b",
+        "scene.glb": "d3efc180ce5a47cdf2c89f0f80caeabafaf1363e690ccbb297f185873dc45b09",
+        "scene.mapskp1": "d1f2248b351276f9c0189c80f3c1acc4dd3301f3b02103e163c992fe3ac5a223",
+        "scene.mtl": "673d4817ea217576b75b147a85f8e71bcc4464edf44d4b7a89f35bcf8cc1af0f",
+        "scene.obj": "4c7ad6718e76cd47307a2c99caf181227b754b59c7cf0f3c366617e3fdb421b4",
+        "scene_maps/tex_0.jpg": "5a708cad46fe63da7b30793a26b4fdede7d876c8d751b64ce9b7715c48a8c5d7",
+        "scene_maps/tex_10.jpg": "11da2f410d68c66e6aaaad856521a44e0c874e01b5bde7a8a21c7cb21f283dbf",
+        "scene_maps/tex_11.jpg": "2daaa10d78e95256e50881cc390ee0cfc42abcbae8d1da3cf90805eaeb864fb1",
+        "scene_maps/tex_12.jpg": "592eb34a2ddf27e97b1fcbefa75b005e71a4255b9e25f89a4733fef76af5106a",
+        "scene_maps/tex_8.jpg": "1abce682946e053e1826f0ab6fe282b6ed6011e10b0bf890053607f5aab513f6",
+        "scene_maps/tex_9.jpg": "343bc1fbeb043fc8503dc0d08cac503270e1654d6ddb1b4abc178d71b9033566",
+        "textures/rb_tex_0.jpg": "5a708cad46fe63da7b30793a26b4fdede7d876c8d751b64ce9b7715c48a8c5d7",
+        "textures/rb_tex_10.jpg": "11da2f410d68c66e6aaaad856521a44e0c874e01b5bde7a8a21c7cb21f283dbf",
+        "textures/rb_tex_11.jpg": "2daaa10d78e95256e50881cc390ee0cfc42abcbae8d1da3cf90805eaeb864fb1",
+        "textures/rb_tex_12.jpg": "592eb34a2ddf27e97b1fcbefa75b005e71a4255b9e25f89a4733fef76af5106a",
+        "textures/rb_tex_8.jpg": "1abce682946e053e1826f0ab6fe282b6ed6011e10b0bf890053607f5aab513f6",
+        "textures/rb_tex_9.jpg": "343bc1fbeb043fc8503dc0d08cac503270e1654d6ddb1b4abc178d71b9033566"
+      }
+    },
+    {
+      "name": "byte_exact_exports_empty",
+      "files": 5,
+      "sha256": {
+        "fallback.json": "c3295a7252d29e8ecb00128f992bd8bcb3b3481bf83eb3e02fa9d3441e030a37",
+        "scene.glb": "84b806f7e5c28fbd735e7633d23f9e6f5b4afd49752a2f36670fd6832a105560",
+        "scene.mapskp1": "be09736a3b9c90b0c8ebd08c482991de985353d795e91376ccff76c2a1e645a9",
+        "scene.mtl": "e1751995b1cea161b573b71137464741d77044c86b1a6613ff1eb9bde10f00bf",
+        "scene.obj": "d57524433a3a20837c2bd1c2bfc419be2446a3be047b365397df3f43da7effad"
+      }
+    },
+    {
+      "name": "byte_exact_exports_small_alpha",
+      "files": 5,
+      "sha256": {
+        "fallback.json": "c613e1ff850e4ae257549798d918e35550bd1fdf74ab4bef6e6586b02d5aa118",
+        "scene.glb": "237c5dbb31bf84216684985e7e4793920aaabd346fc7a6a806ea256c36d00303",
+        "scene.mapskp1": "1c6ed55d668fc895349398fc0d53f3abf76406fa53fa2f03f6bd32a8d6e5880e",
+        "scene.mtl": "0922921b0f5463aba042e8141b594a8410046df160e576440cf757340f3692ec",
+        "scene.obj": "9bf34c360e4e2704ad013ddc6a08e1c53881b0bde89beb7f2efaf24fd3970b73"
+      }
+    },
+    {
+      "name": "soft_edges",
+      "cases": 54
+    },
+    {
+      "name": "srgb_linear",
+      "cases": 8
+    },
+    {
+      "name": "year_normalization",
+      "cases": 12
+    },
+    {
+      "name": "sdk_abi_struct_sizes",
+      "cases": 5
+    },
+    {
+      "name": "sdk_call_trace_empty",
+      "calls": 6,
+      "equal": true,
+      "stopped_before_save": true
+    },
+    {
+      "name": "sdk_call_trace_alpha_uv_invalid_duplicate",
+      "calls": 83,
+      "equal": true,
+      "stopped_before_save": true
+    },
+    {
+      "name": "sdk_call_trace_chunk_16001",
+      "calls": 208048,
+      "equal": true,
+      "stopped_before_save": true
+    },
+    {
+      "name": "sdk_call_trace_real_quynh_luu",
+      "calls": 129707,
+      "equal": true,
+      "stopped_before_save": true
+    },
+    {
+      "name": "sdk_discovery",
+      "cases": 3
+    },
+    {
+      "name": "worker_missing_dll_and_args",
+      "cases": 6
+    },
+    {
+      "name": "worker_subprocess_control_flow",
+      "cases": 4
+    },
+    {
+      "name": "worker_repeated_flags_and_result_serialization",
+      "cases": 2
+    },
+    {
+      "name": "script_main_dispatch_exact_argv_slice_exit",
+      "cases": 4
+    }
+  ],
+  "actual_sketchup_sdk_tested": false,
+  "native_file_created": false,
+  "status": "passed"
+}

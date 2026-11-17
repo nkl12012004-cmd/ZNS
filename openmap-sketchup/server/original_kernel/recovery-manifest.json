@@ -1,0 +1,48 @@
+{
+  "schema": "sitecraft.original-recovery.v2",
+  "private_candidate": false,
+  "source_archive": "MapSKP_3D_for_SketchUp.zip",
+  "publication_approval": "Explicitly approved by the user in this session on 2026-11-17",
+  "modules": {
+    "geo_math": {
+      "path": "geo_math.py",
+      "format": "Python source",
+      "bytes": 5312,
+      "sha256": "628c70ea991334aa17dc0a4a5525dd344656c17a4fc494c4f17af678e91d959e",
+      "original_code_sha256": "d882476a0c8ae6260d0f34cd72700072feb3305dcdea000340f63dced6348e02",
+      "status": "Readable reconstruction; compared against unchanged original execution; original rights retained"
+    },
+    "facade_texture_gen": {
+      "path": "facade_texture_gen.py",
+      "format": "Python source",
+      "bytes": 27685,
+      "sha256": "da7ecdfec556957b167e6c2e16f05ca5cf3046c57653e6cad97de24413bf6fb3",
+      "original_code_sha256": "2db5ebcfc51cad1fddd75ff8823a73001b8e034f912b197afe9afa861e56ba7f",
+      "status": "Readable reconstruction; compared against unchanged original execution; original rights retained"
+    },
+    "mode1_osm_dem_builder": {
+      "path": "mode1_osm_dem_builder.py",
+      "format": "Python source",
+      "bytes": 143053,
+      "sha256": "7190c6c2cae3693455b130998369be11ddd599298a2e09f8343584ee55b203a3",
+      "original_code_sha256": "672cb3b4cce9acb828a85acf7b89a4a24470b7448a328a839bb2dbd560b69f1f",
+      "status": "Readable reconstruction; compared against unchanged original execution; original rights retained"
+    },
+    "skp_capi_writer": {
+      "path": "skp_capi_writer.py",
+      "format": "Python source",
+      "bytes": 40993,
+      "sha256": "daa25a9e10e4948aeb5f730d81b7e53b1421897a0e4543b91620365b398da115",
+      "original_code_sha256": "6a99fbc066aa07984f71f18a4349b4e746d7b28206192233d411122509a166f5",
+      "status": "Readable reconstruction; compared against unchanged original execution; original rights retained"
+    },
+    "ocr_google_earth": {
+      "path": "ocr_google_earth.py",
+      "format": "Python source",
+      "bytes": 11977,
+      "sha256": "78833efe74fa17bff7f5da723b9207c0a4ea092e3ef5d92b0a9987eac3eeb4c7",
+      "original_code_sha256": "87663d2c82219b85917ca70eef8ced344d9caa1573349053c48ea579cc63189b",
+      "status": "Readable reconstruction; compared against unchanged original execution; original rights retained"
+    }
+  }
+}

@@ -7,6 +7,9 @@ require 'net/http'
 require 'base64'
 require_relative 'bridge-host'
 
+# This boot/transport test uses the explicit independent offline engine.
+# Bundled recovered-source execution is tested separately in test_original_engine.py.
+ENV['OPENMAP_ENGINE'] = 'openmap'
 plugin_dir = File.expand_path(ARGV.fetch(0))
 leave_running = ARGV[1] == '--parent-exit'
 require File.join(plugin_dir, 'main.rb')

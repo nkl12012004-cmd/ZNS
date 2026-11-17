@@ -1,223 +1,169 @@
-# OpenMap SketchUp 0.3.0 — Windows Full, mở thẳng bản đồ
+# SiteCraft 0.4.0 — bản đồ và địa hình cho SketchUp
 
-**Không cần đăng nhập, tài khoản hoặc Supabase khi dùng bản Windows Full.**
-Không có xu, tín dụng, gói trả phí hoặc tính lượt xuất.
+SiteCraft mở thẳng bản đồ khi chạy Windows Full, không cần đăng nhập hoặc
+Supabase, không có xu, tín dụng hay tính lượt xuất. Điều khiển vùng chọn,
+địa hình, công trình, tiến trình, xuất tệp và ghép mảnh nằm trong một thanh bên.
+Giao diện dùng các tệp SVN-Avo do người dùng cung cấp, có đủ bốn kiểu chữ.
 
-[Tải bộ cài Full 0.3.0](https://github.com/nkl12012004-cmd/ZNS/releases/download/openmap-v0.3.0/OpenMap_SketchUp_Full_0.3.0_Windows_x64.rbz).
-Cài qua Extension Manager, thoát hoàn toàn mọi cửa sổ SketchUp rồi mở lại.
-Vào Extensions → OpenMap SketchUp → Mở OpenMap; chờ bộ xử lý khởi động,
-plugin tự vào bản đồ. Không cần điền cấu hình xác thực.
+Bản 0.4.0 chuyển sang **mã Python có thể đọc và sửa của bộ dựng MapSKP cũ**:
+51 hàm dựng cảnh, 11 hàm tọa độ, 22 hàm texture mặt đứng/mái, 14 hàm ghi tệp
+và 6 hàm tọa độ/OCR. Các mô-đun nằm trong `server/original_kernel/`; không còn
+trình nạp `.marshal` hoặc `.pyc` trong thư mục này. Phần tích hợp Ruby/API/UI
+của SiteCraft vẫn có mã nguồn riêng.
 
-Đã kèm CPython 3.14.10, Pillow 12.3.0 và OCR Tesseract 5.5.0/English.
-Bản đồ/DEM/OSM cần Internet để tải dữ liệu. Bộ xử lý cục bộ chỉ nhận lệnh
-có mã kết nối riêng của phiên SketchUp, không phải máy chủ truy cập công khai.
+Người dùng đã xác nhận công bố SiteCraft cùng năm mô-đun nguồn khôi phục trong
+repository `nkl12012004-cmd/ZNS` ngày 17/11/2026, theo giờ Việt Nam.
+Các gói của Release `sitecraft-v0.4.0`:
 
-Bản 0.3.0 mặc định chạy cục bộ, không kế thừa chế độ máy chủ riêng/URL
-của các bản trước. Nếu muốn dùng máy chủ riêng, cần chọn lại rõ ràng trong
-Cấu hình; lựa chọn mới được lưu cho các lần mở sau. Khi máy chủ riêng lỗi,
-Cấu hình có nút chuyển về chạy trên máy này.
+- [SiteCraft_Full_0.4.0_Windows_x64.rbz](https://github.com/nkl12012004-cmd/ZNS/releases/download/sitecraft-v0.4.0/SiteCraft_Full_0.4.0_Windows_x64.rbz): bộ cài có runtime Windows.
+- [SiteCraft_Source_0.4.0.zip](https://github.com/nkl12012004-cmd/ZNS/releases/download/sitecraft-v0.4.0/SiteCraft_Source_0.4.0.zip): mã nguồn, tài liệu và bộ cài trong `install/`.
+- [SHA256SUMS.txt](https://github.com/nkl12012004-cmd/ZNS/releases/download/sitecraft-v0.4.0/SHA256SUMS.txt): checksum của hai gói.
 
-Bản mới dùng kết nối loopback
-trực tiếp, bỏ proxy cho kết nối này và trả kết quả về luồng UI của SketchUp.
-Nếu khởi động lỗi, Cấu hình cho phép khởi động lại và mở log.
+Release được công bố sau khi kiểm tra Windows của đúng gói đạt. Các liên kết
+tải có hiệu lực khi Release được công bố; kết quả Windows đầy đủ chưa được
+ghi nhận tại thời điểm cập nhật tài liệu này.
 
-[Hướng dẫn cài/nâng cấp Windows Full](docs/INSTALL_WINDOWS_FULL_VI.md).
-Mã mới trong `extension/` và `server/` phát hành MIT. Tệp gốc đọc được trong
-`reference/` giữ quyền riêng. Đây là bản viết lại độc lập; lõi MapSKP mã hóa
-và Google Photorealistic 3D của bản gốc chưa khôi phục.
+Mã tích hợp mới giữ giấy phép MIT; mã MapSKP khôi phục và font giữ quyền gốc.
+Chưa tìm thấy giấy phép nguồn mở cho mã gốc trong ZIP được cung cấp. Vì vậy,
+“có mã nguồn chỉnh sửa được” không đồng nghĩa toàn bộ gói được cấp phép MIT.
+Quyền gốc của các thành phần vẫn được giữ nguyên sau khi công bố.
+Xem [NOTICE.md](NOTICE.md).
 
-## Thay đổi bản đồ/tìm kiếm 0.3.0
+## Cài Windows Full
 
-- Một thanh bên chứa điều khiển, tiến trình, xuất tệp và ghép mảnh; không còn
-  ba bảng nổi chiếm vùng bản đồ. Thanh tìm kiếm có địa điểm mẫu, OCR và xóa nhanh.
-- Mặc định Hà Nội, khung 380m, Vệ tinh sạch Esri, ảnh 4K và lưới 64 như bản cũ.
-- Gợi ý địa điểm khi gõ, chọn bằng phím mũi tên/Enter; gửi tìm sẽ tới ngay kết quả
-  đầu. Có dự phòng ArcGIS/Photon/Nominatim; không dùng Nominatim cho autocomplete.
-- Link Google Maps đầy đủ đọc tọa độ ngay; link chia sẻ rút gọn chỉ theo redirect
-  HTTPS trên miền Maps được phép. Link không trả tọa độ được báo rõ để dán tọa độ.
-- Lớp bản đồ vệ tinh chọn để xem cũng là nguồn ảnh xuất. OSM chỉ dùng xem 2D;
-  nguồn ảnh xuất riêng được ghi rõ khi đang xem OSM.
-- OSM dùng XML trước cho vùng nhỏ, có hostname/Overpass dự phòng với thời gian
-  chờ hữu hạn. Khi mọi nguồn OSM đều lỗi, vẫn giữ ảnh/DEM nhưng báo lớp bị thiếu,
-  không tự nạp phần thiếu; người dùng chủ động nạp nền/địa hình hoặc dựng lại.
+1. SketchUp → Extension Manager → Install Extension… → chọn
+   `SiteCraft_Full_0.4.0_Windows_x64.rbz` đã được bàn giao.
+2. Thoát hoàn toàn tất cả cửa sổ SketchUp rồi mở lại để nạp mã Ruby mới.
+3. Extensions → SiteCraft → Mở SiteCraft, hoặc bấm biểu tượng trên toolbar.
+4. Chờ bộ xử lý trên máy khởi động. Không cần điền Email, Google hay Supabase.
+5. Tìm địa điểm hoặc dán tọa độ/link Google Maps, chọn vùng và các lớp cần dựng.
+6. Bấm Đưa vào SketchUp; khi tác vụ xong, nạp mô hình hoặc lưu tệp xuất.
 
-## Tính năng đã triển khai
+Windows Full kèm CPython 3.14.10, NumPy 2.5.3, Pillow 12.2.0, Requests 2.33.1
+và Tesseract/English theo `tools/runtime.lock.json`. Không cần tự cài Python/pip.
+Bản đồ, DEM và OSM vẫn cần Internet. Mục tiêu là Windows 10/11 x64 và SketchUp
+Desktop có Ruby/HtmlDialog, từ 2021 trở lên; kiểm tra thực tế trong SketchUp
+trên máy người dùng vẫn cần thực hiện.
 
-- Chế độ Windows Full mở thẳng bản đồ, không cần tài khoản hoặc Supabase.
-- Máy chủ riêng nâng cao vẫn hỗ trợ Supabase Email/Google.
-- Giữ phiên trong bộ nhớ của phiên SketchUp; không ghi mật khẩu/token xuống đĩa.
-- Giao diện bản đồ toàn màn hình, thẻ điều khiển nổi, sáng/tối, preset kích thước,
-  địa điểm mẫu, tùy chỉnh thu gọn; giữ luồng thao tác của giao diện cũ.
-- Chọn tâm bằng kéo/zoom, kéo góc khung để đổi kích thước, tìm địa chỉ,
-  dán tọa độ thập phân/DMS hoặc link Google Maps có tọa độ.
-- Tải và ghép ảnh vệ tinh Esri/Google, bản đồ Google đường phố, texture
-  1024/2048/4096/8192; có lớp OSM để xem bản đồ 2D.
-- Nền phẳng Z=0 hoặc lưới địa hình DEM Terrarium, hệ số cao độ tùy chỉnh.
-- Trám đồi lên nền phẳng: nội suy chuyển tiếp, rìa mảnh về Z=0.
-- Bật/tắt riêng đường chính/ngõ; nhà cao/thấp tầng từ footprint và số tầng OSM.
-- Box trắng hoặc map mặt đứng tạo thủ tục; mái phẳng, mái tông trầm/bê tông,
-  gờ chắn mái. Số tầng mặc định và tên component tùy chỉnh.
-- Mặt nước dạng polygon và cây tại các node OSM `natural=tree`.
-- Mốc ENU/WGS84 chung trong mô hình; các mảnh mới dùng cùng đơn vị mét và mốc.
-- Nạp vào các Group/Tag riêng, giữ thông tin nguồn và hỗ trợ Undo một thao tác.
-- Tự nạp sau khi dựng; xuất OBJ + MTL + PNG/JPEG + metadata trong ZIP, GLB độc lập,
-  lưu nhóm được chọn thành SKP; mở thư mục xuất và đồng bộ bóng nắng.
-- Xem trước WebGL 3D: xoay, pan, zoom, căn giữa và khung dây.
-- Metadata trong SKP xuất mới, tự ghép các mảnh kéo-thả mới thêm vào mô hình;
-  đọc metadata công khai `MapSKP_Meta` / `__MAPSKP_META__` của SKP cũ khi có.
-- OCR ảnh tọa độ và Ctrl+V ảnh; Tesseract đã được đóng kèm trong bản Windows Full.
-- Tác vụ nền, tiến độ, hủy tác vụ; mỗi tài khoản chỉ lấy được tác vụ của mình.
+Cấu hình mặc định chạy bộ xử lý trên máy. Nếu đang dùng URL máy chủ riêng bị
+lỗi, mở Cấu hình và chọn chạy trên máy này; có nút khởi động lại và mở log.
+Đường dẫn nội bộ `openmap_sketchup`, biến `OPENMAP_*` và dữ liệu cấu hình cũ
+được giữ để tương thích nâng cấp. Tên hiển thị của sản phẩm là SiteCraft.
+Hướng dẫn 0.3.0 trong tài liệu cũ chỉ dùng để tham khảo; hướng dẫn 0.4.0 ở đây
+và [ghi chú bản 0.4.0](docs/RELEASE_0.4.0.md) được ưu tiên.
 
-Khối nhà là mô hình khối xấp xỉ từ OSM; map mặt đứng là ảnh tạo thủ tục,
-không phải ảnh mặt đứng thật. Không có mesh Google Photorealistic 3D.
-Footprint hỗ trợ các way khép kín đơn giản; chưa xử lý multipolygon có sân trong.
-Đường là dải bề mặt đơn giản, chưa mô phỏng nút giao/cầu/hầm chi tiết.
-Không dùng cơ chế cập nhật có chữ ký/gói thương mại của nhà cung cấp cũ.
-Tương thích SKP cũ dựa trên metadata đọc được; file thiếu metadata không tự ghép.
-Ghép các dự án có mốc xa nhau dùng phép dịch ENU gần đúng, không thay thế
-quy trình đo đạc/trắc địa. Giữ nguyên mốc và hệ số cao độ để ghép các mảnh cùng dự án.
-Nút chọn vùng kế bên là tiện ích
-chọn vùng, không phải cam kết sai số hình học 0 mm ở mọi vĩ độ.
+## Quy trình dựng đã chuyển từ bản cũ
 
-## Yêu cầu
+Bộ dựng dùng lại cách lấy dữ liệu và tạo hình của mã gốc, thay cho hình học
+xấp xỉ riêng của các bản OpenMap trước:
 
-- SketchUp Desktop có Ruby API/HtmlDialog, mục tiêu SketchUp 2021 trở lên.
-- Bản Windows Full đã kèm Python/Pillow/OCR. Cách chạy máy chủ riêng cần Python 3.10+ và Pillow.
-- Chỉ máy chủ riêng mới cần dự án Supabase; Windows Full không cần.
-- Internet để tải dữ liệu bản đồ/DEM/OSM.
-- OCR Tesseract và `eng` đã có trong bản Full; chỉ cài riêng khi dùng server tùy chỉnh.
-  Đặt đường dẫn chương trình vào `TESSERACT_BIN` trong `.env` nếu chưa có trong PATH.
+1. Chuyển vùng địa lý sang hệ tọa độ mét, tải các tile ảnh và ghép/cắt texture.
+   Vệ tinh sạch dùng Esri; Google vệ tinh, hybrid và đường phố giữ cách chọn
+   nguồn của bộ dựng gốc.
+2. Tải DEM Terrarium, giải mã cao độ, nội suy lưới và dựng địa hình có thành
+   cùng đáy khối. Nền phẳng và trám đồi giữ các nhánh dựng tương ứng của bản cũ.
+3. Lấy đường/nhà/nước từ OpenFreeMap MVT, sau đó dùng Overpass khi dữ liệu chưa
+   đủ. Cách chia vùng, cache, chọn nguồn dự phòng và xử lý giờ cao điểm được giữ.
+4. Khi cần bù phần thiếu, đọc màu đường và footprint trong ảnh Google đường phố
+   không nhãn, thu mảnh đường thành tim tuyến và tìm các khối nhà ứng viên.
+5. Dựng đường theo địa hình; dựng nhà từ footprint, chiều cao/số tầng hoặc quy
+   tắc suy ra của bản cũ. Nhà có thể có khối đế, tầng giật cấp, khối mái và gờ mái.
+   Texture mặt đứng, mái và gờ được tạo bằng đúng bộ hàm đã khôi phục.
+6. Chuyển cảnh sang OBJ/MTL/ảnh, GLB hoặc JSON nạp SketchUp bằng bộ ghi gốc.
+   GLB có thêm bước sửa tương thích khi nhóm mặt bị gán texture nhưng thiếu UV.
+   Nhánh SKP SDK được thử khi có môi trường Windows và DLL phù hợp; nếu chưa
+   sẵn sàng, dùng mesh có thể chỉnh sửa để nạp và lưu bằng SketchUp.
 
-## Máy chủ riêng nâng cao — cấu hình Supabase
+Với GLB cần sửa, SiteCraft giữ tệp nguyên bản thành `<tên>_original.glb` và chỉ
+đổi liên kết vật liệu trên nhóm mặt (primitive) thiếu UV: tạo bản sao vật liệu màu theo RGBA
+của cảnh, bỏ texture không có tọa độ để ánh xạ. Hình học, UV đã có và toàn bộ
+byte BIN/ảnh được giữ nguyên. Báo cáo nằm trong `original_manifest.glb_compatibility`.
+Vì vậy GLB giao cho người dùng có thể khác byte tệp của bộ ghi gốc; tệp không
+cần sửa được giữ đúng byte.
 
-Phần dưới chỉ dành cho người tự triển khai máy chủ riêng. Windows Full không cần
-các bước Supabase, `.env` hoặc terminal này.
+Nhà và ảnh mặt đứng vẫn là mô hình suy ra, không phải bản quét mặt đứng thật.
+Bù dữ liệu từ màu bản đồ là phép ước lượng; khôi phục thuật toán không bổ sung
+những công trình mà nguồn dữ liệu không có. Dữ liệu/ảnh của cùng một vùng có
+thể thay đổi theo thời gian hoặc theo tình trạng dịch vụ.
 
-### 1. Cấu hình Supabase
+## Giao diện và thao tác
 
-1. Tạo hoặc chọn dự án Supabase của bạn.
-2. Trong Project Settings → API, lấy Project URL và public anon/publishable key.
-   Không dùng `service_role` hoặc secret key.
-3. Sao chép `server/.env.example` thành `server/.env`, điền:
+- Một thanh bên chứa tùy chọn và tiến trình; chỉ vùng xem bản đồ chuyển 2D/3D.
+- Tìm tên địa điểm, chọn gợi ý bằng chuột/phím, dán tọa độ thập phân/DMS hoặc
+  link Google Maps có tọa độ; có OCR ảnh và dán ảnh từ clipboard.
+- Preset 200/380/600/1000 m, nhập kích thước và kéo góc khung vùng chọn.
+- Chọn nền phẳng/DEM, ảnh 1K–8K, độ phân giải lưới và hệ số cao độ.
+- Bật riêng đường chính/ngõ, nhà cao/thấp tầng, nước và cây; chọn box trắng hoặc
+  map công trình. Các lớp được nạp theo Group/Tag.
+- Tự nạp sau khi dựng, nạp thủ công, OBJ + ảnh, GLB, SKP, mở thư mục xuất,
+  bóng nắng, Undo và ghép các mảnh theo mốc chung.
 
-```dotenv
-SUPABASE_URL=https://YOUR_PROJECT.supabase.co
-SUPABASE_ANON_KEY=YOUR_PUBLIC_KEY
-PUBLIC_BASE_URL=http://127.0.0.1:8877
-```
+Nếu thiếu một lớp dữ liệu, đọc cảnh báo của tác vụ trước khi nạp. Một vùng không
+có nhà trong OSM có thể vẫn có nền/DEM hợp lệ. Tệp đã dựng cần được lưu sau khi
+hoàn thành; bộ xử lý có thể dọn tác vụ và cache theo chính sách vận hành.
 
-4. Trong Authentication → Providers, bật Email. Chọn chính sách xác nhận email
-   theo nhu cầu; nếu bật xác nhận, người dùng phải xác nhận trước khi đăng nhập.
-5. Để dùng Google, tạo OAuth Client kiểu Web application trong Google Cloud,
-   bật Google provider ở Supabase và nhập Client ID/Client Secret **trong
-   bảng điều khiển Supabase**, không đưa secret vào extension.
-6. Google Authorized redirect URI là callback mà Supabase hiển thị, thường:
-   `https://YOUR_PROJECT.supabase.co/auth/v1/callback`.
-7. Trong Supabase Authentication → URL Configuration → Redirect URLs, thêm:
-   `http://127.0.0.1:*/auth/callback**` cho bản Full dùng cổng động;
-   server riêng có thể dùng URL/cổng cố định của bạn.
+## Phạm vi và giới hạn
 
-Google đăng nhập trong trình duyệt mặc định. Khi báo hoàn tất, quay lại SketchUp;
-extension tự nhận phiên qua luồng PKCE. Authorization code chỉ dùng một lần;
-trình duyệt không nhận access token qua URL của OpenMap.
+Mã dựng địa hình, nhà, texture và bộ ghi được đối chiếu với chương trình gốc
+trong các ca đã kiểm tra; kết quả và giới hạn nằm trong
+[VALIDATION.md](docs/VALIDATION.md). Một vùng Quỳnh Lưu dùng lại dữ liệu cache
+cho cùng 7.316 đỉnh, 10.500 tam giác, vật liệu và texture như cảnh gốc.
+87 bài kiểm tra máy chủ đạt, một bài bỏ qua đúng điều kiện. GLB mẫu sau sửa
+tương thích đạt glTF Validator với 0 lỗi và 0 cảnh báo; đây không phải kiểm tra
+mọi mô hình hoặc thay thế việc mở bằng SketchUp.
 
-## 2. Chạy máy chủ riêng — chỉ dành cho chế độ nâng cao
+Chưa xác minh việc ghi SKP bằng SDK thật trên Windows hoặc nạp hình học, vật
+liệu, Undo và vị trí mảnh bằng SketchUp Desktop thật. Kiểm tra dấu vết lời gọi
+SDK hoặc tệp OBJ/GLB không thay thế kiểm tra SKP native.
+Google Photorealistic 3D và cơ chế cập nhật/chữ ký/tài khoản của nhà cung cấp cũ
+không nằm trong phạm vi khôi phục này. Nhánh chính sách native tùy chọn của mã
+khôi phục được giữ nguyên; không tạo giấy phép hoặc chữ ký thay thế.
 
-Windows PowerShell, mở từ thư mục dự án:
+Ghép mảnh có mốc khác nhau dùng phép dịch trong hệ tọa độ cục bộ; đây không
+phải công cụ trắc địa được chứng nhận. Giữ cùng mốc và hệ số cao độ trong dự án.
+Nguồn ảnh, OSM/DEM và SDK có điều kiện cung cấp/giấy phép riêng.
 
-```powershell
-cd server
-py -3 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe run.py
-```
-
-Hoặc, sau khi điền `.env`, chạy `server/START_SERVER.cmd`.
-
-macOS/Linux:
-
-```sh
-cd server
-python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python run.py
-```
-
-Máy chủ mặc định: `http://127.0.0.1:8877`. Dừng bằng Ctrl+C.
-Chỉ cần public key; backend xác minh access token thật bằng `/auth/v1/user` của
-Supabase. Nếu chưa cấu hình, đăng nhập trả lỗi rõ ràng và các API bản đồ vẫn khóa.
-Không có tài khoản demo, token đặc biệt hoặc luồng tự cho qua đăng nhập.
-
-Nếu chạy từ máy khác, đặt `PUBLIC_BASE_URL` thành URL HTTPS thực tế, thêm URL
-callback tương ứng trong Supabase và dùng HTTPS reverse proxy. Không dùng Python
-HTTP server để phục vụ trực tiếp mật khẩu/token qua HTTP trên mạng công cộng.
-
-## 3. Cài extension
-
-Trong gói nguồn ZIP có `install/OpenMap_SketchUp_Full_0.3.0_Windows_x64.rbz`.
-
-1. SketchUp → Extension Manager → Install Extension… → chọn file RBZ.
-2. Mở Extensions → OpenMap SketchUp → Mở OpenMap hoặc bấm icon toolbar.
-3. Đóng/mở lại SketchUp. Trong Cấu hình chọn tự chạy cục bộ và điền Supabase; hoặc chọn máy chủ riêng nếu cần.
-4. Đăng nhập Email hoặc Google, chọn vùng và bấm Dựng bản đồ.
-5. Khi xong, bấm Nạp vào SketchUp hoặc Xuất OBJ + ảnh.
-6. Để lưu SKP, chọn Group OpenMap trong mô hình rồi bấm Lưu SKP đã chọn.
-
-RBZ không ký chứng thực SketchUp. Khi môi trường cài đặt chỉ cho phép extension
-đã ký, cần quản trị theo chính sách cài extension của máy đang dùng.
-
-## Không có hệ thống xu/tín dụng
-
-Mã mới không có bảng số dư, trừ xu, checkout, subscription hay đếm lượt xuất.
-Giới hạn kích thước lưới, ảnh và hàng đợi nhằm giữ bộ nhớ/luồng xử lý ổn định,
-không gắn với tài khoản hay thanh toán. Dữ liệu tác vụ nằm trong RAM; khởi động
-lại server sẽ xóa chúng. Các kết quả cũ có thể được dọn khi quá một giờ hoặc khi
-bộ nhớ kết quả đầy, vì vậy hãy nạp/lưu kết quả sau khi dựng xong.
-
-Ảnh 8K dùng JPEG để giữ dung lượng hợp lý và cần nhiều RAM/thời gian tải hơn.
-Các endpoint ảnh bản đồ có thể hạn chế khả dụng; có thể đổi nguồn trong giao diện.
-Plugin không thu phí/lượt. Supabase, máy chủ và nguồn dữ liệu bên ngoài vẫn có
-chính sách/dung lượng dịch vụ riêng; mã mới không thay đổi các chính sách đó.
-Overpass có nguồn OSM API dự phòng; nếu cả hai không tải được dữ liệu, có thể
-bỏ chọn Đường OSM/Khối nhà OSM để tiếp tục dựng nền và địa hình.
-
-## Sửa mã, kiểm tra và đóng gói
+## Chỉnh sửa và kiểm tra mã
 
 ```text
-extension/openmap_sketchup.rb          đăng ký extension
-extension/openmap_sketchup/main.rb     HTTP bất đồng bộ và cầu nối giao diện
-extension/openmap_sketchup/importer.rb kiểm tra/nạp mesh, texture, Group/Tag
-extension/openmap_sketchup/linking.rb  metadata và ghép SKP kéo-thả
-extension/openmap_sketchup/ui/         HTML/CSS/JS/icon
-server/openmap_server/auth.py          Supabase Email/Google PKCE
-server/openmap_server/builder.py       tile, DEM, OSM, mesh và xuất OBJ
-server/openmap_server/geo.py           WGS84/ENU, clip, triangulation
-server/openmap_server/formats.py       GLB nhúng ảnh và mesh xem trước
-server/openmap_server/ocr.py           gọi Tesseract tùy chọn
-server/openmap_server/app.py           API và hàng đợi tác vụ
-server/tests/                         kiểm tra API/xác thực/hình học
-tools/build.py                        tạo RBZ và ZIP nguồn
+extension/openmap_sketchup.rb             đăng ký extension
+extension/openmap_sketchup/main.rb        cầu nối Ruby/API
+extension/openmap_sketchup/importer.rb    nạp mesh và vật liệu
+extension/openmap_sketchup/ui/            giao diện và font SVN-Avo
+server/openmap_server/original_engine.py  nối API với bộ dựng khôi phục
+server/openmap_server/original_scene.py   chuyển cảnh giữ tọa độ/UV/vật liệu
+server/openmap_server/glb_compat.py       sửa liên kết texture GLB khi thiếu UV
+server/original_kernel/                   5 mô-đun Python gốc đã khôi phục
+server/original_kernel/recovery-manifest.json  kích thước và SHA-256 mã gốc
+server/openmap_server/                    API, tác vụ, tìm kiếm và mã tích hợp
+server/tests/                            kiểm tra mã tích hợp
+tools/build.py                           xác minh mã nguồn và tạo gói cục bộ
 ```
 
-Chạy kiểm tra Python:
+Môi trường tự phát triển bộ dựng dùng CPython 3.14 và các dependency được ghim:
 
 ```sh
 cd server
-python -m unittest discover -s tests -v
+python3.14 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-Kiểm tra UI với Node.js/Playwright, dùng cầu nối SketchUp và đăng nhập mô phỏng:
+Trên Windows dùng `.venv\Scripts\python.exe`; đặt
+`PYTHONDONTWRITEBYTECODE=1` trước khi chạy để không sinh cache trong thư mục
+mã khôi phục. Chế độ máy chủ riêng nâng cao có cấu hình Supabase riêng, không
+cần cho Windows Full. Mẫu `server/.env.example` không chứa khóa thật; không
+đưa `.env` vào gói hoặc repository.
+
+Các lệnh UI/Ruby nằm trong `tools/package.json`. Để chuẩn bị gói cục bộ sau khi
+hoàn thành kiểm tra:
 
 ```sh
-cd tools
-npm install
-npx playwright install chromium
-npm run test:ui
-npm run test:ruby
+python tools/prepare_runtime.py
+python tools/build.py
 ```
 
-Tạo runtime: `python tools/prepare_runtime.py`. Đóng gói: `python tools/build.py`.
-Runtime dùng các bản phát hành và SHA-256 trong `tools/runtime.lock.json`;
-không cần tự cài pip vào runtime. GitHub Windows workflow kiểm tra gói trước khi tạo Release.
-Xem `docs/VALIDATION.md` để biết kết quả và giới hạn kiểm tra của bản bàn giao.
-Xem `docs/FEATURE_PORT.md` để đối chiếu tính năng cũ và phần đã chuyển sang.
+Trình đóng gói kiểm tra SHA-256/kích thước của năm tệp nguồn, từ chối bytecode,
+vault/armor và native binary trong `original_kernel`, giữ các thông báo font và
+thư viện, loại `.env`, cache và kết quả thử nghiệm tạm. Gói nguồn vẫn có mã
+kiểm tra. Build không tự upload hoặc tạo GitHub Release.

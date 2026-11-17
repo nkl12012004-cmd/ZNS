@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "interpreter": "3.14.10 (main, Oct 26 2026, 14:09:22) [Clang 23.1.3 ]",
+  "comparison": "Unmodified supplied code-object oracle; exact return types, float64 bits, ndarray shape/dtype/bytes, output structure and exceptions.",
+  "functions": {
+    "build_terrain_mesh_with_plinth": 60,
+    "build_flat_sheet_mesh": 18,
+    "sample_dem_bilinear": 3000,
+    "build_trimmed_hill_patch_mesh": 216,
+    "_make_architectural_tree": 1000,
+    "_sweep_road_ribbon_on_terrain": 900,
+    "_rdp_simplify_2d": 276,
+    "triangulate_polygon_2d": 46,
+    "_clean_ccw_ring_2d": 230,
+    "_inset_polygon_2d_safe": 1242,
+    "_build_parapet_or_flat_roof_uv": 552,
+    "_build_step_terrace_ring_uv": 92,
+    "_find_safe_penthouse_core_rect": 46,
+    "_clip_triangles_to_rect_2d": 1184,
+    "_extrude_polygon_on_terrain": 552,
+    "_extrude_textured_building_on_terrain": 552,
+    "_extrude_wall_tier_uv": 1288,
+    "_build_articulated_building_v24": 778
+  },
+  "total_comparisons": 12032
+}

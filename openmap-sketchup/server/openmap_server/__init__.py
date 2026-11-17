@@ -1,3 +1,3 @@
-"""OpenMap SketchUp: independently implemented, self-hosted map tools."""
+"""SiteCraft local mapping app with editable recovered geometry engine."""
 
-VERSION = "0.3.0"
+VERSION = "0.4.0"

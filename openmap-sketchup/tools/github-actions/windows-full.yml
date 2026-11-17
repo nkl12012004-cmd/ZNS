@@ -1,4 +1,4 @@
-name: OpenMap Windows Full
+name: SiteCraft Windows Full
 
 on:
   push:
@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build-test-release:
+  build-test:
     runs-on: windows-latest
     timeout-minutes: 25
     permissions:
@@ -44,13 +44,14 @@ jobs:
         run: python tools/windows-smoke.py
       - uses: actions/upload-artifact@v4
         with:
-          name: OpenMap-Windows-Full-0.3.0
+          name: SiteCraft-Windows-Full-0.4.0
           path: |
-            openmap-sketchup/dist/*0.3.0*.rbz
-            openmap-sketchup/dist/*0.3.0*.zip
+            openmap-sketchup/dist/SiteCraft_Full_0.4.0_Windows_x64.rbz
+            openmap-sketchup/dist/SiteCraft_Source_0.4.0.zip
             openmap-sketchup/dist/SHA256SUMS.txt
           if-no-files-found: error
-      - name: Publish verified installer and source
+      - name: Publish verified SiteCraft release
+        if: github.ref == 'refs/heads/main' && success()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: pwsh
@@ -58,22 +59,36 @@ jobs:
           $version = python -c "import runpy; print(runpy.run_path('tools/build.py')['VERSION'])"
           if ($LASTEXITCODE -ne 0) { throw 'Could not read package version.' }
           $version = $version.Trim()
-          $tag = "openmap-v$version"
+          $tag = "sitecraft-v$version"
           $files = @(
-            (Join-Path $PWD "dist/OpenMap_SketchUp_Full_${version}_Windows_x64.rbz"),
-            (Join-Path $PWD "dist/OpenMap_SketchUp_Open_Source_${version}.zip"),
+            (Join-Path $PWD "dist/SiteCraft_Full_${version}_Windows_x64.rbz"),
+            (Join-Path $PWD "dist/SiteCraft_Source_${version}.zip"),
             (Join-Path $PWD 'dist/SHA256SUMS.txt')
           )
           foreach ($file in $files) {
             if (!(Test-Path $file -PathType Leaf)) { throw "Missing release asset: $file" }
           }
+          $lines = @(Get-Content -LiteralPath $files[2])
+          if ($lines.Count -ne 2) { throw 'Expected checksums for exactly the installer and source ZIP.' }
+          $checksums = @{}
+          foreach ($line in $lines) {
+            $match = [regex]::Match($line, '^([0-9a-f]{64})  (.+)$')
+            if (!$match.Success) { throw 'Malformed release checksum file.' }
+            $checksums[$match.Groups[2].Value] = $match.Groups[1].Value
+          }
+          foreach ($file in $files[0..1]) {
+            $name = Split-Path $file -Leaf
+            $actual = (Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($checksums[$name] -ne $actual) { throw "Local release checksum mismatch: $name" }
+          }
           gh release view $tag --repo $env:GITHUB_REPOSITORY --json tagName 2>$null
           if ($LASTEXITCODE -eq 0) {
             $existing = gh api "repos/$env:GITHUB_REPOSITORY/commits/$tag" --jq '.sha'
+            if ($LASTEXITCODE -ne 0) { throw 'Could not resolve the existing release tag.' }
             if ($existing.Trim() -ne $env:GITHUB_SHA) { throw 'Release tag belongs to another commit; bump the version.' }
             gh release upload $tag @files --repo $env:GITHUB_REPOSITORY --clobber
           } else {
-            gh release create $tag @files --draft --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title "OpenMap SketchUp $version — Windows x64 Full" --notes-file "docs/RELEASE_${version}.md"
+            gh release create $tag @files --draft --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title "SiteCraft $version — Windows x64 Full" --notes-file "docs/RELEASE_${version}.md"
           }
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $assets = gh release view $tag --repo $env:GITHUB_REPOSITORY --json assets | ConvertFrom-Json
@@ -81,7 +96,7 @@ jobs:
           foreach ($file in $files) {
             $name = Split-Path $file -Leaf
             $asset = @($assets.assets | Where-Object { $_.name -eq $name })
-            if ($asset.Count -ne 1 -or $asset[0].size -ne (Get-Item $file).Length) { throw "Release asset missing or truncated: $name" }
+            if ($asset.Count -ne 1 -or $asset[0].size -ne (Get-Item -LiteralPath $file).Length) { throw "Release asset missing or truncated: $name" }
           }
           gh release edit $tag --repo $env:GITHUB_REPOSITORY --draft=false --latest
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

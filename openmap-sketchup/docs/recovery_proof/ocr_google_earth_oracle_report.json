@@ -1,0 +1,42 @@
+{
+  "original_bytecode_unmodified": true,
+  "all_six_functions_editable": true,
+  "actual_windows_ocr_executed": false,
+  "checks": [
+    {
+      "name": "_parse_google_maps_url_coords",
+      "cases": 928
+    },
+    {
+      "name": "parse_coordinates_from_text",
+      "cases": 928
+    },
+    {
+      "name": "parse_direct_search_coordinates",
+      "cases": 928
+    },
+    {
+      "name": "valid_lat_lon",
+      "cases": 54
+    },
+    {
+      "name": "powershell_template_literal",
+      "sha256": "810ccc2906c65910bdf03e19f8d08d1c2580b47fa6d89fc48f5711151089fc7b"
+    },
+    {
+      "name": "windows_ocr_command_encoding_and_result",
+      "cases": 3,
+      "subprocess_stubbed": true
+    },
+    {
+      "name": "image_scaling_threshold_two_pass_parse_cleanup",
+      "cases": 5,
+      "windows_ocr_stubbed": true
+    },
+    {
+      "name": "empty_and_invalid_base64",
+      "cases": 3
+    }
+  ],
+  "status": "passed"
+}

@@ -1,0 +1,56 @@
+{
+  "changed": true,
+  "corrected_primitives": 2,
+  "new_materials": 1,
+  "raw_sha256": "b741242f95bda661f008719c0d14d040e008ca1f98b0b1c0f11d377e1768cc89",
+  "output_sha256": "6c29c8f9c8e96e3b1333af637958fe03fe8d45539a0c51a718d46556156c50d3",
+  "bin_sha256": "00364f9a338a4ee4088336cd6c4f4c1ad59949457642b73cd4998b50219102f5",
+  "primitive_fixes": [
+    {
+      "mesh": 1,
+      "primitive": 3,
+      "original_material": 9,
+      "replacement_material": 14,
+      "missing_attribute": "TEXCOORD_0",
+      "removed_texture_bindings": [
+        "pbrMetallicRoughness.baseColorTexture"
+      ],
+      "base_color_factor": [
+        0.23074,
+        0.25415,
+        0.28744,
+        1.0
+      ],
+      "original_rgba": [
+        132.0,
+        138.0,
+        146.0,
+        255.0
+      ],
+      "color_source": "scene_rgba"
+    },
+    {
+      "mesh": 2,
+      "primitive": 3,
+      "original_material": 9,
+      "replacement_material": 14,
+      "missing_attribute": "TEXCOORD_0",
+      "removed_texture_bindings": [
+        "pbrMetallicRoughness.baseColorTexture"
+      ],
+      "base_color_factor": [
+        0.23074,
+        0.25415,
+        0.28744,
+        1.0
+      ],
+      "original_rgba": [
+        132.0,
+        138.0,
+        146.0,
+        255.0
+      ],
+      "color_source": "scene_rgba"
+    }
+  ]
+}

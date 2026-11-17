@@ -1,0 +1,56 @@
+{
+  "passed": true,
+  "tests": 3,
+  "comparisons": 102,
+  "functions": [
+    "_gen_charcoal_commercial_tower",
+    "_gen_podium_commercial"
+  ],
+  "array_comparison": "exact dtype/shape/bytes or exact error type/message",
+  "jpeg_comparison": "identical bytes using unchanged original encoder in same environment",
+  "numpy": "2.5.5",
+  "source_sha256": "d2468284131dd268a8f9c2e18f85c8f07d6896f1768507119fc3f25c508139f3",
+  "sample_digests": {
+    "_gen_charcoal_commercial_tower:(256,)": {
+      "pixels": "5392f59a941a15f09038d16b9f3512d07b26da649fc7199753b607283203a90d",
+      "jpeg": "9192cabacf88d85b4b9729f989283ae02f0fb1d9b3a0f69618801c2ec9b8258b",
+      "jpeg_bytes": 20517
+    },
+    "_gen_charcoal_commercial_tower:(512,)": {
+      "pixels": "34b313c941c370d38c63ac420fe6ea04da52e88252ef7dd28da4e11bd99ccd14",
+      "jpeg": "796d3712d184f745f427a155b330964fec9a791b8d95e2710111b9fb4acd824a",
+      "jpeg_bytes": 47281
+    },
+    "_gen_charcoal_commercial_tower:(1025,)": {
+      "pixels": "0709f432b7fe1a415bf6981f8861688657876aae975e136449e38abed2744b60",
+      "jpeg": "ba892b450493d288f6257374527865446fa0eb3c8ac491448d0a4c63ace8acfd",
+      "jpeg_bytes": 109917
+    },
+    "_gen_podium_commercial:(256,)": {
+      "pixels": "439ddeaff8b824c0e51fc4cb108f83b0677759e0d4c57d87c46ce6a1caa6c395",
+      "jpeg": "defb877cf19b2f5f1ca9146cb1d9a903142cf40519693b21dbd57a932fcd67c4",
+      "jpeg_bytes": 12853
+    },
+    "_gen_podium_commercial:(512,)": {
+      "pixels": "191c0a77056ff1af24122efd745684ba3863d06010b71a2d0fb08335c8a922d1",
+      "jpeg": "218e2287ad27de300e602b324b7dcf2d7e1da8b46b6b9c19d9c5ac630ab35037",
+      "jpeg_bytes": 36402
+    },
+    "_gen_podium_commercial:(1025,)": {
+      "pixels": "16da0ad4fcecdef0a40cb1b40d2165fdd7f57435d3f9a62d5f3b6066ea168037",
+      "jpeg": "5e24b2aaaceb1aa2171111eb0950db9f16a681c01b61819123ec94f43b786feb",
+      "jpeg_bytes": 97748
+    },
+    "_gen_charcoal_commercial_tower:()": {
+      "pixels": "27c2b069ba11e1517b024fc97d9563dd5890e661b59fcfa474f7353fb565a0dc",
+      "jpeg": "55a869dfc1308b54a4fd75eb9564445ca6f749c9d8c8cebdb251c1b1a726dceb",
+      "jpeg_bytes": 108830
+    },
+    "_gen_podium_commercial:()": {
+      "pixels": "b788eaf67def16a3f53a88e8049b4faacbd511660484a05a2a26ad7903c9ebea",
+      "jpeg": "607b2eaefba2b79972d6761a18e161ad76aa904f7c23e187b7ad2d4e2b9a3e6c",
+      "jpeg_bytes": 97058
+    }
+  },
+  "scope": "local only; original rights retained; no project or public uploads"
+}

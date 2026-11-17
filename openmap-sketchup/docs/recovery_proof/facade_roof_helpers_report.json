@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "tests": 3,
+  "comparisons": 352,
+  "functions": [
+    "_gen_parapet_trim_stone",
+    "_gen_concrete_roof_deck",
+    "_gen_corrugated_metal_roof"
+  ],
+  "comparison": "exact errors or array dtype/shape/bytes",
+  "numpy": "2.5.5",
+  "source_sha256": "338c6e041a1c1f5e4523f11738d30e8f6f8b7db0bb64aaac7d6e01aa0d0cf10d",
+  "scope": "local-only original reconstruction; rights retained"
+}

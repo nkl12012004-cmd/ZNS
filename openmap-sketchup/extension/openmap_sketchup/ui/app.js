@@ -4,6 +4,7 @@
   var pending = {}, sequence = 0, session = null, refreshPromise = null, job = null;
   var bridgePage = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
   var jobTimer = null, googleTimer = null, active = false, noticeTimer = null;
+  var jobGeneration = 0, operation = null, cancelRequest = null;
   var modelAnchor = null, lastTile = null, viewMode = '2d', previewJob = null;
   var runtimeMode = 'bundled', runtimeReady = false;
   var suggestTimer = null, suggestSequence = 0, suggestItems = [], suggestIndex = -1;
@@ -46,7 +47,9 @@
   }
   function guard(action) { return function (event) { if (event) event.preventDefault(); Promise.resolve().then(action).catch(function (e) { tell(e.message); }); }; }
   function updateAnchor() {
+    var generation = jobGeneration;
     return native('config').then(function (config) {
+      if (generation !== jobGeneration) return;
       var a = config.anchor;
       modelAnchor = a;
       lastTile = config.last_tile || null;
@@ -66,6 +69,7 @@
     $('control-panel').insertBefore($('app-header'), $('control-panel').firstChild);
     $('password').value = ''; $('login').hidden = true; $('workspace').hidden = false;
     document.body.classList.add('workspace-open');
+    refreshJobControls();
     document.body.classList.toggle('has-account', runtimeMode === 'remote');
     $('account-email').textContent = me.email || me.id;
     $('logout').hidden = runtimeMode === 'bundled';
@@ -73,8 +77,10 @@
   }
   function clearLogin() {
     document.body.insertBefore($('app-header'), document.body.firstChild);
+    jobGeneration++; operation = null; cancelRequest = null;
     session = null; clearTimeout(googleTimer); clearTimeout(jobTimer); active = false;
-    job = null; $('build').disabled = false; $('import').disabled = $('export').disabled = $('export-glb').disabled = $('cancel').disabled = true;
+    job = null; refreshJobControls();
+    $('job-warning').hidden = true; $('job-warning').textContent = ''; $('import').textContent = 'Nạp SU';
     $('job-message').textContent = 'Chọn một vùng, rồi bấm Dựng bản đồ.';
     $('progress').value = 0; $('job-detail').textContent = '';
     $('login').hidden = false; $('workspace').hidden = true;
@@ -115,7 +121,7 @@
     return native('set_mode', { mode: $('setup-mode').value, server: $('setup-server').value }).then(function () { window.location.reload(); });
   });
   function restartRuntime() {
-    if (active && !window.confirm('Khởi động lại sẽ dừng tác vụ đang dựng. Tiếp tục?')) return;
+    if ((active || operation || cancelRequest) && !window.confirm('Khởi động lại sẽ ngắt phiên tác vụ đang xử lý. Tiếp tục?')) return;
     $('setup-overlay').hidden = true;
     loginEnabled(false);
     return clearLogin().then(function () { return native('runtime_restart'); }).then(bootRuntime);
@@ -153,58 +159,149 @@
       roads_main: $('roads-main').checked, roads_local: $('roads-local').checked, water: $('water').checked, trees: $('trees').checked, project_name: $('project-name').value,
       default_floors: numeric('default-floors'), building_style: $('building-style').value, roof_style: $('roof-style').value };
   }
-  function finishJob(message) {
-    active = false; $('build').disabled = false; $('cancel').disabled = true; $('job-message').textContent = message;
+  function sameJob(target, generation) {
+    return job === target && jobGeneration === generation;
   }
-  function pollJob() {
-    if (!job || !active) return;
-    var id = job.id;
-    api('GET', '/api/jobs/' + id).then(function (status) {
-      if (!job || job.id !== id || !active) return;
+  function currentOperation(token) {
+    return operation === token && jobGeneration === token.generation && (token.action === 'build' || job === token.job);
+  }
+  function refreshJobControls() {
+    var busy = active || !!operation || !!cancelRequest;
+    var ready = !!job && job.state === 'complete' && !busy;
+    $('build').disabled = busy;
+    ['import', 'export', 'export-glb', 'save-skp', 'view3d'].forEach(function (id) { $(id).disabled = !ready; });
+    $('cancel').disabled = !active || !!operation || !!cancelRequest;
+  }
+  function renderJobWarning(target) {
+    var warnings = target && target.warnings || [];
+    var partial = !!(target && target.partial);
+    $('job-warning').hidden = !partial && !warnings.length;
+    $('job-warning').textContent = warnings.join(' ') + (partial ? ' Chưa tự nạp. Bạn có thể bấm Nạp nền/địa hình hoặc dựng lại vùng này để thử tải lớp OSM.' : '');
+    $('import').textContent = partial ? 'Nạp nền/địa hình' : 'Nạp SU';
+  }
+  function pollJob(target, generation) {
+    if (!sameJob(target, generation) || !active || cancelRequest) return;
+    api('GET', '/api/jobs/' + target.id).then(function (status) {
+      if (!sameJob(target, generation) || !active || cancelRequest) return;
       $('progress').value = status.progress; $('job-message').textContent = status.message;
       if (status.state === 'complete') {
-        job.partial = !!status.partial; job.warnings = status.warnings || []; job.missing_layers = status.missing_layers || [];
-        $('job-warning').hidden = !job.partial && !job.warnings.length;
-        $('job-warning').textContent = job.warnings.join(' ') + (job.partial ? ' Chưa tự nạp. Bạn có thể bấm Nạp nền/địa hình hoặc dựng lại vùng này để thử tải lớp OSM.' : '');
-        $('import').textContent = job.partial ? 'Nạp nền/địa hình' : 'Nạp SU';
-        job.state = 'complete'; finishJob(status.message); $('import').disabled = $('export').disabled = $('export-glb').disabled = false;
-        if ($('auto-import').checked && !job.partial) return jobAction('import')();
+        target.partial = !!status.partial; target.warnings = status.warnings || []; target.missing_layers = status.missing_layers || [];
+        renderJobWarning(target);
+        target.state = 'complete'; active = false; refreshJobControls();
+        if (target.autoImportSuppressed) {
+          $('job-message').textContent = status.message + ' Chưa tự nạp vì bạn đã yêu cầu hủy; có thể nạp thủ công.';
+        } else if ($('auto-import').checked && !target.partial) {
+          return jobAction('import')();
+        }
+      } else if (status.state === 'error' || status.state === 'cancelled') {
+        target.state = status.state; active = false; $('progress').value = 0; refreshJobControls();
+      } else {
+        jobTimer = setTimeout(function () { pollJob(target, generation); }, 1700);
       }
-      else if (status.state === 'error' || status.state === 'cancelled') { $('progress').value = 0; finishJob(status.message); }
-      else jobTimer = setTimeout(pollJob, 1700);
-    }).catch(function (error) { finishJob(error.message); tell(error.message); });
+    }).catch(function (error) {
+      if (!sameJob(target, generation) || !active || cancelRequest) return;
+      active = false; target.state = 'error'; refreshJobControls();
+      $('job-message').textContent = 'Không đọc được tiến trình: ' + error.message;
+      $('job-detail').textContent = 'Có thể dựng lại hoặc mở Cấu hình để kiểm tra bộ xử lý.';
+      tell(error.message);
+    });
   }
   $('build').onclick = guard(function () {
-    var params = buildParams(); $('build').disabled = true; $('import').disabled = $('export').disabled = $('export-glb').disabled = true;
+    if (active || operation || cancelRequest) return;
+    var params = buildParams(), previous = job, generation = ++jobGeneration;
+    var token = { action: 'build', generation: generation, job: previous };
+    operation = token; clearTimeout(jobTimer); refreshJobControls();
     previewJob = null;
     $('job-warning').hidden = true; $('import').textContent = 'Nạp SU';
     $('progress').value = 0; $('job-detail').textContent = ''; $('job-message').textContent = 'Đang gửi vùng chọn…';
     $('job-panel').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     return api('POST', '/api/jobs', params).then(function (value) {
-      job = value; active = true; $('cancel').disabled = false; pollJob();
-    }).catch(function (error) { finishJob(error.message); throw error; });
+      if (!currentOperation(token)) return;
+      operation = null; job = value; active = true; refreshJobControls(); pollJob(value, generation);
+    }).catch(function (error) {
+      if (!currentOperation(token)) return;
+      operation = null; active = false; job = previous; renderJobWarning(previous); refreshJobControls();
+      $('job-message').textContent = 'Không khởi tạo được tác vụ: ' + error.message;
+      $('job-detail').textContent = previous && previous.state === 'complete' ? 'Kết quả trước vẫn còn; bạn có thể nạp/xuất lại hoặc thử dựng mới.' : 'Kiểm tra vùng chọn rồi thử dựng lại.';
+      tell(error.message);
+    });
   });
   $('cancel').onclick = guard(function () {
-    if (!job) return;
-    return api('DELETE', '/api/jobs/' + job.id).then(function () { clearTimeout(jobTimer); finishJob('Đã hủy tác vụ.'); });
+    if (!job || !active || operation || cancelRequest) return;
+    var target = job, generation = jobGeneration, previousState = target.state;
+    var token = { job: target, generation: generation };
+    cancelRequest = token; target.autoImportSuppressed = true; active = false; target.state = 'cancelling';
+    clearTimeout(jobTimer); $('job-message').textContent = 'Đang hủy tác vụ…'; refreshJobControls();
+    return api('DELETE', '/api/jobs/' + target.id).then(function () {
+      if (cancelRequest !== token || !sameJob(target, generation)) return;
+      cancelRequest = null; target.state = 'cancelled'; $('progress').value = 0;
+      $('job-message').textContent = 'Đã hủy tác vụ. Bạn có thể chọn vùng và dựng lại.'; refreshJobControls();
+    }).catch(function (error) {
+      if (cancelRequest !== token || !sameJob(target, generation)) return;
+      cancelRequest = null; active = true; target.state = previousState;
+      $('job-message').textContent = 'Chưa hủy được: ' + error.message + ' Đang kiểm tra lại tiến trình…';
+      $('job-detail').textContent = 'Có thể bấm Hủy để thử lại. Tác vụ này sẽ không tự nạp vào SketchUp.';
+      refreshJobControls(); tell(error.message); pollJob(target, generation);
+    });
   });
   function jobAction(action) {
     return function () {
+      if (active || operation || cancelRequest) return;
       if (!job || job.state !== 'complete') throw new Error('Dựng xong bản đồ trước khi nạp hoặc xuất.');
-      var button = $(action === 'export_glb' ? 'export-glb' : action);
-      button.disabled = true; $('build').disabled = true;
-      return api('GET', '/api/me').then(function () { return native(action, { job_id: job.id }); }).then(function (result) {
+      var target = job, generation = jobGeneration;
+      var token = { action: action, job: target, generation: generation };
+      var phase = {
+        import: target.partial ? 'Đang tải và nạp nền/địa hình vào SketchUp…' : 'Đang tải và nạp mô hình vào SketchUp…',
+        export: 'Đang chuẩn bị tệp OBJ, ảnh và vật liệu…',
+        export_glb: 'Đang chuẩn bị tệp GLB…',
+        save_skp: 'Đang chuẩn bị tệp SKP của mảnh hiện tại…',
+        preview: 'Đang tải mô hình xem trước 3D…'
+      }[action];
+      operation = token; refreshJobControls();
+      $('job-message').textContent = phase; $('job-detail').textContent = 'Đợi thao tác này hoàn tất trước khi dựng hoặc xuất mảnh khác.';
+      return api('GET', '/api/me').then(function () {
+        if (!currentOperation(token)) return null;
+        return native(action, { job_id: target.id });
+      }).then(function (result) {
+        if (!currentOperation(token) || !result) return;
         if (action === 'import') {
+          var message = target.partial ? 'Đã nạp nền/địa hình. Các lớp OSM được cảnh báo vẫn còn thiếu.' : 'Đã nạp bản đồ vào SketchUp.';
+          $('job-message').textContent = message;
           $('job-detail').textContent = 'Đã nạp ' + result.name + ' · ' + result.triangles.toLocaleString() + ' tam giác. ' + (result.warnings || []).join(' ');
-          tell(job.partial ? 'Đã nạp nền/địa hình. Các lớp OSM được cảnh báo vẫn còn thiếu.' : 'Đã nạp bản đồ vào SketchUp.', !job.partial); return updateAnchor();
+          tell(message, !target.partial);
+          return updateAnchor().catch(function (error) {
+            if (currentOperation(token)) $('job-detail').textContent += ' Đã nạp mô hình nhưng chưa đọc được mốc: ' + error.message;
+          });
         }
-        if (result.saved) tell(action === 'export_glb' ? 'Đã lưu mô hình GLB.' : 'Đã lưu gói OBJ, vật liệu, ảnh và metadata.', true);
-      }).finally(function () { button.disabled = !job || job.state !== 'complete'; $('build').disabled = active; });
+        if (action === 'preview') {
+          switchView('3d');
+          return window.OpenMapViewer.load(result).then(function () {
+            if (!currentOperation(token)) return;
+            previewJob = target.id; $('job-message').textContent = 'Đã mở mô hình xem trước 3D.';
+            $('job-detail').textContent = 'Có thể xoay, phóng to hoặc bật khung dây trong cùng cửa sổ.';
+          });
+        }
+        var savedMessage = action === 'save_skp' ? 'Đã lưu mảnh SKP.' : (action === 'export_glb' ? 'Đã lưu mô hình GLB.' : 'Đã lưu gói OBJ, vật liệu, ảnh và metadata.');
+        $('job-message').textContent = result.saved ? savedMessage : 'Đã hủy lưu tệp. Kết quả dựng vẫn còn để xuất lại.';
+        $('job-detail').textContent = target.partial ? 'Lưu ý: tệp này còn thiếu các lớp OSM đã được cảnh báo.' : '';
+        if (result.saved) tell(savedMessage, true);
+      }).catch(function (error) {
+        if (!currentOperation(token)) return;
+        var label = action === 'import' ? 'nạp mô hình' : (action === 'preview' ? 'mở mô hình 3D' : 'xuất tệp');
+        $('job-message').textContent = 'Không ' + label + ' được: ' + error.message;
+        $('job-detail').textContent = 'Kết quả dựng vẫn còn. Bạn có thể thử lại thao tác này, không cần dựng lại.';
+        if (action === 'preview') switchView('2d');
+        tell(error.message);
+      }).finally(function () {
+        if (!currentOperation(token)) return;
+        operation = null; refreshJobControls();
+      });
     };
   }
   $('import').onclick = guard(jobAction('import')); $('export').onclick = guard(jobAction('export'));
   $('export-glb').onclick = guard(jobAction('export_glb'));
-  $('save-skp').onclick = guard(function () { return native('save_skp').then(function (r) { if (r.saved) tell('Đã lưu mảnh SKP.', true); }); });
+  $('save-skp').onclick = guard(jobAction('save_skp'));
+  refreshJobControls();
   $('reset-anchor').onclick = guard(function () { return native('reset_anchor').then(updateAnchor); });
   $('undo').onclick = guard(function () { return native('undo').then(updateAnchor); });
   $('sync-shadow').onclick = guard(function () { return native('sync_shadow', { lat: numeric('lat'), lon: numeric('lon') }).then(function () { tell('Đã đồng bộ tọa độ bóng nắng.', true); }); });
@@ -351,8 +448,8 @@
     if (!drag) return;
     if (drag.resize) {
       var frame = $('map').getBoundingClientRect(), scale = 156543.03392 * Math.cos(Number($('lat').value) * Math.PI / 180) / Math.pow(2, zoom);
-      $('width').value = clamp(Math.round(Math.abs(event.clientX - frame.left - frame.width / 2) * 2 * scale), 10, 10000);
-      $('height').value = clamp(Math.round(Math.abs(event.clientY - frame.top - frame.height / 2) * 2 * scale), 10, 10000); renderMap();
+      $('width').value = clamp(Math.round(Math.abs(event.clientX - frame.left - frame.width / 2) * 2 * scale), 40, 4000);
+      $('height').value = clamp(Math.round(Math.abs(event.clientY - frame.top - frame.height / 2) * 2 * scale), 40, 4000); renderMap();
     } else { var center = inverse(drag.center.x - (event.clientX - drag.x), drag.center.y - (event.clientY - drag.y), zoom); setCenter(center.lat, center.lon); }
   };
   $('map').onpointerup = $('map').onpointercancel = function () { drag = null; $('map').classList.remove('dragging'); };
@@ -413,13 +510,10 @@
   }
   $('view2d').onclick = function () { switchView('2d'); };
   $('view3d').onclick = guard(function () {
+    if (active || operation || cancelRequest) return;
     if (!job || job.state !== 'complete') throw new Error('Dựng bản đồ xong để xem mô hình 3D.');
     if (previewJob === job.id) { switchView('3d'); return; }
-    var id = job.id; $('view3d').disabled = true;
-    return api('GET', '/api/me').then(function () { return native('preview', { job_id: id }); }).then(function (mesh) {
-      if (!job || job.id !== id) return;
-      switchView('3d'); return window.OpenMapViewer.load(mesh).then(function () { if (job && job.id === id) previewJob = id; });
-    }).finally(function () { $('view3d').disabled = false; });
+    return jobAction('preview')();
   });
   $('wireframe').onclick = function () { window.OpenMapViewer.wireframe = !window.OpenMapViewer.wireframe; window.OpenMapViewer.render(); };
   $('reset-camera').onclick = function () { window.OpenMapViewer.reset(); };
@@ -443,6 +537,8 @@
       runtimeReady = true; $('runtime-progress').hidden = true;
       return api('GET', '/health');
     }).then(function (info) {
+      if (info.engine === 'original' && info.engine_status && !info.engine_status.available) throw new Error(info.engine_status.reason || 'Bộ dựng gốc chưa sẵn sàng.');
+      $('app-header').querySelector('.brand small').textContent = info.engine === 'original' ? 'Quy trình dựng và xuất MapSKP gốc' : 'Bản đồ · Địa hình · Khối kiến trúc';
       $('ocr').title = info.ocr_available ? 'OCR đã có sẵn trong bộ xử lý' : 'Máy chủ chưa có bộ OCR';
       if (info.auth_mode === 'local') {
         session = null;
@@ -453,7 +549,7 @@
       $('login-options').hidden = false; $('signin-title').textContent = 'Đăng nhập máy chủ riêng';
       $('signin-description').textContent = 'Đăng nhập Email hoặc Google của máy chủ bạn đã cấu hình.';
       loginEnabled(info.auth_configured);
-      $('connection').textContent = info.auth_configured ? 'Bộ xử lý sẵn sàng · OpenMap ' + info.version : 'Mở Cấu hình để nhập Project URL và public key Supabase.';
+      $('connection').textContent = info.auth_configured ? 'Bộ xử lý sẵn sàng · SiteCraft ' + info.version : 'Mở Cấu hình để nhập Project URL và public key Supabase.';
       if (config.open_settings) return openSettings();
       if (info.auth_configured && config.session) return loggedIn(config.session);
     }).catch(function (error) {

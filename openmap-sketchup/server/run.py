@@ -29,7 +29,7 @@ def read_env(path):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="OpenMap SketchUp — Supabase login, open map processing")
+    parser = argparse.ArgumentParser(description="SiteCraft — local map and terrain processing")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8877)
     parser.add_argument("--env", type=Path, default=Path(__file__).with_name(".env"))
@@ -40,6 +40,7 @@ if __name__ == "__main__":
     config = {**read_env(args.env), **os.environ}
     config["OPENMAP_CONFIG_FILE"] = str(args.env.resolve())
     config["OPENMAP_INSTANCE_ID"] = args.instance
+    config.setdefault("OPENMAP_ENGINE", "original" if (Path(__file__).parent / "original_kernel/mode1_osm_dem_builder.py").is_file() else "openmap")
     if config.get("OPENMAP_LOCAL_TOKEN") and config.get("OPENMAP_OCR_DIR"):
         from openmap_server.native_ocr import library
         library()  # Fail during startup if a bundled native dependency cannot load.
@@ -61,7 +62,7 @@ if __name__ == "__main__":
     if args.ready_file:
         write_ready(args.ready_file, server.server_port, args.instance)
     if sys.stdout:
-        print("OpenMap listening at http://%s:%d" % (args.host, server.server_port), flush=True)
+        print("SiteCraft listening at http://%s:%d" % (args.host, server.server_port), flush=True)
         print("Supabase configured: %s" % application.auth.configured, flush=True)
     try:
         server.serve_forever()

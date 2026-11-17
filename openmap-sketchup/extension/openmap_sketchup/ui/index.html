@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>OpenMap SketchUp</title>
+  <title>SiteCraft</title>
+  <link rel="icon" type="image/png" href="icon.png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header id="app-header"><div class="brand"><img src="icon.png" alt=""><div><strong>OpenMap</strong><small>Bản đồ · Địa hình · Khối kiến trúc</small></div></div><button id="settings" class="quiet">Cấu hình</button></header>
+  <header id="app-header"><div class="brand"><img src="icon.png" alt=""><div><strong>SiteCraft</strong><small>Bản đồ · Địa hình · Khối kiến trúc</small></div></div><button id="settings" class="quiet">Cấu hình</button></header>
   <div id="notice" role="status" aria-live="polite" hidden></div>
   <main id="login">
-    <section class="intro"><span class="eyebrow">SKETCHUP · MAPS · TERRAIN</span><h1>Bắt đầu từ<br>một địa điểm.</h1><p>Ảnh vệ tinh, địa hình và dữ liệu đường, nhà — trong cùng một mô hình SketchUp.</p><div class="tags"><span>Nền phẳng</span><span>Địa hình DEM</span><span>OpenStreetMap</span></div><p class="fine">OpenMap là bản viết lại độc lập, mã nguồn MIT.</p></section>
+    <section class="intro"><span class="eyebrow">SKETCHUP · MAPS · TERRAIN</span><h1>Bắt đầu từ<br>một địa điểm.</h1><p>Ảnh vệ tinh, địa hình và dữ liệu đường, nhà — trong cùng một mô hình SketchUp.</p><div class="tags"><span>Nền phẳng</span><span>Địa hình DEM</span><span>OpenStreetMap</span></div><p class="fine">SiteCraft · Bản đồ, địa hình và bối cảnh kiến trúc.</p></section>
     <section class="card signin"><h2 id="signin-title">Đang mở bản đồ</h2><p id="signin-description" class="muted">Không cần tài khoản hoặc Supabase. Chờ bộ xử lý khởi động để bắt đầu.</p>
       <div id="login-options" hidden>
       <form id="login-form"><label>Email<input id="email" type="email" autocomplete="username" required maxlength="320"></label><label>Mật khẩu<input id="password" type="password" autocomplete="current-password" required maxlength="4096"></label><button id="login-button" class="primary" type="submit">Đăng nhập bằng Email</button></form>
@@ -30,9 +31,9 @@
       <div class="building-tabs"><button data-building="textured" class="selected">🏢 Có map công trình</button><button data-building="white">⬜ Box trắng</button></div>
       <button id="advanced-toggle" class="quiet full">Tùy chỉnh chi tiết ▾</button><div id="advanced" hidden>
       <div class="pair"><label>Vĩ độ<input id="lat" type="number" step="0.000001" min="-79.9" max="79.9" value="21.028511"></label><label>Kinh độ<input id="lon" type="number" step="0.000001" min="-179.9" max="179.9" value="105.854444"></label></div>
-      <div class="pair"><label>Rộng (m)<input id="width" type="number" min="10" max="10000" value="380"></label><label>Dài (m)<input id="height" type="number" min="10" max="10000" value="380"></label></div>
-      <label>Tên component<input id="project-name" value="OpenMap_Context" maxlength="80"></label>
-      <label>Ảnh xuất · theo lớp bản đồ đã chọn<select id="imagery"><option value="satellite">Vệ tinh sạch (Esri)</option><option value="google_sat">Google vệ tinh</option><option value="google_hybrid">Google vệ tinh + tên đường</option><option value="google_street">Google đường phố</option><option value="none">Nền màu, không tải ảnh</option></select></label><p id="imagery-note" class="fine">Ảnh xuất dùng cùng nguồn với bản đồ đang xem.</p>
+      <div class="pair"><label>Rộng (m)<input id="width" type="number" min="40" max="4000" value="380"></label><label>Dài (m)<input id="height" type="number" min="40" max="4000" value="380"></label></div>
+      <label>Tên component<input id="project-name" value="SiteCraft_Context" maxlength="80"></label>
+      <label>Ảnh xuất · theo lớp bản đồ đã chọn<select id="imagery"><option value="satellite">Vệ tinh sạch (Esri)</option><option value="google_sat">Google vệ tinh</option><option value="google_hybrid">Google vệ tinh + tên đường</option><option value="google_street">Google đường phố</option></select></label><p id="imagery-note" class="fine">Ảnh xuất dùng cùng nguồn với bản đồ đang xem.</p>
       <div class="pair"><label>Độ phân giải ảnh<select id="image_size"><option>1024</option><option>2048</option><option selected>4096</option><option>8192</option></select></label><label>Độ chia lưới<select id="grid"><option>24</option><option>48</option><option selected>64</option><option>96</option><option>128</option></select></label></div>
       <label class="check"><input id="terrain" type="checkbox"> Dựng địa hình 3D từ DEM</label><label>Hệ số cao độ<input id="exaggeration" type="number" min="0.1" max="10" step="0.1" value="1"></label>
       <label>Số tầng mặc định<input id="default-floors" type="number" min="1" max="100" step="0.5" value="3.5"></label>
@@ -50,7 +51,7 @@
     <footer>Ảnh: Esri và các nhà cung cấp dữ liệu · Đường/nhà: © OpenStreetMap contributors · Cao độ: Mapzen Terrain Tiles. Thông tin nguồn được lưu trong từng mảnh và tệp xuất.</footer>
   </main>
   <div id="setup-overlay" class="setup-overlay" hidden><section class="card setup-card" role="dialog" aria-modal="true" aria-labelledby="setup-title">
-    <div class="heading"><h2 id="setup-title">Cấu hình OpenMap</h2><button id="setup-close" type="button" class="quiet">Đóng</button></div>
+    <div class="heading"><h2 id="setup-title">Cấu hình SiteCraft</h2><button id="setup-close" type="button" class="quiet">Đóng</button></div>
     <p id="setup-runtime" class="muted">Đang kiểm tra bộ xử lý…</p>
     <label>Bộ xử lý<select id="setup-mode"><option value="bundled">Tự chạy trên máy Windows này</option><option value="remote">Máy chủ riêng — nâng cao</option></select></label>
     <div id="setup-remote" hidden><label>Địa chỉ máy chủ<input id="setup-server" placeholder="https://maps.example.com"></label><p class="fine">Supabase được cấu hình trên máy chủ riêng. Dùng HTTPS khi kết nối qua mạng.</p><button id="setup-use-local" type="button" class="primary full">Chạy trên máy này — không cần máy chủ riêng</button></div>

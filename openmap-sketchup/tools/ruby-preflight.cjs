@@ -71,9 +71,9 @@ const { DefaultRubyVM } = require('@ruby/wasm-wasi/dist/node');
     tile_model.stored = 'x' * 4097
     raise 'Oversized old tile metadata was accepted' unless OpenMapSketchUp::Importer.last_tile(tile_model).nil?
     delta = OpenMapSketchUp::Linking.offset({'lat'=>0,'lon'=>0,'elevation'=>0,'terrain_mode'=>'flat'}, {'lat'=>0,'lon'=>0.001,'elevation'=>100,'terrain_mode'=>'terrain_3d'})
-    raise 'SKP georeference projection failed' unless (delta[0]-111.31949).abs < 0.001 && delta[2] == 0
+    raise 'SKP georeference projection failed' unless (delta[0]-111.31949).abs < 0.001 && delta[2] == 100
     origin = OpenMapSketchUp::Linking.read_json('{"lat":10,"lon":106,"elevation_m":15,"terrain_mode":"flat"}', true)
-    raise 'Legacy SKP metadata conversion failed' unless origin['elevation'] == 15 && origin['terrain_mode'] == 'flat'
+    raise 'Legacy SKP metadata conversion failed' unless origin['elevation_m'] == 15 && OpenMapSketchUp::Linking.origin_anchor(origin)['elevation'] == 15 && origin['terrain_mode'] == 'flat'
     puts 'Ruby preflight PASS: mesh validation, JPEG dimensions, last imported tile reference and corrupt/NaN/bounded metadata checks.'
   `);
   console.log('Ruby VM preflight assertions passed.');

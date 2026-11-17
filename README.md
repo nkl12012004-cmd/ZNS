@@ -3,52 +3,38 @@ Zenith System - SketchUp plugin thiết kế &amp; sản xuất nội thất g�
 
 ---
 
-## OpenMap SketchUp 0.3.0 — Windows x64 Full
+## SiteCraft 0.4.0 — bản đồ và địa hình cho SketchUp
 
-**Mở thẳng bản đồ, không cần tài khoản hoặc Supabase.**
-Bộ cài đã kèm Python, Pillow và OCR; bộ xử lý tự chạy/dừng theo SketchUp.
-Không có xu, tín dụng hoặc tính lượt xuất.
+Mở thẳng bản đồ, không cần đăng nhập hoặc Supabase, không có xu hay tín dụng.
+Một thanh bên chứa chọn vùng, lớp dữ liệu, tiến trình, xuất và ghép mảnh.
+Tên hiển thị SiteCraft, icon địa hình xanh/khối vàng và font SVN-Avo được kèm sẵn.
 
-### Tải xuống
+- [Bộ cài Windows Full (.rbz)](https://github.com/nkl12012004-cmd/ZNS/releases/download/sitecraft-v0.4.0/SiteCraft_Full_0.4.0_Windows_x64.rbz)
+- [Mã nguồn và bộ cài (.zip)](https://github.com/nkl12012004-cmd/ZNS/releases/download/sitecraft-v0.4.0/SiteCraft_Source_0.4.0.zip)
+- [Release và SHA-256](https://github.com/nkl12012004-cmd/ZNS/releases/tag/sitecraft-v0.4.0)
 
-- [Bộ cài Full 0.3.0 (.rbz)](https://github.com/nkl12012004-cmd/ZNS/releases/download/openmap-v0.3.0/OpenMap_SketchUp_Full_0.3.0_Windows_x64.rbz)
-- [Toàn bộ mã nguồn và bộ cài (.zip)](https://github.com/nkl12012004-cmd/ZNS/releases/download/openmap-v0.3.0/OpenMap_SketchUp_Open_Source_0.3.0.zip)
-- [Release và SHA-256](https://github.com/nkl12012004-cmd/ZNS/releases/tag/openmap-v0.3.0)
+Cài RBZ bằng Extension Manager, thoát hoàn toàn SketchUp rồi mở lại.
+Extensions → SiteCraft → Mở SiteCraft. Không cần cài Python riêng.
 
-Cài RBZ qua Extension Manager, **thoát hoàn toàn mọi cửa sổ SketchUp**, mở lại
-và vào Extensions → OpenMap SketchUp → Mở OpenMap. Không cần điền Supabase.
+Bản này dùng mã Python chỉnh sửa được phục hồi từ bộ dựng MapSKP do người dùng
+cung cấp: lấy dữ liệu OpenFreeMap MVT/Overpass, bù đường/nhà từ Google roadmap,
+DEM, địa hình có thành/đáy, khối nhà có đế/tầng giật cấp/mái và texture tạo thủ tục.
+Bộ ghi gốc tạo OBJ/MTL/ảnh và GLB; bước tương thích GLB sửa gán texture trên mặt
+thiếu UV, giữ nguyên geometry/BIN và ảnh. Giữ riêng tệp GLB gốc khi có sửa.
 
-### Luồng bản đồ đã chuyển lại từ bản cũ
+Bộ dựng đầy đủ khớp 61 ca với thực thi gốc; cảnh Quỳnh Lưu dùng cache khớp
+lưới/UV/texture/metadata. Linux: 87 bài máy chủ đạt, 1 bỏ qua đúng điều kiện;
+kiểm tra UI, font, Ruby và glTF Validator đạt. Quy trình Windows Full chạy trước
+khi phát hành. SketchUp Desktop/SDK save-load thật vẫn cần xác nhận trên máy đích;
+runner không thay thế kiểm tra import, Undo và hình thức hiển thị trong SketchUp.
+Google Photorealistic 3D và backend thương mại cũ không thuộc phần đã phục hồi.
 
-- Một bảng điều khiển chứa tùy chọn, tiến trình, tệp xuất và ghép mảnh.
-- “Vệ tinh sạch” dùng Esri như bản cũ; giữ Google vệ tinh/hybrid/đường phố và OSM.
-  Đổi lớp vệ tinh để xem cũng đổi nguồn ảnh xuất.
-- Tìm có gợi ý khi gõ, phím mũi tên/Enter, bấm Tìm tới ngay kết quả đầu; có các
-  nguồn tìm kiếm dự phòng. Địa điểm mẫu/OCR nằm cạnh ô tìm kiếm.
-- OSM vùng nhỏ dùng XML trước và có nguồn dự phòng. Nếu mọi nguồn đều lỗi,
-  vẫn giữ nền/địa hình và ghi rõ lớp thiếu; không tự nạp kết quả thiếu lớp.
-- Không xuất ảnh Esri xám “chưa có dữ liệu” như ảnh hợp lệ; có hạ zoom và
-  cảnh báo đúng mức ảnh nguồn. Kích thước file 4K không cam kết thêm chi tiết gốc.
-- Ghép Bắc/Nam/Đông/Tây dùng mảnh nền vừa nạp; trám đồi không thay tham chiếu đó.
-- Mặc định Hà Nội, 380 m, Vệ tinh sạch, ảnh 4K, lưới 64 như giao diện cũ.
+- [Xem/chỉnh sửa nguồn](openmap-sketchup/)
+- [Cài và nâng cấp](openmap-sketchup/docs/INSTALL_WINDOWS_FULL_VI.md)
+- [Phạm vi kiểm tra](openmap-sketchup/docs/VALIDATION.md)
+- [Windows build và kiểm tra](https://github.com/nkl12012004-cmd/ZNS/actions/workflows/openmap-windows-full.yml)
+- [Quyền của mã gốc, font và thư viện](openmap-sketchup/NOTICE.md)
 
-### Mã nguồn và kiểm tra
-
-- [Xem/chỉnh sửa mã nguồn](openmap-sketchup/)
-- [Cài/nâng cấp Windows Full](openmap-sketchup/docs/INSTALL_WINDOWS_FULL_VI.md)
-- [Đối chiếu tính năng với bản cũ](openmap-sketchup/docs/FEATURE_PORT.md)
-- [Kết quả kiểm tra và giới hạn](openmap-sketchup/docs/VALIDATION.md)
-- [Kiểm tra Windows 0.3.0](https://github.com/nkl12012004-cmd/ZNS/actions/runs/44007270317)
-
-62 bài kiểm tra server, Playwright UI và Ruby preflight đã qua. Native Windows
-kiểm tra Python/OCR đóng kèm, cấu hình cũ, Core HTTP, Maps URL, mesh/GLB,
-đường dẫn Unicode, khởi động lại và dừng tiến trình con.
-Dữ liệu thật Hà Nội/TP.HCM và địa chỉ tiếng Việt đã được thử; cấu hình Hà Nội
-380m/4K/grid64 tạo ảnh hàng không thực và mô hình 17.641 tam giác.
-
-SketchUp Desktop không có trên runner; import/Undo/placement thực tế cần được
-xác nhận trong SketchUp. Giao diện/cách gọi đọc được đã được dùng để chuyển luồng;
-lõi geocode/OSM/geometry bản cũ nằm trong mã hóa nên phần xử lý mới được viết
-độc lập. Google Photorealistic 3D cũ chưa khôi phục.
-Mã mới MIT; tệp tham chiếu và thư viện giữ giấy phép riêng:
-[NOTICE](openmap-sketchup/NOTICE.md).
+Mã tích hợp mới MIT. Năm tệp Python phục hồi và font giữ quyền gốc; chưa xác
+minh giấy phép nguồn mở cho phần gốc. Người dùng đã xác nhận công bố chúng
+trong repository này; việc công bố không đổi quyền của các thành phần.

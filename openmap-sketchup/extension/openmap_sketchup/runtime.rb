@@ -127,7 +127,7 @@ module OpenMapSketchUp
         if File.file?(marker) && File.read(marker) == expected && File.file?(File.join(target, 'pythonw.exe'))
           return target
         end
-        raise 'Cache runtime chưa hoàn tất. Đóng các phiên SketchUp rồi xóa thư mục cache OpenMap để thử lại.' if File.exist?(target)
+        raise 'Cache runtime chưa hoàn tất. Đóng các phiên SketchUp rồi xóa thư mục cache SiteCraft để thử lại.' if File.exist?(target)
         stage = Dir.mktmpdir('unpack_', root)
         begin
           extract_package(package, stage) do |done, count|
@@ -156,7 +156,7 @@ module OpenMapSketchUp
       socket.close if socket && !socket.closed?
     end
 
-    def self.start(server_dir, executable_dir = nil)
+    def self.start(server_dir, executable_dir = nil, sketchup_version = nil)
       epoch = @mutex.synchronize do
         return if ['preparing', 'starting', 'ready'].include?(@state['state'])
         @epoch += 1
@@ -182,6 +182,11 @@ module OpenMapSketchUp
           shim = 'import runpy,sys;p=sys.argv.pop(1);sys.path.insert(0,p);runpy.run_path(p+"/run.py",run_name="__main__")'
           paths = [root, executable_dir, ENV['PATH']].compact.reject(&:empty?).join(File::PATH_SEPARATOR)
           env = { 'OPENMAP_LOCAL_TOKEN' => token, 'OPENMAP_AUTH_MODE' => 'local', 'OPENMAP_OCR_DIR' => File.join(root, 'ocr'), 'OPENMAP_LOG_PATH' => log, 'OMP_THREAD_LIMIT' => '2', 'PATH' => paths, 'PYTHONIOENCODING' => 'utf-8' }
+          env['OPENMAP_SKETCHUP_DIR'] = executable_dir.to_s
+          env['OPENMAP_SKETCHUP_VERSION'] = sketchup_version.to_s
+          env['OPENMAP_WORK_DIR'] = File.join(state_root, 'generated')
+          env['OPENMAP_ENGINE'] = ENV.fetch('OPENMAP_ENGINE', 'original')
+          env['OPENBLAS_NUM_THREADS'] = '2'
           publish(epoch, 'starting', 85, 'Đang khởi động bộ xử lý bản đồ và OCR')
           pid = Process.spawn(env, File.join(root, 'pythonw.exe'), '-c', shim, server_dir, '--port', '0', '--env', config, '--ready-file', ready, '--parent-pid', Process.pid.to_s, '--instance', instance, out: log, err: log, new_pgroup: true)
           waiter = Process.detach(pid)
@@ -200,7 +205,7 @@ module OpenMapSketchUp
           deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + 90
           connected = false
           while Process.clock_gettime(Process::CLOCK_MONOTONIC) < deadline
-            raise 'Bộ xử lý dừng khi khởi động. Mở thư mục OpenMap để xem nhật ký worker.' unless waiter.alive?
+            raise 'Bộ xử lý dừng khi khởi động. Mở thư mục cấu hình SiteCraft để xem nhật ký worker.' unless waiter.alive?
             break unless @mutex.synchronize { epoch == @epoch }
             if File.file?(ready)
               doc = JSON.parse(File.read(ready)) rescue nil
