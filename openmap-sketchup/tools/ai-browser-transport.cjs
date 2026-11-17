@@ -18,6 +18,9 @@ const root = path.resolve(__dirname, '..');
 const extensionDir = path.join(root, 'browser_extension', 'sitecraft_flow_bridge');
 const driver = String.raw`
 import base64, json, secrets, sys, threading
+for stream in (sys.stdin, sys.stdout, sys.stderr):
+    if hasattr(stream, 'reconfigure'):
+        stream.reconfigure(encoding='utf-8')
 from io import BytesIO
 from PIL import Image
 sys.path.insert(0, sys.argv[2])  # Embedded Windows Python ignores PYTHONPATH.
@@ -185,6 +188,7 @@ function startPython(folder) {
     assert.deepEqual(complete.first.result_ids, complete.retry.result_ids, 'Completion retry created duplicate output.');
     const localJob = await python.request('job');
     assert.equal(localJob.state, 'complete'); assert.equal(localJob.result_ids.length, 1);
+    assert.match(localJob.message, /Đã nhận đúng ảnh/, 'Python fixture JSON must preserve Vietnamese over Windows pipes.');
 
     pageServer = http.createServer((_request, response) => {
       response.writeHead(200, {'Content-Type':'text/html'}); response.end('<!doctype html><title>Unauthorized web origin fixture</title>');

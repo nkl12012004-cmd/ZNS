@@ -3,9 +3,8 @@
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const root=path.resolve(__dirname,'..');
 const PNG='iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGPUCKhgYGBgYmBgYGBgAAALGgD0KRPd0QAAAABJRU5ErkJggg==';
-async function nativeTests(){
- const {RubyVM}=require('@ruby/wasm-wasi'),{WASI}=require('node:wasi'),os=require('node:os');const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'sitecraft-cleanup-fixture-'));const module=await WebAssembly.compile(fs.readFileSync(require.resolve('@ruby/3.3-wasm-wasi/dist/ruby+stdlib.wasm')));const wasi=new WASI({version:'preview1',returnOnExit:true,env:{TMPDIR:'/tmp'},preopens:{'/tmp':temporary}});const{vm}=await RubyVM.instantiateModule({module,wasip1:wasi});
- vm.eval(`require 'json';require 'base64';require 'tmpdir';module Sketchup;class ViewObserver;end;class AppObserver;end;end
+function rubyFixture(){
+ const setup=`require 'json';require 'base64';require 'tmpdir';module Sketchup;class ViewObserver;end;class AppObserver;end;end
  module UI
   class << self;attr_accessor :directory,:save_path;end
   def self.select_directory(**);@directory;end
@@ -20,10 +19,8 @@ async function nativeTests(){
    def self.error_response(*);nil;end
    def self.http(method,path,body);self.calls << [method,path];yield Struct.new(:body,:status_code).new(JSON.generate(asset),200),nil;end
   end
- end`);
- vm.eval(fs.readFileSync(path.join(root,'extension/openmap_sketchup/ai_render.rb'),'utf8'));
- vm.eval(fs.readFileSync(path.join(root,'extension/openmap_sketchup/ai_image_tools.rb'),'utf8'));
- vm.eval(`
+ end`;
+ const assertions=`
  module OpenMapSketchUp::AIImageTools
   @test_replies={}
   def self.reply(id,value,generation);@test_replies[id]=value;end
@@ -64,8 +61,61 @@ async function nativeTests(){
  ensure
   FileUtils.remove_entry(folder)
  end
- `);
- console.log('PASS cleanup native batch: '+vm.eval('$cleanup_checks').toString()+' Ruby VM checks; existing originals retained.');fs.rmSync(temporary,{recursive:true,force:true});
+ `;
+ return{setup,assertions,expectedChecks:13};
+}
+async function nativeTests(){
+ const os=require('node:os');
+ const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'sitecraft-cleanup-fixture-'));
+ const fixture=rubyFixture();
+ const sources=['ai_render.rb','ai_image_tools.rb'].map(name=>path.join(root,'extension/openmap_sketchup',name));
+ // Windows Node/WASI preopened temp files can terminate the host without a
+ // catchable exception. Exercise the SAME fixture against real native Ruby
+ // and NTFS there; Linux retains the independent Ruby/WASM execution path.
+ const nativeRuby=process.platform==='win32';
+ let stage='initializing';
+ console.log('CHECK cleanup native batch: '+(nativeRuby?'native Ruby':'Ruby WASM')+'; 13 required save-safety assertions.');
+ try{
+  if(nativeRuby){
+   const driver=path.join(temporary,'cleanup-fixture.rb');
+   fs.writeFileSync(driver,`# encoding: UTF-8
+STDOUT.sync = true
+STDERR.sync = true
+begin
+${fixture.setup}
+ARGV.each { |source| load File.expand_path(source) }
+${fixture.assertions}
+puts 'SITECRAFT_CLEANUP_RESULT ' + JSON.generate({'checks' => $cleanup_checks})
+rescue Exception => error
+STDERR.puts JSON.generate({'phase'=>'cleanup_native_ruby','class'=>error.class.name,'message'=>error.message,'backtrace'=>error.backtrace})
+exit 1
+end
+`,'utf8');
+   stage='native Ruby subprocess';
+   const result=require('node:child_process').spawnSync('ruby',[driver,...sources],{cwd:root,encoding:'utf8',windowsHide:true,timeout:60000,maxBuffer:1024*1024});
+   const diagnostic={phase:'cleanup_native_batch',runtime:'native Ruby',status:result.status,signal:result.signal,
+    error:result.error?{code:result.error.code,message:result.error.message}:null,stdout:(result.stdout||'').slice(-12000),stderr:(result.stderr||'').slice(-12000)};
+   if(result.error||result.status!==0){console.error(JSON.stringify(diagnostic,null,2));throw Error('Native Ruby cleanup fixture failed; see subprocess diagnostics above.');}
+   const marker=(result.stdout||'').split(/\r?\n/).find(line=>line.startsWith('SITECRAFT_CLEANUP_RESULT '));
+   if(!marker){console.error(JSON.stringify(diagnostic,null,2));throw Error('Native Ruby exited without its cleanup assertion result.');}
+   const report=JSON.parse(marker.slice('SITECRAFT_CLEANUP_RESULT '.length));
+   assert.equal(report.checks,fixture.expectedChecks,'Native Ruby did not execute all save-safety assertions');
+   if(result.stderr)console.error(result.stderr.trim());
+   console.log('PASS cleanup native batch: '+report.checks+' native Ruby checks; existing originals retained.');
+  }else{
+   const{RubyVM}=require('@ruby/wasm-wasi'),{WASI}=require('node:wasi');
+   const module=await WebAssembly.compile(fs.readFileSync(require.resolve('@ruby/3.3-wasm-wasi/dist/ruby+stdlib.wasm')));
+   const wasi=new WASI({version:'preview1',returnOnExit:true,env:{TMPDIR:'/tmp'},preopens:{'/tmp':temporary}});
+   const{vm}=await RubyVM.instantiateModule({module,wasip1:wasi});
+   stage='Ruby WASM fixture';vm.eval(fixture.setup);
+   for(const source of sources)vm.eval(fs.readFileSync(source,'utf8'));
+   vm.eval(fixture.assertions);
+   const checks=Number(vm.eval('$cleanup_checks').toString());
+   assert.equal(checks,fixture.expectedChecks,'Ruby WASM did not execute all save-safety assertions');
+   console.log('PASS cleanup native batch: '+checks+' Ruby VM checks; existing originals retained.');
+  }
+ }catch(error){console.error(JSON.stringify({phase:'cleanup_native_batch',runtime:nativeRuby?'native Ruby':'Ruby WASM',stage,error:error.message,stack:error.stack},null,2));throw error;}
+ finally{fs.rmSync(temporary,{recursive:true,force:true});}
 }
 async function uiTests(){
  const{chromium}=require('playwright');const{pathToFileURL}=require('node:url');const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
