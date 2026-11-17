@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SiteCraft Flow Bridge</title><link rel="stylesheet" href="fonts/fonts.css"><link rel="stylesheet" href="popup.css"></head>
+<body><main>
+  <h1>SiteCraft <span>Flow Bridge</span></h1>
+  <p>Mở Render AI trong SketchUp để lấy mã. Sau đó chọn đúng tab Google Flow.</p>
+  <form id="pair-form">
+    <label for="port">Cổng SiteCraft</label>
+    <div class="row"><select id="port"></select><button id="find" type="button">Tìm</button></div>
+    <label for="code">Mã ghép nối 6 chữ số</label>
+    <input id="code" inputmode="numeric" autocomplete="off" maxlength="6" pattern="[0-9]{6}" placeholder="000000" required>
+    <button type="submit">Ghép với SiteCraft</button>
+  </form>
+  <div class="actions"><button id="connect">Kết nối tab Flow hiện tại</button><button id="disconnect" class="secondary">Ngắt tab</button></div>
+  <section class="advanced"><h2>Thao tác nền</h2><p class="note">Cho phép cú bấm chuột thật trong đúng tab Flow đã ghép. Chrome có thể hiện thông báo gỡ lỗi trong lúc bấm; tiện ích không đọc cookie hay chạy mã tùy ý.</p><button id="trusted" class="secondary">Cho phép thao tác nền</button><label class="inline"><input id="auto-open" type="checkbox"> Tự mở lại dự án đã chọn nếu tab bị đóng</label><p id="mode-status" class="note"></p></section>
+  <p id="status" role="status" aria-live="polite">Đang kiểm tra…</p>
+  <p class="note">Dùng phiên Google của bạn trên Flow. Đăng nhập, CAPTCHA, quyền sử dụng và hạn mức của Google vẫn áp dụng. Tiện ích không đọc hoặc gửi mật khẩu/cookie về SiteCraft.</p>
+  <p class="note">Nếu Flow đổi giao diện: kiểm tra tab, tải ảnh kết quả rồi chọn <b>Nhập ảnh</b> trong SiteCraft. Lượt đã gửi không tự gửi lại.</p>
+</main><script src="popup.js"></script></body></html>

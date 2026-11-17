@@ -121,6 +121,7 @@
   $('setup-mode').onchange = updateSetupMode;
   $('setup-close').onclick = function () { $('setup-overlay').hidden = true; };
   $('settings').onclick = guard(openSettings);
+  $('render-ai').onclick = guard(function () { return native('open_ai'); });
   $('setup-use-local').onclick = guard(function () {
     return native('set_mode', { mode: 'bundled' }).then(function () { window.location.reload(); });
   });
@@ -163,7 +164,7 @@
   function numeric(id) { var input = $(id); if (!input.checkValidity() || !input.value.trim()) throw new Error('Kiểm tra giá trị ' + id + '.'); return Number(input.value); }
   function buildParams() {
     return { lat: numeric('lat'), lon: numeric('lon'), width: numeric('width'), height: numeric('height'), grid: numeric('grid'), image_size: numeric('image_size'), imagery: $('imagery').value, terrain: $('terrain').checked, hill_patch: hillPatchEligible() && $('hill-patch').checked, exaggeration: numeric('exaggeration'), roads: $('roads-main').checked || $('roads-local').checked, buildings: $('buildings').checked,
-      roads_main: $('roads-main').checked, roads_local: $('roads-local').checked, water: $('water').checked, trees: $('trees').checked, trees_from_imagery: $('trees').checked && $('trees-from-imagery').checked, tree_density: $('tree-density').value, project_name: $('project-name').value,
+      roads_main: $('roads-main').checked, roads_local: $('roads-local').checked, water: $('water').checked, trees: $('trees').checked, trees_from_imagery: $('trees').checked && $('trees-from-imagery').checked, tree_density: $('tree-density').value, project_name: $('project-name').value, ai_texture: $('ai-texture').checked,
       default_floors: numeric('default-floors'), building_style: $('building-style').value, roof_style: $('roof-style').value };
   }
   function treeControlsUI() {

@@ -8,6 +8,7 @@ require_relative 'linking'
 require_relative 'runtime'
 require_relative 'local_http'
 require_relative 'original_skp_importer'
+require_relative 'ai_render'
 require 'tempfile'
 
 module OpenMapSketchUp
@@ -321,6 +322,9 @@ module OpenMapSketchUp
       when 'settings'
         settings
         reply(id, { 'ok' => true, 'data' => {} })
+      when 'open_ai'
+        AIRender.show
+        reply(id, { 'ok' => true, 'data' => {} })
       when 'session'
         token = args['access_token']
         raise 'Phiên đăng nhập không hợp lệ.' unless token.nil? || (token.is_a?(String) && token.bytesize.between?(1, 16_384) && token !~ /[\r\n]/)
@@ -456,6 +460,7 @@ module OpenMapSketchUp
     unless file_loaded?(__FILE__)
       menu = UI.menu('Extensions').add_submenu('SiteCraft')
       menu.add_item('Mở SiteCraft') { show }
+      menu.add_item('Render AI qua Google Flow') { AIRender.show }
       menu.add_item('Cấu hình máy chủ') { settings }
       menu.add_item('Lưu mảnh đã chọn thành SKP') { invoke('menu', 'save_skp', {}) }
       command = UI::Command.new('SiteCraft') { show }
@@ -463,6 +468,11 @@ module OpenMapSketchUp
       command.small_icon = command.large_icon = File.join(__dir__, 'ui', 'icon.png')
       toolbar = UI::Toolbar.new('SiteCraft')
       toolbar.add_item(command)
+      ai_command = UI::Command.new('SiteCraft Render AI') { AIRender.show }
+      ai_command.tooltip = 'SiteCraft Render AI — Google Flow'
+      ai_command.status_bar_text = 'Chụp góc nhìn, render/chỉnh ảnh qua Google Flow và lưu kết quả.'
+      ai_command.small_icon = ai_command.large_icon = File.join(__dir__, 'ui', 'icon.png')
+      toolbar.add_item(ai_command)
       toolbar.restore
       @toolbar = toolbar
       Linking.install

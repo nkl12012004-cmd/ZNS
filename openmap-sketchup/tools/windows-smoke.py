@@ -1,6 +1,7 @@
 """Native Windows validation of the packaged CPython, Pillow, OCR and Ruby boot."""
 import json
 import os
+import runpy
 from pathlib import Path
 import shutil
 import socket
@@ -25,7 +26,8 @@ def main():
     if os.name != 'nt': raise SystemExit('This test must run on native Windows x64.')
     with tempfile.TemporaryDirectory(prefix='OpenMap bản đầy đủ ') as folder:
         path = Path(folder)
-        rbz = next((ROOT/'dist').glob('SiteCraft_Full_0.4.2_Windows_x64.rbz'))
+        version = runpy.run_path(str(ROOT / 'tools/build.py'))['VERSION']
+        rbz = ROOT / 'dist' / ('SiteCraft_Full_%s_Windows_x64.rbz' % version)
         installed = path/'SketchUp Plugins thử nghiệm'
         with zipfile.ZipFile(rbz) as archive: archive.extractall(installed)
         plugin = installed/'openmap_sketchup'

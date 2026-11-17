@@ -7,7 +7,7 @@ import re
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "0.4.2"
+VERSION = "0.5.0-beta.1"
 DIST = ROOT / "dist"
 ORIGINAL_MODULES = {
     "geo_math", "facade_texture_gen", "mode1_osm_dem_builder",
@@ -27,7 +27,7 @@ GENERATED_SUFFIXES = {
     ".pyc", ".pyo", ".marshal", ".log", ".tmp", ".bak",
     ".swp", ".swo", ".orig", ".rej",
 }
-PACKAGE_NOTICE = """# SiteCraft 0.4.2 — editable source and runtime
+PACKAGE_NOTICE = """# SiteCraft 0.5.0-beta.1 — editable source and runtime
 
 The five recovered MapSKP engine modules are editable Python source, not
 bytecode loading wrappers. Their original rights are retained. No open-source
@@ -45,6 +45,15 @@ script creates local files only. It does not upload, commit, or publish anything
 Original account/payment modules, armor/vault payloads, signing keys, and native
 binaries are not included in server/original_kernel. Optional native-policy
 checks in the recovered source retain their normal behavior.
+
+SiteCraft Render AI and Flow Bridge are new MIT integration code. The supplied
+Nano Render reference installer, encrypted files, keys and vendor scripts are
+not included. Recovered prompt TEXT retains its original rights; the installed
+reference/nano_render_prompts.json records source locations and limits. Public
+MIT watermark helpers/assets retain the LICENSE/provenance files beside them.
+Google Flow is an external service requiring the user's Google
+session and its own availability, quotas and terms. No AI model is bundled and
+live Google generation quality/performance has not been validated by this build.
 """
 
 
@@ -119,6 +128,9 @@ def add(archive, name, data):
 
 def create():
     verify_original_modules()
+    bridge_root = ROOT / "browser_extension/sitecraft_flow_bridge"
+    if not (bridge_root / "manifest.json").is_file():
+        raise SystemExit("SiteCraft Flow Bridge source is missing.")
     runtime = ROOT / "extension/openmap_sketchup/runtime/windows-x64.pak"
     if not runtime.is_file():
         raise SystemExit("Run python tools/prepare_runtime.py before building the Full installer.")
@@ -132,6 +144,13 @@ def create():
         add(archive, "openmap_sketchup/LICENSE", (ROOT / "LICENSE").read_bytes())
         add(archive, "openmap_sketchup/NOTICE.md", (ROOT / "NOTICE.md").read_bytes())
         add(archive, "openmap_sketchup/PACKAGE_CONTENTS_NOTICE.md", PACKAGE_NOTICE.encode())
+        for path in sorted(bridge_root.rglob("*")):
+            rel = path.relative_to(bridge_root)
+            if path.is_file() and not excluded(rel):
+                add(archive, "openmap_sketchup/browser_extension/sitecraft_flow_bridge/" + rel.as_posix(), path.read_bytes())
+        for name in ("AI_RENDER_VI.md", "AI_RENDER_PROTOCOL.md", "AI_RENDER_PARITY_VI.md"):
+            add(archive, "openmap_sketchup/docs/" + name, (ROOT / "docs" / name).read_bytes())
+        add(archive, "openmap_sketchup/reference/nano_render_prompts.json", (ROOT / "reference/nano_render_prompts.json").read_bytes())
         for path in sorted((ROOT / "server").rglob("*")):
             rel = path.relative_to(ROOT / "server")
             if path.is_file() and not excluded(rel, server=True):
@@ -144,14 +163,21 @@ def create():
                 add(archive, "SiteCraft/" + relative.as_posix(), path.read_bytes())
         add(archive, "SiteCraft/install/" + rbz.name, rbz.read_bytes())
         add(archive, "SiteCraft/PACKAGE_CONTENTS_NOTICE.md", PACKAGE_NOTICE.encode())
-    for path in (rbz, source):
+    bridge = DIST / ("SiteCraft_Flow_Bridge_%s.zip" % VERSION)
+    with zipfile.ZipFile(bridge, "w") as archive:
+        for path in sorted(bridge_root.rglob("*")):
+            rel = path.relative_to(bridge_root)
+            if path.is_file() and not excluded(rel):
+                add(archive, "sitecraft_flow_bridge/" + rel.as_posix(), path.read_bytes())
+        add(archive, "HUONG_DAN.md", (ROOT / "docs/AI_RENDER_VI.md").read_bytes())
+    for path in (rbz, source, bridge):
         with zipfile.ZipFile(path) as archive:
             if archive.testzip() is not None:
                 raise ValueError("Archive CRC verification failed: " + path.name)
-    checksums = "".join(sha256(path.read_bytes()).hexdigest() + "  " + path.name + "\n" for path in (rbz, source))
+    checksums = "".join(sha256(path.read_bytes()).hexdigest() + "  " + path.name + "\n" for path in (rbz, source, bridge))
     (DIST / "SHA256SUMS.txt").write_text(checksums, encoding="utf8")
     print(checksums, end="")
-    return rbz, source
+    return rbz, source, bridge
 
 
 if __name__ == "__main__":

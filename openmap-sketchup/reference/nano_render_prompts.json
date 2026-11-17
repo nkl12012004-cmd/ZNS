@@ -1,0 +1,2097 @@
+{
+  "schema": "sitecraft.reference-prompts.v1",
+  "source_product": "Nano Banana Render 2.6.14 (user-supplied installer)",
+  "source_archive_sha256": "ce758f9c9bfa46c8f155e374868ee360b8467e125388e0a1c431d2c66b6348d5",
+  "source_app_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+  "extraction": {
+    "method": "Acorn 8.15.0 parses source into inert AST. No supplied JavaScript was executed.",
+    "formatted_line_reference": "static_views/to_nano_render_2.6.14.rbz.contents/to_nano_render/ui/app.js",
+    "original_lines_authoritative": true,
+    "original_offset_unit": "UTF-16 code units (Acorn source offsets)"
+  },
+  "rights": {
+    "license": "NOASSERTION",
+    "notice": "Original prompt text rights are retained. Reproduced from the user-supplied installer at the user’s explicit request. No license for all Nano Render code/text is inferred.",
+    "implementation_separate": "SiteCraft adapter logic is independently written. Vendor code, authentication, keys and binary modules are excluded."
+  },
+  "limitations": [
+    "Production hidden_prompt/edit_prompt/default_hidden_prompt/default_edit_prompt arrive through encrypted Ruby settings.rbe and cannot be established from these readable files.",
+    "The two readable base strings are browser-preview mock data only, not verified production defaults.",
+    "Dynamic templates preserve exact literal parts; runtime user data, expressions and server additions are not executed or reconstructed."
+  ],
+  "groups": {
+    "lighting": [
+      {
+        "id": "none",
+        "label": "Theo ảnh gốc",
+        "prompt": "",
+        "record_id": "lighting.none"
+      },
+      {
+        "id": "day",
+        "label": "Ban ngày tự nhiên",
+        "prompt": "ánh sáng ban ngày tự nhiên, trời trong, nắng dịu, bóng đổ mềm và chân thực",
+        "record_id": "lighting.day"
+      },
+      {
+        "id": "morning",
+        "label": "Bình minh",
+        "prompt": "nắng sớm bình minh, ánh sáng vàng nhạt dịu, bóng đổ dài, không khí trong lành",
+        "record_id": "lighting.morning"
+      },
+      {
+        "id": "noon",
+        "label": "Trưa nắng gắt",
+        "prompt": "nắng trưa gay gắt, bầu trời xanh, bóng đổ sắc nét, tương phản cao",
+        "record_id": "lighting.noon"
+      },
+      {
+        "id": "golden",
+        "label": "Hoàng hôn – giờ vàng",
+        "prompt": "giờ vàng lúc hoàng hôn, nắng vàng cam ấm áp chiếu xiên, bóng đổ dài, bầu trời ráng chiều",
+        "record_id": "lighting.golden"
+      },
+      {
+        "id": "blue",
+        "label": "Chạng vạng – blue hour",
+        "prompt": "giờ xanh lúc chạng vạng, bầu trời xanh thẫm, đèn trong nhà và đèn ngoại thất đã bật sáng ấm, tương phản nóng lạnh đẹp",
+        "record_id": "lighting.blue"
+      },
+      {
+        "id": "night",
+        "label": "Ban đêm",
+        "prompt": "ban đêm, chiếu sáng nhân tạo ấm áp từ đèn trong nhà, đèn hắt tường, đèn sân vườn, có phản chiếu ánh đèn",
+        "record_id": "lighting.night"
+      },
+      {
+        "id": "overcast",
+        "label": "Trời âm u",
+        "prompt": "trời nhiều mây, ánh sáng khuếch tán mềm và đều, gần như không có bóng đổ gắt",
+        "record_id": "lighting.overcast"
+      },
+      {
+        "id": "rain",
+        "label": "Sau mưa",
+        "prompt": "vừa tạnh mưa, mặt đất và các bề mặt ướt phản chiếu ánh sáng, không khí ẩm mát",
+        "record_id": "lighting.rain"
+      },
+      {
+        "id": "int_day",
+        "label": "Nội thất – nắng qua cửa",
+        "prompt": "ánh sáng tự nhiên tràn vào qua cửa sổ, vệt nắng trên sàn, ánh sáng mềm, cân bằng với đèn nội thất ấm",
+        "record_id": "lighting.int_day"
+      },
+      {
+        "id": "int_night",
+        "label": "Nội thất – tối ấm cúng",
+        "prompt": "buổi tối, bật toàn bộ đèn nội thất: đèn hắt trần, đèn thả, đèn bàn; ánh sáng vàng ấm cúng, tương phản sáng tối nhẹ nhàng",
+        "record_id": "lighting.int_night"
+      },
+      {
+        "id": "studio",
+        "label": "Studio mềm",
+        "prompt": "ánh sáng studio mềm, đều và trung tính, bóng rất nhẹ",
+        "record_id": "lighting.studio"
+      },
+      {
+        "id": "custom",
+        "label": "Tuỳ chỉnh…",
+        "prompt": "",
+        "record_id": "lighting.custom"
+      }
+    ],
+    "context": [
+      {
+        "id": "none",
+        "label": "Giữ nguyên",
+        "prompt": "",
+        "record_id": "context.none"
+      },
+      {
+        "id": "vn_street",
+        "label": "Phố đô thị Việt Nam",
+        "prompt": "đường phố đô thị Việt Nam hiện đại: vỉa hè lát gạch, cây xanh đường phố, các nhà phố lân cận, vài xe máy và người đi đường",
+        "record_id": "context.vn_street"
+      },
+      {
+        "id": "residential",
+        "label": "Khu dân cư sân vườn",
+        "prompt": "khu dân cư yên tĩnh với sân vườn cỏ xanh, cây bụi, cây bóng mát, lối đi lát đá tự nhiên",
+        "record_id": "context.residential"
+      },
+      {
+        "id": "villa",
+        "label": "Biệt thự nhiệt đới",
+        "prompt": "cảnh quan nhiệt đới sang trọng: hồ bơi, cây cau, cây dừa, thảm cỏ, tiểu cảnh xanh mướt",
+        "record_id": "context.villa"
+      },
+      {
+        "id": "urban",
+        "label": "Trung tâm thành phố",
+        "prompt": "trung tâm thành phố với các toà nhà cao tầng phía xa, đường phố sầm uất",
+        "record_id": "context.urban"
+      },
+      {
+        "id": "sea",
+        "label": "Ven biển",
+        "prompt": "ven biển, bãi cát, mặt biển xanh và đường chân trời rộng",
+        "record_id": "context.sea"
+      },
+      {
+        "id": "mountain",
+        "label": "Đồi núi, rừng thông",
+        "prompt": "đồi núi và rừng thông, sương mù nhẹ phía xa, không khí cao nguyên",
+        "record_id": "context.mountain"
+      },
+      {
+        "id": "lake",
+        "label": "Ven sông hồ",
+        "prompt": "ven sông hồ, mặt nước phản chiếu công trình, cây xanh bờ nước",
+        "record_id": "context.lake"
+      },
+      {
+        "id": "country",
+        "label": "Làng quê Việt Nam",
+        "prompt": "làng quê Việt Nam với cánh đồng lúa, luỹ tre, đường làng",
+        "record_id": "context.country"
+      },
+      {
+        "id": "win_city",
+        "label": "Nội thất – view thành phố",
+        "prompt": "qua cửa kính nhìn ra toàn cảnh thành phố từ trên cao",
+        "record_id": "context.win_city"
+      },
+      {
+        "id": "win_garden",
+        "label": "Nội thất – view sân vườn",
+        "prompt": "qua cửa kính nhìn ra sân vườn cây xanh mát mắt",
+        "record_id": "context.win_garden"
+      },
+      {
+        "id": "custom",
+        "label": "Tuỳ chỉnh…",
+        "prompt": "",
+        "record_id": "context.custom"
+      }
+    ],
+    "style": [
+      {
+        "id": "none",
+        "label": "Mặc định",
+        "prompt": "",
+        "record_id": "style.none"
+      },
+      {
+        "id": "arch",
+        "label": "Ảnh kiến trúc chuyên nghiệp",
+        "prompt": "ảnh chụp kiến trúc chuyên nghiệp bằng máy ảnh full-frame, ống kính góc rộng, đường thẳng đứng không méo, độ nét cao, dải tương phản rộng, màu sắc trung thực",
+        "record_id": "style.arch"
+      },
+      {
+        "id": "editorial",
+        "label": "Tạp chí nội thất",
+        "prompt": "ảnh nội thất phong cách tạp chí (editorial), bố cục sạch sẽ, ánh sáng mềm, chi tiết vật liệu sắc nét, tông màu tinh tế",
+        "record_id": "style.editorial"
+      },
+      {
+        "id": "phone",
+        "label": "Ảnh điện thoại đời thường",
+        "prompt": "ảnh chụp bằng điện thoại thông thường, cảm giác chân thực đời thường, không quá hoàn hảo",
+        "record_id": "style.phone"
+      },
+      {
+        "id": "film",
+        "label": "Phim analog",
+        "prompt": "ảnh phim analog, hạt phim nhẹ, màu ấm hoài cổ",
+        "record_id": "style.film"
+      },
+      {
+        "id": "drone",
+        "label": "Flycam",
+        "prompt": "ảnh chụp bằng flycam (drone) từ trên cao, rõ nét",
+        "record_id": "style.drone"
+      },
+      {
+        "id": "custom",
+        "label": "Tuỳ chỉnh…",
+        "prompt": "",
+        "record_id": "style.custom"
+      }
+    ],
+    "extras": [
+      {
+        "id": "people",
+        "label": "Thêm người",
+        "prompt": "thêm vài người sinh hoạt tự nhiên, đúng tỉ lệ",
+        "record_id": "extras.people"
+      },
+      {
+        "id": "plants",
+        "label": "Thêm cây xanh",
+        "prompt": "thêm cây xanh, chậu cây phù hợp",
+        "record_id": "extras.plants"
+      },
+      {
+        "id": "cars",
+        "label": "Thêm xe cộ",
+        "prompt": "thêm xe ô tô, xe máy đỗ hoặc di chuyển hợp lý",
+        "record_id": "extras.cars"
+      },
+      {
+        "id": "sky",
+        "label": "Bầu trời đẹp",
+        "prompt": "bầu trời có mây đẹp, tự nhiên",
+        "record_id": "extras.sky"
+      },
+      {
+        "id": "decor",
+        "label": "Đồ trang trí",
+        "prompt": "thêm đồ trang trí, vật dụng sinh hoạt hợp phong cách",
+        "record_id": "extras.decor"
+      },
+      {
+        "id": "clean",
+        "label": "Gọn gàng tối giản",
+        "prompt": "không gian gọn gàng, tối giản, không bày biện thừa",
+        "record_id": "extras.clean"
+      }
+    ],
+    "scene": [
+      {
+        "id": "auto",
+        "label": "Tự nhận diện",
+        "prompt": "",
+        "record_id": "scene.auto"
+      },
+      {
+        "id": "interior",
+        "label": "Nội thất",
+        "prompt": "Đây là không gian nội thất.",
+        "record_id": "scene.interior"
+      },
+      {
+        "id": "exterior",
+        "label": "Ngoại thất",
+        "prompt": "Đây là công trình kiến trúc ngoại thất.",
+        "record_id": "scene.exterior"
+      },
+      {
+        "id": "landscape",
+        "label": "Cảnh quan",
+        "prompt": "Đây là thiết kế cảnh quan.",
+        "record_id": "scene.landscape"
+      },
+      {
+        "id": "aerial",
+        "label": "Phối cảnh tổng thể",
+        "prompt": "Đây là phối cảnh tổng thể nhìn từ trên cao.",
+        "record_id": "scene.aerial"
+      }
+    ],
+    "referenceRoles": [
+      {
+        "id": "style",
+        "label": "Phong cách",
+        "prompt": "lấy phong cách, tông màu và cảm giác tổng thể từ ảnh này",
+        "record_id": "referenceRoles.style"
+      },
+      {
+        "id": "material",
+        "label": "Vật liệu",
+        "prompt": "áp dụng vật liệu / hoàn thiện trong ảnh này cho các bề mặt tương ứng",
+        "record_id": "referenceRoles.material"
+      },
+      {
+        "id": "light",
+        "label": "Ánh sáng",
+        "prompt": "lấy cách chiếu sáng và không khí ánh sáng từ ảnh này",
+        "record_id": "referenceRoles.light"
+      },
+      {
+        "id": "object",
+        "label": "Đồ vật",
+        "prompt": "đưa đồ vật / nội thất trong ảnh này vào vị trí phù hợp",
+        "record_id": "referenceRoles.object"
+      },
+      {
+        "id": "context",
+        "label": "Bao cảnh",
+        "prompt": "dùng cảnh quan / bối cảnh xung quanh giống ảnh này",
+        "record_id": "referenceRoles.context"
+      },
+      {
+        "id": "other",
+        "label": "Khác",
+        "prompt": "tham khảo ảnh này",
+        "record_id": "referenceRoles.other"
+      }
+    ],
+    "regionQuickActions": [
+      {
+        "id": "1",
+        "label": "Thay vật liệu",
+        "prompt": "Thay vật liệu trong vùng khoanh bằng texture ở ảnh vật liệu 1, giữ nguyên hình dáng đồ vật",
+        "record_id": "regionQuickActions.1"
+      },
+      {
+        "id": "2",
+        "label": "Đổi màu",
+        "prompt": "Đổi màu đồ vật trong vùng khoanh sang ",
+        "record_id": "regionQuickActions.2"
+      },
+      {
+        "id": "3",
+        "label": "Xoá vật thể",
+        "prompt": "Xoá đồ vật trong vùng khoanh, lấp lại nền tự nhiên",
+        "record_id": "regionQuickActions.3"
+      },
+      {
+        "id": "4",
+        "label": "Thêm đồ vật",
+        "prompt": "Thêm vào vùng khoanh: ",
+        "record_id": "regionQuickActions.4"
+      },
+      {
+        "id": "5",
+        "label": "Sáng hơn",
+        "prompt": "Làm vùng khoanh sáng và rõ hơn, ánh sáng tự nhiên",
+        "record_id": "regionQuickActions.5"
+      }
+    ]
+  },
+  "assembly": {
+    "edit_preserve": "Giữ nguyên bố cục và mọi chi tiết không được yêu cầu thay đổi.",
+    "keep_design": "Bám sát thiết kế: giữ nguyên chính xác hình khối kiến trúc, bố cục, tỉ lệ, kích thước, vị trí đồ vật, vật liệu và màu sắc như trong ảnh gốc; không tự thêm, bớt hay thay đổi chi tiết thiết kế nào ngoài những gì tôi yêu cầu bên dưới. Chỉ nâng cấp thành chất lượng ảnh chụp thật: vật liệu chân thực, ánh sáng tự nhiên, bóng đổ, phản xạ và chi tiết bề mặt.",
+    "keep_camera": "Không thay đổi góc camera: giữ nguyên chính xác vị trí đặt máy, hướng nhìn, độ cao, tiêu cự và phối cảnh như ảnh gốc; không xoay, không đổi góc, không phóng to hay thu nhỏ.",
+    "prefix.lighting": "Ánh sáng: ",
+    "prefix.context": "Bao cảnh xung quanh: ",
+    "prefix.style": "Phong cách ảnh: ",
+    "prefix.extras": "Bổ sung: ",
+    "prefix.user": "Yêu cầu thêm của tôi: ",
+    "annotation.intro": "Trên ảnh chính có các vùng được khoanh bằng nét màu kèm ghi chú – làm đúng ghi chú ở từng vùng (mỗi màu là một vùng riêng), các phần khác theo yêu cầu chung:",
+    "annotation.default_note": "chú ý xử lý vùng này đúng yêu cầu chung",
+    "annotation.additional": "Ghi chú thêm: ",
+    "references.intro": "Ảnh chính là ảnh khung nhìn SketchUp (01_khung_sketchup). Các ảnh còn lại là ảnh tham chiếu:",
+    "references.marked_intro": "Trên ảnh này có vùng khoanh: ",
+    "references.default_mark": "phần cần lấy theo",
+    "references.marked_suffix": " (nét khoanh chỉ để chỉ chỗ, không đưa nét vẽ vào ảnh kết quả).",
+    "references.note_prefix": "Ghi chú: ",
+    "output_constraints": "Không thêm chữ, logo, watermark hay khung viền. Kết quả là một bức ảnh chụp chân thực duy nhất, đúng tỉ lệ khung hình yêu cầu.",
+    "annotation.erase": "Các nét khoanh màu chỉ là đánh dấu vị trí: xoá hoàn toàn, ảnh kết quả không còn bất kỳ nét vẽ hay đường viền màu nào."
+  },
+  "base_preview_fixture": {
+    "hidden_prompt": "Biến ảnh tôi gửi thành ảnh chụp thực tế.",
+    "edit_prompt": "Chỉnh sửa ảnh tôi gửi theo yêu cầu bên dưới, giữ nguyên những phần không được nhắc tới."
+  },
+  "records": [
+    {
+      "id": "lighting.none",
+      "category": "lighting",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 727,
+        "original_start": 727,
+        "original_end": 729,
+        "formatted_line": 30,
+        "formatted_column": 15
+      },
+      "label": "Theo ảnh gốc",
+      "kind": "literal",
+      "exact_decoded_text": ""
+    },
+    {
+      "id": "lighting.day",
+      "category": "lighting",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 775,
+        "original_start": 775,
+        "original_end": 912,
+        "formatted_line": 34,
+        "formatted_column": 15
+      },
+      "label": "Ban ngày tự nhiên",
+      "kind": "literal",
+      "exact_decoded_text": "ánh sáng ban ngày tự nhiên, trời trong, nắng dịu, bóng đổ mềm và chân thực"
+    },
+    {
+      "id": "lighting.morning",
+      "category": "lighting",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 946,
+        "original_start": 946,
+        "original_end": 1082,
+        "formatted_line": 38,
+        "formatted_column": 15
+      },
+      "label": "Bình minh",
+      "kind": "literal",
+      "exact_decoded_text": "nắng sớm bình minh, ánh sáng vàng nhạt dịu, bóng đổ dài, không khí trong lành"
+    },
+    {
+      "id": "lighting.noon",
+      "category": "lighting",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 1129,
+        "original_start": 1129,
+        "original_end": 1257,
+        "formatted_line": 42,
+        "formatted_column": 15
+      },
+      "label": "Trưa nắng gắt",
+      "kind": "literal",
+      "exact_decoded_text": "nắng trưa gay gắt, bầu trời xanh, bóng đổ sắc nét, tương phản cao"
+    },
+    {
+      "id": "lighting.golden",
+      "category": "lighting",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 1317,
+        "original_start": 1317,
+        "original_end": 1482,
+        "formatted_line": 46,
+        "formatted_column": 15
+      },
+      "label": "Hoàng hôn – giờ vàng",
+      "kind": "literal",
+      "exact_decoded_text": "giờ vàng lúc hoàng hôn, nắng vàng cam ấm áp chiếu xiên, bóng đổ dài, bầu trời ráng chiều"
+    },
+    {
+      "id": "lighting.blue",
+      "category": "lighting",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 1538,
+        "original_start": 1538,
+        "original_end": 1776,
+        "formatted_line": 50,
+        "formatted_column": 15
+      },
+      "label": "Chạng vạng – blue hour",
+      "kind": "literal",
+      "exact_decoded_text": "giờ xanh lúc chạng vạng, bầu trời xanh thẫm, đèn trong nhà và đèn ngoại thất đã bật sáng ấm, tương phản nóng lạnh đẹp"
+    },
+    {
+      "id": "lighting.night",
+      "category": "lighting",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 1811,
+        "original_start": 1811,
+        "original_end": 2032,
+        "formatted_line": 54,
+        "formatted_column": 15
+      },
+      "label": "Ban đêm",
+      "kind": "literal",
+      "exact_decoded_text": "ban đêm, chiếu sáng nhân tạo ấm áp từ đèn trong nhà, đèn hắt tường, đèn sân vườn, có phản chiếu ánh đèn"
+    },
+    {
+      "id": "lighting.overcast",
+      "category": "lighting",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 2072,
+        "original_start": 2072,
+        "original_end": 2229,
+        "formatted_line": 58,
+        "formatted_column": 15
+      },
+      "label": "Trời âm u",
+      "kind": "literal",
+      "exact_decoded_text": "trời nhiều mây, ánh sáng khuếch tán mềm và đều, gần như không có bóng đổ gắt"
+    },
+    {
+      "id": "lighting.rain",
+      "category": "lighting",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 2260,
+        "original_start": 2260,
+        "original_end": 2425,
+        "formatted_line": 62,
+        "formatted_column": 15
+      },
+      "label": "Sau mưa",
+      "kind": "literal",
+      "exact_decoded_text": "vừa tạnh mưa, mặt đất và các bề mặt ướt phản chiếu ánh sáng, không khí ẩm mát"
+    },
+    {
+      "id": "lighting.int_day",
+      "category": "lighting",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 2495,
+        "original_start": 2495,
+        "original_end": 2690,
+        "formatted_line": 66,
+        "formatted_column": 15
+      },
+      "label": "Nội thất – nắng qua cửa",
+      "kind": "literal",
+      "exact_decoded_text": "ánh sáng tự nhiên tràn vào qua cửa sổ, vệt nắng trên sàn, ánh sáng mềm, cân bằng với đèn nội thất ấm"
+    },
+    {
+      "id": "lighting.int_night",
+      "category": "lighting",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 2764,
+        "original_start": 2764,
+        "original_end": 3017,
+        "formatted_line": 70,
+        "formatted_column": 15
+      },
+      "label": "Nội thất – tối ấm cúng",
+      "kind": "literal",
+      "exact_decoded_text": "buổi tối, bật toàn bộ đèn nội thất: đèn hắt trần, đèn thả, đèn bàn; ánh sáng vàng ấm cúng, tương phản sáng tối nhẹ nhàng"
+    },
+    {
+      "id": "lighting.studio",
+      "category": "lighting",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 3053,
+        "original_start": 3053,
+        "original_end": 3147,
+        "formatted_line": 74,
+        "formatted_column": 15
+      },
+      "label": "Studio mềm",
+      "kind": "literal",
+      "exact_decoded_text": "ánh sáng studio mềm, đều và trung tính, bóng rất nhẹ"
+    },
+    {
+      "id": "lighting.custom",
+      "category": "lighting",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 3193,
+        "original_start": 3193,
+        "original_end": 3195,
+        "formatted_line": 78,
+        "formatted_column": 15
+      },
+      "label": "Tuỳ chỉnh…",
+      "kind": "literal",
+      "exact_decoded_text": ""
+    },
+    {
+      "id": "context.none",
+      "category": "context",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 3236,
+        "original_start": 3236,
+        "original_end": 3238,
+        "formatted_line": 83,
+        "formatted_column": 15
+      },
+      "label": "Giữ nguyên",
+      "kind": "literal",
+      "exact_decoded_text": ""
+    },
+    {
+      "id": "context.vn_street",
+      "category": "context",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 3304,
+        "original_start": 3304,
+        "original_end": 3578,
+        "formatted_line": 87,
+        "formatted_column": 15
+      },
+      "label": "Phố đô thị Việt Nam",
+      "kind": "literal",
+      "exact_decoded_text": "đường phố đô thị Việt Nam hiện đại: vỉa hè lát gạch, cây xanh đường phố, các nhà phố lân cận, vài xe máy và người đi đường"
+    },
+    {
+      "id": "context.residential",
+      "category": "context",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 3644,
+        "original_start": 3644,
+        "original_end": 3818,
+        "formatted_line": 91,
+        "formatted_column": 15
+      },
+      "label": "Khu dân cư sân vườn",
+      "kind": "literal",
+      "exact_decoded_text": "khu dân cư yên tĩnh với sân vườn cỏ xanh, cây bụi, cây bóng mát, lối đi lát đá tự nhiên"
+    },
+    {
+      "id": "context.villa",
+      "category": "context",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 3881,
+        "original_start": 3881,
+        "original_end": 4045,
+        "formatted_line": 95,
+        "formatted_column": 15
+      },
+      "label": "Biệt thự nhiệt đới",
+      "kind": "literal",
+      "exact_decoded_text": "cảnh quan nhiệt đới sang trọng: hồ bơi, cây cau, cây dừa, thảm cỏ, tiểu cảnh xanh mướt"
+    },
+    {
+      "id": "context.urban",
+      "category": "context",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 4095,
+        "original_start": 4095,
+        "original_end": 4231,
+        "formatted_line": 99,
+        "formatted_column": 15
+      },
+      "label": "Trung tâm thành phố",
+      "kind": "literal",
+      "exact_decoded_text": "trung tâm thành phố với các toà nhà cao tầng phía xa, đường phố sầm uất"
+    },
+    {
+      "id": "context.sea",
+      "category": "context",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 4262,
+        "original_start": 4262,
+        "original_end": 4372,
+        "formatted_line": 103,
+        "formatted_column": 15
+      },
+      "label": "Ven biển",
+      "kind": "literal",
+      "exact_decoded_text": "ven biển, bãi cát, mặt biển xanh và đường chân trời rộng"
+    },
+    {
+      "id": "context.mountain",
+      "category": "context",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 4435,
+        "original_start": 4435,
+        "original_end": 4556,
+        "formatted_line": 107,
+        "formatted_column": 15
+      },
+      "label": "Đồi núi, rừng thông",
+      "kind": "literal",
+      "exact_decoded_text": "đồi núi và rừng thông, sương mù nhẹ phía xa, không khí cao nguyên"
+    },
+    {
+      "id": "context.lake",
+      "category": "context",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 4594,
+        "original_start": 4594,
+        "original_end": 4714,
+        "formatted_line": 111,
+        "formatted_column": 15
+      },
+      "label": "Ven sông hồ",
+      "kind": "literal",
+      "exact_decoded_text": "ven sông hồ, mặt nước phản chiếu công trình, cây xanh bờ nước"
+    },
+    {
+      "id": "context.country",
+      "category": "context",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 4764,
+        "original_start": 4764,
+        "original_end": 4877,
+        "formatted_line": 115,
+        "formatted_column": 15
+      },
+      "label": "Làng quê Việt Nam",
+      "kind": "literal",
+      "exact_decoded_text": "làng quê Việt Nam với cánh đồng lúa, luỹ tre, đường làng"
+    },
+    {
+      "id": "context.win_city",
+      "category": "context",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 4948,
+        "original_start": 4948,
+        "original_end": 5037,
+        "formatted_line": 119,
+        "formatted_column": 15
+      },
+      "label": "Nội thất – view thành phố",
+      "kind": "literal",
+      "exact_decoded_text": "qua cửa kính nhìn ra toàn cảnh thành phố từ trên cao"
+    },
+    {
+      "id": "context.win_garden",
+      "category": "context",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 5114,
+        "original_start": 5114,
+        "original_end": 5197,
+        "formatted_line": 123,
+        "formatted_column": 15
+      },
+      "label": "Nội thất – view sân vườn",
+      "kind": "literal",
+      "exact_decoded_text": "qua cửa kính nhìn ra sân vườn cây xanh mát mắt"
+    },
+    {
+      "id": "context.custom",
+      "category": "context",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 5243,
+        "original_start": 5243,
+        "original_end": 5245,
+        "formatted_line": 127,
+        "formatted_column": 15
+      },
+      "label": "Tuỳ chỉnh…",
+      "kind": "literal",
+      "exact_decoded_text": ""
+    },
+    {
+      "id": "style.none",
+      "category": "style",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 5291,
+        "original_start": 5291,
+        "original_end": 5293,
+        "formatted_line": 132,
+        "formatted_column": 15
+      },
+      "label": "Mặc định",
+      "kind": "literal",
+      "exact_decoded_text": ""
+    },
+    {
+      "id": "style.arch",
+      "category": "style",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 5360,
+        "original_start": 5360,
+        "original_end": 5660,
+        "formatted_line": 136,
+        "formatted_column": 15
+      },
+      "label": "Ảnh kiến trúc chuyên nghiệp",
+      "kind": "literal",
+      "exact_decoded_text": "ảnh chụp kiến trúc chuyên nghiệp bằng máy ảnh full-frame, ống kính góc rộng, đường thẳng đứng không méo, độ nét cao, dải tương phản rộng, màu sắc trung thực"
+    },
+    {
+      "id": "style.editorial",
+      "category": "style",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 5718,
+        "original_start": 5718,
+        "original_end": 5929,
+        "formatted_line": 140,
+        "formatted_column": 15
+      },
+      "label": "Tạp chí nội thất",
+      "kind": "literal",
+      "exact_decoded_text": "ảnh nội thất phong cách tạp chí (editorial), bố cục sạch sẽ, ánh sáng mềm, chi tiết vật liệu sắc nét, tông màu tinh tế"
+    },
+    {
+      "id": "style.phone",
+      "category": "style",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 6014,
+        "original_start": 6014,
+        "original_end": 6197,
+        "formatted_line": 144,
+        "formatted_column": 15
+      },
+      "label": "Ảnh điện thoại đời thường",
+      "kind": "literal",
+      "exact_decoded_text": "ảnh chụp bằng điện thoại thông thường, cảm giác chân thực đời thường, không quá hoàn hảo"
+    },
+    {
+      "id": "style.film",
+      "category": "style",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 6227,
+        "original_start": 6227,
+        "original_end": 6305,
+        "formatted_line": 148,
+        "formatted_column": 15
+      },
+      "label": "Phim analog",
+      "kind": "literal",
+      "exact_decoded_text": "ảnh phim analog, hạt phim nhẹ, màu ấm hoài cổ"
+    },
+    {
+      "id": "style.drone",
+      "category": "style",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 6331,
+        "original_start": 6331,
+        "original_end": 6410,
+        "formatted_line": 152,
+        "formatted_column": 15
+      },
+      "label": "Flycam",
+      "kind": "literal",
+      "exact_decoded_text": "ảnh chụp bằng flycam (drone) từ trên cao, rõ nét"
+    },
+    {
+      "id": "style.custom",
+      "category": "style",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 6456,
+        "original_start": 6456,
+        "original_end": 6458,
+        "formatted_line": 156,
+        "formatted_column": 15
+      },
+      "label": "Tuỳ chỉnh…",
+      "kind": "literal",
+      "exact_decoded_text": ""
+    },
+    {
+      "id": "extras.people",
+      "category": "extras",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 6506,
+        "original_start": 6506,
+        "original_end": 6600,
+        "formatted_line": 161,
+        "formatted_column": 15
+      },
+      "label": "Thêm người",
+      "kind": "literal",
+      "exact_decoded_text": "thêm vài người sinh hoạt tự nhiên, đúng tỉ lệ"
+    },
+    {
+      "id": "extras.plants",
+      "category": "extras",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 6640,
+        "original_start": 6640,
+        "original_end": 6695,
+        "formatted_line": 165,
+        "formatted_column": 15
+      },
+      "label": "Thêm cây xanh",
+      "kind": "literal",
+      "exact_decoded_text": "thêm cây xanh, chậu cây phù hợp"
+    },
+    {
+      "id": "extras.cars",
+      "category": "extras",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 6732,
+        "original_start": 6732,
+        "original_end": 6819,
+        "formatted_line": 169,
+        "formatted_column": 15
+      },
+      "label": "Thêm xe cộ",
+      "kind": "literal",
+      "exact_decoded_text": "thêm xe ô tô, xe máy đỗ hoặc di chuyển hợp lý"
+    },
+    {
+      "id": "extras.sky",
+      "category": "extras",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 6869,
+        "original_start": 6869,
+        "original_end": 6934,
+        "formatted_line": 173,
+        "formatted_column": 15
+      },
+      "label": "Bầu trời đẹp",
+      "kind": "literal",
+      "exact_decoded_text": "bầu trời có mây đẹp, tự nhiên"
+    },
+    {
+      "id": "extras.decor",
+      "category": "extras",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 6979,
+        "original_start": 6979,
+        "original_end": 7072,
+        "formatted_line": 177,
+        "formatted_column": 15
+      },
+      "label": "Đồ trang trí",
+      "kind": "literal",
+      "exact_decoded_text": "thêm đồ trang trí, vật dụng sinh hoạt hợp phong cách"
+    },
+    {
+      "id": "extras.clean",
+      "category": "extras",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 7127,
+        "original_start": 7127,
+        "original_end": 7216,
+        "formatted_line": 181,
+        "formatted_column": 15
+      },
+      "label": "Gọn gàng tối giản",
+      "kind": "literal",
+      "exact_decoded_text": "không gian gọn gàng, tối giản, không bày biện thừa"
+    },
+    {
+      "id": "scene.auto",
+      "category": "scene",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 7266,
+        "original_start": 7266,
+        "original_end": 7268,
+        "formatted_line": 186,
+        "formatted_column": 15
+      },
+      "label": "Tự nhận diện",
+      "kind": "literal",
+      "exact_decoded_text": ""
+    },
+    {
+      "id": "scene.interior",
+      "category": "scene",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 7309,
+        "original_start": 7309,
+        "original_end": 7362,
+        "formatted_line": 190,
+        "formatted_column": 15
+      },
+      "label": "Nội thất",
+      "kind": "literal",
+      "exact_decoded_text": "Đây là không gian nội thất."
+    },
+    {
+      "id": "scene.exterior",
+      "category": "scene",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 7405,
+        "original_start": 7405,
+        "original_end": 7481,
+        "formatted_line": 194,
+        "formatted_column": 15
+      },
+      "label": "Ngoại thất",
+      "kind": "literal",
+      "exact_decoded_text": "Đây là công trình kiến trúc ngoại thất."
+    },
+    {
+      "id": "scene.landscape",
+      "category": "scene",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 7519,
+        "original_start": 7519,
+        "original_end": 7573,
+        "formatted_line": 198,
+        "formatted_column": 15
+      },
+      "label": "Cảnh quan",
+      "kind": "literal",
+      "exact_decoded_text": "Đây là thiết kế cảnh quan."
+    },
+    {
+      "id": "scene.aerial",
+      "category": "scene",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 7632,
+        "original_start": 7632,
+        "original_end": 7719,
+        "formatted_line": 202,
+        "formatted_column": 15
+      },
+      "label": "Phối cảnh tổng thể",
+      "kind": "literal",
+      "exact_decoded_text": "Đây là phối cảnh tổng thể nhìn từ trên cao."
+    },
+    {
+      "id": "referenceRoles.style",
+      "category": "referenceRoles",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 7756,
+        "original_start": 7756,
+        "original_end": 7862,
+        "formatted_line": 207,
+        "formatted_column": 15
+      },
+      "label": "Phong cách",
+      "kind": "literal",
+      "exact_decoded_text": "lấy phong cách, tông màu và cảm giác tổng thể từ ảnh này"
+    },
+    {
+      "id": "referenceRoles.material",
+      "category": "referenceRoles",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 7903,
+        "original_start": 7903,
+        "original_end": 8035,
+        "formatted_line": 211,
+        "formatted_column": 15
+      },
+      "label": "Vật liệu",
+      "kind": "literal",
+      "exact_decoded_text": "áp dụng vật liệu / hoàn thiện trong ảnh này cho các bề mặt tương ứng"
+    },
+    {
+      "id": "referenceRoles.light",
+      "category": "referenceRoles",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 8069,
+        "original_start": 8069,
+        "original_end": 8167,
+        "formatted_line": 215,
+        "formatted_column": 15
+      },
+      "label": "Ánh sáng",
+      "kind": "literal",
+      "exact_decoded_text": "lấy cách chiếu sáng và không khí ánh sáng từ ảnh này"
+    },
+    {
+      "id": "referenceRoles.object",
+      "category": "referenceRoles",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 8209,
+        "original_start": 8209,
+        "original_end": 8327,
+        "formatted_line": 219,
+        "formatted_column": 15
+      },
+      "label": "Đồ vật",
+      "kind": "literal",
+      "exact_decoded_text": "đưa đồ vật / nội thất trong ảnh này vào vị trí phù hợp"
+    },
+    {
+      "id": "referenceRoles.context",
+      "category": "referenceRoles",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 8362,
+        "original_start": 8362,
+        "original_end": 8445,
+        "formatted_line": 223,
+        "formatted_column": 15
+      },
+      "label": "Bao cảnh",
+      "kind": "literal",
+      "exact_decoded_text": "dùng cảnh quan / bối cảnh xung quanh giống ảnh này"
+    },
+    {
+      "id": "referenceRoles.other",
+      "category": "referenceRoles",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 8472,
+        "original_start": 8472,
+        "original_end": 8504,
+        "formatted_line": 227,
+        "formatted_column": 15
+      },
+      "label": "Khác",
+      "kind": "literal",
+      "exact_decoded_text": "tham khảo ảnh này"
+    },
+    {
+      "id": "regionQuickActions.1",
+      "category": "regionQuickActions",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 65168,
+        "original_start": 65168,
+        "original_end": 65327,
+        "formatted_line": 1766,
+        "formatted_column": 40
+      },
+      "label": "Thay vật liệu",
+      "kind": "literal",
+      "exact_decoded_text": "Thay vật liệu trong vùng khoanh bằng texture ở ảnh vật liệu 1, giữ nguyên hình dáng đồ vật"
+    },
+    {
+      "id": "regionQuickActions.2",
+      "category": "regionQuickActions",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 65353,
+        "original_start": 65353,
+        "original_end": 65424,
+        "formatted_line": 1767,
+        "formatted_column": 37
+      },
+      "label": "Đổi màu",
+      "kind": "literal",
+      "exact_decoded_text": "Đổi màu đồ vật trong vùng khoanh sang "
+    },
+    {
+      "id": "regionQuickActions.3",
+      "category": "regionQuickActions",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 65454,
+        "original_start": 65454,
+        "original_end": 65550,
+        "formatted_line": 1768,
+        "formatted_column": 41
+      },
+      "label": "Xoá vật thể",
+      "kind": "literal",
+      "exact_decoded_text": "Xoá đồ vật trong vùng khoanh, lấp lại nền tự nhiên"
+    },
+    {
+      "id": "regionQuickActions.4",
+      "category": "regionQuickActions",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 65585,
+        "original_start": 65585,
+        "original_end": 65618,
+        "formatted_line": 1769,
+        "formatted_column": 46
+      },
+      "label": "Thêm đồ vật",
+      "kind": "literal",
+      "exact_decoded_text": "Thêm vào vùng khoanh: "
+    },
+    {
+      "id": "regionQuickActions.5",
+      "category": "regionQuickActions",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 65640,
+        "original_start": 65640,
+        "original_end": 65725,
+        "formatted_line": 1770,
+        "formatted_column": 33
+      },
+      "label": "Sáng hơn",
+      "kind": "literal",
+      "exact_decoded_text": "Làm vùng khoanh sáng và rõ hơn, ánh sáng tự nhiên"
+    },
+    {
+      "id": "assembly.edit_preserve",
+      "category": "assembly",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 42886,
+        "original_start": 42886,
+        "original_end": 43017,
+        "formatted_line": 1274,
+        "formatted_column": 97
+      },
+      "kind": "literal",
+      "exact_decoded_text": "Giữ nguyên bố cục và mọi chi tiết không được yêu cầu thay đổi."
+    },
+    {
+      "id": "assembly.keep_design",
+      "category": "assembly",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 43040,
+        "original_start": 43040,
+        "original_end": 43730,
+        "formatted_line": 1274,
+        "formatted_column": 255
+      },
+      "kind": "literal",
+      "exact_decoded_text": "Bám sát thiết kế: giữ nguyên chính xác hình khối kiến trúc, bố cục, tỉ lệ, kích thước, vị trí đồ vật, vật liệu và màu sắc như trong ảnh gốc; không tự thêm, bớt hay thay đổi chi tiết thiết kế nào ngoài những gì tôi yêu cầu bên dưới. Chỉ nâng cấp thành chất lượng ảnh chụp thật: vật liệu chân thực, ánh sáng tự nhiên, bóng đổ, phản xạ và chi tiết bề mặt."
+    },
+    {
+      "id": "assembly.keep_camera",
+      "category": "assembly",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 43753,
+        "original_start": 43753,
+        "original_end": 44067,
+        "formatted_line": 1274,
+        "formatted_column": 971
+      },
+      "kind": "literal",
+      "exact_decoded_text": "Không thay đổi góc camera: giữ nguyên chính xác vị trí đặt máy, hướng nhìn, độ cao, tiêu cự và phối cảnh như ảnh gốc; không xoay, không đổi góc, không phóng to hay thu nhỏ."
+    },
+    {
+      "id": "assembly.prefix.lighting",
+      "category": "assembly",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 44156,
+        "original_start": 44156,
+        "original_end": 44174,
+        "formatted_line": 1278,
+        "formatted_column": 20
+      },
+      "kind": "literal",
+      "exact_decoded_text": "Ánh sáng: "
+    },
+    {
+      "id": "assembly.prefix.context",
+      "category": "assembly",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 44232,
+        "original_start": 44232,
+        "original_end": 44260,
+        "formatted_line": 1280,
+        "formatted_column": 20
+      },
+      "kind": "literal",
+      "exact_decoded_text": "Bao cảnh xung quanh: "
+    },
+    {
+      "id": "assembly.prefix.style",
+      "category": "assembly",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 44314,
+        "original_start": 44314,
+        "original_end": 44340,
+        "formatted_line": 1282,
+        "formatted_column": 20
+      },
+      "kind": "literal",
+      "exact_decoded_text": "Phong cách ảnh: "
+    },
+    {
+      "id": "assembly.prefix.extras",
+      "category": "assembly",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 44433,
+        "original_start": 44433,
+        "original_end": 44449,
+        "formatted_line": 1284,
+        "formatted_column": 27
+      },
+      "kind": "literal",
+      "exact_decoded_text": "Bổ sung: "
+    },
+    {
+      "id": "assembly.prefix.user",
+      "category": "assembly",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 44519,
+        "original_start": 44519,
+        "original_end": 44562,
+        "formatted_line": 1286,
+        "formatted_column": 27
+      },
+      "kind": "literal",
+      "exact_decoded_text": "Yêu cầu thêm của tôi: "
+    },
+    {
+      "id": "assembly.annotation.intro",
+      "category": "assembly",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 44712,
+        "original_start": 44712,
+        "original_end": 44996,
+        "formatted_line": 1294,
+        "formatted_column": 43
+      },
+      "kind": "literal",
+      "exact_decoded_text": "Trên ảnh chính có các vùng được khoanh bằng nét màu kèm ghi chú – làm đúng ghi chú ở từng vùng (mỗi màu là một vùng riêng), các phần khác theo yêu cầu chung:"
+    },
+    {
+      "id": "assembly.annotation.default_note",
+      "category": "assembly",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 45077,
+        "original_start": 45077,
+        "original_end": 45154,
+        "formatted_line": 1294,
+        "formatted_column": 411
+      },
+      "kind": "literal",
+      "exact_decoded_text": "chú ý xử lý vùng này đúng yêu cầu chung"
+    },
+    {
+      "id": "assembly.annotation.additional",
+      "category": "assembly",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 45246,
+        "original_start": 45246,
+        "original_end": 45268,
+        "formatted_line": 1294,
+        "formatted_column": 590
+      },
+      "kind": "literal",
+      "exact_decoded_text": "Ghi chú thêm: "
+    },
+    {
+      "id": "assembly.references.intro",
+      "category": "assembly",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 45363,
+        "original_start": 45363,
+        "original_end": 45505,
+        "formatted_line": 1295,
+        "formatted_column": 91
+      },
+      "kind": "literal",
+      "exact_decoded_text": "Ảnh chính là ảnh khung nhìn SketchUp (01_khung_sketchup). Các ảnh còn lại là ảnh tham chiếu:"
+    },
+    {
+      "id": "assembly.references.marked_intro",
+      "category": "assembly",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 45718,
+        "original_start": 45718,
+        "original_end": 45766,
+        "formatted_line": 1303,
+        "formatted_column": 50
+      },
+      "kind": "literal",
+      "exact_decoded_text": "Trên ảnh này có vùng khoanh: "
+    },
+    {
+      "id": "assembly.references.default_mark",
+      "category": "assembly",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 45812,
+        "original_start": 45812,
+        "original_end": 45846,
+        "formatted_line": 1303,
+        "formatted_column": 148
+      },
+      "kind": "literal",
+      "exact_decoded_text": "phần cần lấy theo"
+    },
+    {
+      "id": "assembly.references.marked_suffix",
+      "category": "assembly",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 45861,
+        "original_start": 45861,
+        "original_end": 45993,
+        "formatted_line": 1303,
+        "formatted_column": 199
+      },
+      "kind": "literal",
+      "exact_decoded_text": " (nét khoanh chỉ để chỉ chỗ, không đưa nét vẽ vào ảnh kết quả)."
+    },
+    {
+      "id": "assembly.references.note_prefix",
+      "category": "assembly",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 46063,
+        "original_start": 46063,
+        "original_end": 46077,
+        "formatted_line": 1303,
+        "formatted_column": 410
+      },
+      "kind": "literal",
+      "exact_decoded_text": "Ghi chú: "
+    },
+    {
+      "id": "assembly.output_constraints",
+      "category": "assembly",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 46610,
+        "original_start": 46610,
+        "original_end": 46829,
+        "formatted_line": 1306,
+        "formatted_column": 402
+      },
+      "kind": "literal",
+      "exact_decoded_text": "Không thêm chữ, logo, watermark hay khung viền. Kết quả là một bức ảnh chụp chân thực duy nhất, đúng tỉ lệ khung hình yêu cầu."
+    },
+    {
+      "id": "assembly.dynamic.1",
+      "category": "assembly_dynamic",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 45018,
+        "original_start": 45018,
+        "original_end": 45157,
+        "formatted_line": 1294,
+        "formatted_column": 352
+      },
+      "kind": "template",
+      "exact_parts": [
+        "- Vùng khoanh màu ",
+        ": ",
+        "."
+      ],
+      "placeholder_count": 2,
+      "exact_decoded_text": "- Vùng khoanh màu ${expression_1}: ${expression_2}.",
+      "dynamic_values": "Runtime expressions/user values are not executed or inferred."
+    },
+    {
+      "id": "assembly.dynamic.2",
+      "category": "assembly_dynamic",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 45776,
+        "original_start": 45776,
+        "original_end": 45848,
+        "formatted_line": 1303,
+        "formatted_column": 112
+      },
+      "kind": "template",
+      "exact_parts": [
+        "màu ",
+        " – ",
+        ""
+      ],
+      "placeholder_count": 2,
+      "exact_decoded_text": "màu ${expression_1} – ${expression_2}",
+      "dynamic_values": "Runtime expressions/user values are not executed or inferred."
+    },
+    {
+      "id": "assembly.dynamic.3",
+      "category": "assembly_dynamic",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 46116,
+        "original_start": 46116,
+        "original_end": 46227,
+        "formatted_line": 1305,
+        "formatted_column": 23
+      },
+      "kind": "template",
+      "exact_parts": [
+        "- Ảnh tham chiếu ",
+        " (",
+        "): ",
+        ".",
+        ""
+      ],
+      "placeholder_count": 4,
+      "exact_decoded_text": "- Ảnh tham chiếu ${expression_1} (${expression_2}): ${expression_3}.${expression_4}",
+      "dynamic_values": "Runtime expressions/user values are not executed or inferred."
+    },
+    {
+      "id": "assembly.dynamic.4",
+      "category": "assembly_dynamic",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 46249,
+        "original_start": 46249,
+        "original_end": 46321,
+        "formatted_line": 1306,
+        "formatted_column": 36
+      },
+      "kind": "template",
+      "exact_parts": [
+        "Tỉ lệ khung hình ảnh kết quả: ",
+        "."
+      ],
+      "placeholder_count": 1,
+      "exact_decoded_text": "Tỉ lệ khung hình ảnh kết quả: ${expression_1}.",
+      "dynamic_values": "Runtime expressions/user values are not executed or inferred."
+    },
+    {
+      "id": "assembly.dynamic.5",
+      "category": "assembly_dynamic",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 46346,
+        "original_start": 46346,
+        "original_end": 46601,
+        "formatted_line": 1306,
+        "formatted_column": 137
+      },
+      "kind": "template",
+      "exact_parts": [
+        "Kèm theo ",
+        " ảnh tham chiếu; dùng từng ảnh đúng vai trò được ghi chú ngay trước ảnh đó. Ảnh cuối cùng là ảnh chính cần xử lý."
+      ],
+      "placeholder_count": 1,
+      "exact_decoded_text": "Kèm theo ${expression_1} ảnh tham chiếu; dùng từng ảnh đúng vai trò được ghi chú ngay trước ảnh đó. Ảnh cuối cùng là ảnh chính cần xử lý.",
+      "dynamic_values": "Runtime expressions/user values are not executed or inferred."
+    },
+    {
+      "id": "assembly.annotation.erase",
+      "category": "assembly",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 73055,
+        "original_start": 73055,
+        "original_end": 73286,
+        "formatted_line": 1957,
+        "formatted_column": 15
+      },
+      "kind": "literal",
+      "exact_decoded_text": "Các nét khoanh màu chỉ là đánh dấu vị trí: xoá hoàn toàn, ảnh kết quả không còn bất kỳ nét vẽ hay đường viền màu nào."
+    },
+    {
+      "id": "region_edit.1",
+      "category": "region_edit",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 70830,
+        "original_start": 70830,
+        "original_end": 70881,
+        "formatted_line": 1917,
+        "formatted_column": 43
+      },
+      "kind": "template",
+      "exact_parts": [
+        "vùng được khoanh màu ",
+        ""
+      ],
+      "placeholder_count": 1,
+      "exact_decoded_text": "vùng được khoanh màu ${expression_1}",
+      "dynamic_values": "Runtime expressions/user values are not executed or inferred."
+    },
+    {
+      "id": "region_edit.2",
+      "category": "region_edit",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 70882,
+        "original_start": 70882,
+        "original_end": 70998,
+        "formatted_line": 1917,
+        "formatted_column": 97
+      },
+      "kind": "template",
+      "exact_parts": [
+        "các vùng được khoanh màu ",
+        " (mỗi màu là một vùng riêng)"
+      ],
+      "placeholder_count": 1,
+      "exact_decoded_text": "các vùng được khoanh màu ${expression_1} (mỗi màu là một vùng riêng)",
+      "dynamic_values": "Runtime expressions/user values are not executed or inferred."
+    },
+    {
+      "id": "region_edit.3",
+      "category": "region_edit",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 71014,
+        "original_start": 71014,
+        "original_end": 71117,
+        "formatted_line": 1918,
+        "formatted_column": 35
+      },
+      "kind": "template",
+      "exact_parts": [
+        "Chỉnh sửa ảnh đính kèm. Chỉ thay đổi bên trong ",
+        ": ",
+        ""
+      ],
+      "placeholder_count": 2,
+      "exact_decoded_text": "Chỉnh sửa ảnh đính kèm. Chỉ thay đổi bên trong ${expression_1}: ${expression_2}",
+      "dynamic_values": "Runtime expressions/user values are not executed or inferred."
+    },
+    {
+      "id": "region_edit.4",
+      "category": "region_edit",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 71118,
+        "original_start": 71118,
+        "original_end": 71174,
+        "formatted_line": 1918,
+        "formatted_column": 141
+      },
+      "kind": "template",
+      "exact_parts": [
+        "Chỉnh sửa ảnh đính kèm: ",
+        ""
+      ],
+      "placeholder_count": 1,
+      "exact_decoded_text": "Chỉnh sửa ảnh đính kèm: ${expression_1}",
+      "dynamic_values": "Runtime expressions/user values are not executed or inferred."
+    },
+    {
+      "id": "region_edit.5",
+      "category": "region_edit",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 71227,
+        "original_start": 71227,
+        "original_end": 71285,
+        "formatted_line": 1919,
+        "formatted_column": 78
+      },
+      "kind": "literal",
+      "exact_decoded_text": " Ảnh vật liệu / texture gửi kèm: "
+    },
+    {
+      "id": "region_edit.6",
+      "category": "region_edit",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 71304,
+        "original_start": 71304,
+        "original_end": 71351,
+        "formatted_line": 1919,
+        "formatted_column": 160
+      },
+      "kind": "template",
+      "exact_parts": [
+        "ảnh ",
+        "",
+        ""
+      ],
+      "placeholder_count": 2,
+      "exact_decoded_text": "ảnh ${expression_1}${expression_2}",
+      "dynamic_values": "Runtime expressions/user values are not executed or inferred."
+    },
+    {
+      "id": "region_edit.7",
+      "category": "region_edit",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 71371,
+        "original_start": 71371,
+        "original_end": 71705,
+        "formatted_line": 1919,
+        "formatted_column": 232
+      },
+      "kind": "literal",
+      "exact_decoded_text": " Áp đúng màu sắc, hoa văn, chất liệu và độ bóng của texture lên bề mặt cần sửa; kích thước vân theo tỉ lệ thật và phối cảnh; ánh sáng, bóng đổ, nếp vải khớp với cảnh."
+    },
+    {
+      "id": "region_edit.8",
+      "category": "region_edit",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 71710,
+        "original_start": 71710,
+        "original_end": 71924,
+        "formatted_line": 1919,
+        "formatted_column": 574
+      },
+      "kind": "literal",
+      "exact_decoded_text": " Giữ nguyên tuyệt đối mọi phần còn lại: bố cục, góc máy, phối cảnh, hình khối, ánh sáng và các đồ vật khác."
+    },
+    {
+      "id": "region_edit.9",
+      "category": "region_edit",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 71939,
+        "original_start": 71939,
+        "original_end": 72156,
+        "formatted_line": 1919,
+        "formatted_column": 808
+      },
+      "kind": "literal",
+      "exact_decoded_text": " Các nét khoanh màu chỉ là đánh dấu: xoá hoàn toàn, ảnh kết quả không còn bất kỳ nét vẽ hay đường viền màu nào."
+    },
+    {
+      "id": "region_edit.default_texture_request",
+      "category": "region_edit",
+      "scope": "readable_production_ui",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 72164,
+        "original_start": 72164,
+        "original_end": 72228,
+        "formatted_line": 1920,
+        "formatted_column": 19
+      },
+      "kind": "literal",
+      "exact_decoded_text": "áp vật liệu theo ảnh texture gửi kèm"
+    },
+    {
+      "id": "preview_fixture.hidden_prompt",
+      "category": "base_preview_fixture",
+      "scope": "browser_preview_fixture_only",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 85860,
+        "original_start": 85860,
+        "original_end": 85943,
+        "formatted_line": 2266,
+        "formatted_column": 43
+      },
+      "kind": "literal",
+      "exact_decoded_text": "Biến ảnh tôi gửi thành ảnh chụp thực tế."
+    },
+    {
+      "id": "preview_fixture.edit_prompt",
+      "category": "base_preview_fixture",
+      "scope": "browser_preview_fixture_only",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/app.js",
+        "source_sha256": "19b6bad6f0fea0b9f48bde8204e41dffd12796e80e0b79e8739a0549bfd38b64",
+        "original_line": 1,
+        "original_column": 85956,
+        "original_start": 85956,
+        "original_end": 86135,
+        "formatted_line": 2267,
+        "formatted_column": 41
+      },
+      "kind": "literal",
+      "exact_decoded_text": "Chỉnh sửa ảnh tôi gửi theo yêu cầu bên dưới, giữ nguyên những phần không được nhắc tới."
+    },
+    {
+      "id": "ui_example.1",
+      "category": "ui_prompt_example",
+      "scope": "ui_example_not_automatically_sent",
+      "kind": "literal",
+      "exact_decoded_text": "Mô tả thêm cho ảnh render… ví dụ: sàn gỗ sồi, tường sơn trắng ấm, rèm vải linen, thêm cây xanh góc phòng  (Ctrl+Enter để render)",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/index.html",
+        "source_sha256": "f88600b73e2ab33de68a7e956db24f79d6025dcf51aa0871b323019608dee325",
+        "original_line": 103,
+        "original_start": 6606,
+        "original_end": 6780,
+        "formatted_line": 103
+      }
+    },
+    {
+      "id": "ui_example.2",
+      "category": "ui_prompt_example",
+      "scope": "ui_example_not_automatically_sent",
+      "kind": "literal",
+      "exact_decoded_text": "Vùng đỏ: vd thay bằng sofa vải màu kem",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/index.html",
+        "source_sha256": "f88600b73e2ab33de68a7e956db24f79d6025dcf51aa0871b323019608dee325",
+        "original_line": 365,
+        "original_start": 22184,
+        "original_end": 22271,
+        "formatted_line": 365
+      }
+    },
+    {
+      "id": "ui_example.3",
+      "category": "ui_prompt_example",
+      "scope": "ui_example_not_automatically_sent",
+      "kind": "literal",
+      "exact_decoded_text": "Vùng vàng: vd thêm đèn thả trần",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/index.html",
+        "source_sha256": "f88600b73e2ab33de68a7e956db24f79d6025dcf51aa0871b323019608dee325",
+        "original_line": 366,
+        "original_start": 22358,
+        "original_end": 22440,
+        "formatted_line": 366
+      }
+    },
+    {
+      "id": "ui_example.4",
+      "category": "ui_prompt_example",
+      "scope": "ui_example_not_automatically_sent",
+      "kind": "literal",
+      "exact_decoded_text": "Vùng xanh: vd thêm cây xanh lớn",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/index.html",
+        "source_sha256": "f88600b73e2ab33de68a7e956db24f79d6025dcf51aa0871b323019608dee325",
+        "original_line": 367,
+        "original_start": 22527,
+        "original_end": 22612,
+        "formatted_line": 367
+      }
+    },
+    {
+      "id": "ui_example.5",
+      "category": "ui_prompt_example",
+      "scope": "ui_example_not_automatically_sent",
+      "kind": "literal",
+      "exact_decoded_text": "Vd: Thay vật liệu sofa trong vùng khoanh đỏ bằng vải ở ảnh vật liệu 1, giữ nguyên dáng sofa.",
+      "source": {
+        "file": "to_nano_render_2.6.14.rbz/to_nano_render/ui/index.html",
+        "source_sha256": "f88600b73e2ab33de68a7e956db24f79d6025dcf51aa0871b323019608dee325",
+        "original_line": 370,
+        "original_start": 22736,
+        "original_end": 22876,
+        "formatted_line": 370
+      }
+    }
+  ]
+}
